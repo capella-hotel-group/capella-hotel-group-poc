@@ -1,8 +1,12 @@
 {
   "mappings": [
-    "/content/capella-eds-poc/:/"
+    "/content/capella-eds-poc/:/",
+    "/content/dam/capella-eds-poc/:/",
+    "/content/capella-eds-poc/configuration:/.helix/config.json",
+    "/content/capella-eds-poc/metadata:/metadata.json"
   ],
   "includes": [
-    "/content/capella-eds-poc/"
+    "/content/capella-eds-poc/",
+    "/content/dam/capella-eds-poc/"
   ]
 }

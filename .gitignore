@@ -7,3 +7,10 @@ helix-importer-ui
 .DS_Store
 *.bak
 .idea
+
+.vscode/*
+!.vscode/launch.json
+!.vscode/extensions.json
+!.vscode/tasks.json
+dist/
+.vite-dist/

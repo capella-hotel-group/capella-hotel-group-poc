@@ -39,5 +39,11 @@
       "button",
       "title"
     ]
+  },
+  {
+    "id": "restaurant-menu",
+    "components": [
+      "restaurant-menu-item"
+    ]
   }
 ]

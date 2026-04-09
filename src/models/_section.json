@@ -51,7 +51,8 @@
         "cards",
         "columns",
         "fragment",
-        "video-photo-player"
+        "video-photo-player",
+        "restaurant-menu"
       ]
     }
   ]

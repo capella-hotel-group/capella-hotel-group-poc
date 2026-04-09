@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import { readdirSync, existsSync } from 'node:fs';
 import path from 'node:path';
 import type { Plugin } from 'vite';
@@ -35,21 +36,26 @@ export function generateBlockEntries(): Record<string, string> {
   return entries;
 }
 
+function shortHash(content: string): string {
+  return createHash('sha256').update(content).digest('hex').slice(0, 8);
+}
+
 /**
  * Vite plugin that prepends a `/* v{version} *\/` banner comment to every
  * built JS chunk and CSS asset.
  */
 export function versionBannerPlugin(version: string): Plugin {
-  const banner = `/*! v${version} | t${Date.now()}*/`;
   return {
     name: 'version-banner',
     enforce: 'post',
     renderChunk(code) {
+      const banner = `/*! v${version} | h${shortHash(code)}*/`;
       return { code: `${banner}\n${code}`, map: null };
     },
     generateBundle(_opts, bundle) {
       for (const file of Object.values(bundle)) {
         if (file.type === 'asset' && typeof file.source === 'string' && file.fileName.endsWith('.css')) {
+          const banner = `/*! v${version} | h${shortHash(file.source)}*/`;
           file.source = `${banner}\n${file.source}`;
         }
       }

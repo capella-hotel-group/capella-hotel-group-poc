@@ -1,0 +1,1 @@
+/*! v1.0.0 | hfa032fe2*/function n(c){const s=c.firstElementChild;if(!s)return;const i=[...s.children];c.classList.add(`columns-${i.length}-cols`),[...c.children].forEach(r=>{[...r.children].forEach(l=>{const t=l.querySelector("picture");if(t){const e=t.closest("div");e&&e.children.length===1&&e.classList.add("columns-img-col")}})})}export{n as default};

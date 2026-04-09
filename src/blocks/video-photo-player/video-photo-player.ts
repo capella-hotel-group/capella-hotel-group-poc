@@ -1,4 +1,3 @@
-import './video-photo-player.css';
 
 function makeDraggable(frame, container) {
   let startX = 0;

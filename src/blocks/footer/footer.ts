@@ -1,4 +1,3 @@
-import './footer.css';
 import { getMetadata } from '@/app/aem';
 import { loadFragment } from '@/blocks/fragment/fragment';
 

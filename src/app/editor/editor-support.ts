@@ -8,7 +8,7 @@ import {
   loadBlock,
   loadSections,
 } from '@/app/aem';
-import { decorateMain } from '@/app/main';
+import { decorateMain } from '@/app/scripts';
 import decorateRichtext from './editor-support-rte';
 
 let promiseChanges$: Promise<boolean> = Promise.resolve(false);

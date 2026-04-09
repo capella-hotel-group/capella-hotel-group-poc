@@ -6,6 +6,8 @@
     "rule-empty-line-before": null
   },
   "ignoreFiles": [
-    "dist/**/*.css"
+    "dist/**/*.css",
+    "blocks/**/*.css",
+    "styles/*.css"
   ]
 }

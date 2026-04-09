@@ -230,31 +230,5 @@
         ]
       }
     ]
-  },
-  {
-    "id": "video-photo-player",
-    "fields": [
-      {
-        "component": "reference",
-        "valueType": "string",
-        "name": "video",
-        "label": "Video",
-        "multi": false
-      },
-      {
-        "component": "reference",
-        "valueType": "string",
-        "name": "image",
-        "label": "Overlay Image",
-        "multi": false
-      },
-      {
-        "component": "text",
-        "valueType": "string",
-        "name": "imageAlt",
-        "label": "Image Alt Text",
-        "value": ""
-      }
-    ]
   }
 ]

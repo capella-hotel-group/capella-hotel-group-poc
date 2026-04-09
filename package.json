@@ -1,40 +1,62 @@
 {
-  "name": "@adobe/aem-boilerplate",
+  "name": "capella-hotel-group-poc",
+  "version": "1.0.0",
   "private": true,
-  "version": "1.3.0",
-  "description": "Starter project for Adobe Helix",
+  "description": "Capella Hotel Group PoC — Adobe Edge Delivery Services",
+  "type": "module",
   "scripts": {
-    "lint:js": "eslint . --ext .json,.js,.mjs",
-    "lint:css": "stylelint \"blocks/**/*.css\" \"styles/*.css\"",
+    "aem:up": "aem up",
+    "build": "tsc && vite build -c vite.config.ts && vite build -c vite.config-editor.ts",
+    "build:watch": "npm-run-all --parallel tsc:watch vite:watch vite:watch:editor",
+    "tsc:watch": "tsc -w",
+    "vite:watch": "vite build -w -c vite.config.ts",
+    "vite:watch:editor": "vite build -w -c vite.config-editor.ts",
+    "start": "npm-run-all --parallel build:watch aem:up",
+    "lint:js": "eslint .",
+    "lint:css": "stylelint \"src/blocks/**/*.css\" \"src/styles/*.css\"",
     "lint": "npm run lint:js && npm run lint:css",
     "lint:fix": "npm run lint:js -- --fix && npm run lint:css -- --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "build:json": "npm-run-all -p build:json:models build:json:definitions build:json:filters",
-    "build:json:models": "merge-json-cli -i \"models/_component-models.json\" -o \"component-models.json\"",
-    "build:json:definitions": "merge-json-cli -i \"models/_component-definition.json\" -o \"component-definition.json\"",
-    "build:json:filters": "merge-json-cli -i \"models/_component-filters.json\" -o \"component-filters.json\"",
+    "build:json:models": "merge-json-cli -i \"src/models/_component-models.json\" -o \"component-models.json\"",
+    "build:json:definitions": "merge-json-cli -i \"src/models/_component-definition.json\" -o \"component-definition.json\"",
+    "build:json:filters": "merge-json-cli -i \"src/models/_component-filters.json\" -o \"component-filters.json\"",
     "prepare": "husky"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/adobe/aem-boilerplate.git"
+  "lint-staged": {
+    "*.{js,mjs,ts}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.css": [
+      "stylelint --fix",
+      "prettier --write"
+    ],
+    "*.{html,md}": [
+      "prettier --write"
+    ]
   },
-  "author": "Adobe",
-  "license": "Apache License 2.0",
-  "bugs": {
-    "url": "https://github.com/adobe/aem-boilerplate/issues"
+  "dependencies": {
+    "dompurify": "^3.3.3"
   },
-  "homepage": "https://github.com/adobe/aem-boilerplate#readme",
   "devDependencies": {
-    "@babel/eslint-parser": "7.28.6",
-    "eslint": "8.57.1",
-    "eslint-config-airbnb-base": "15.0.0",
-    "eslint-plugin-import": "2.32.0",
-    "eslint-plugin-json": "3.1.0",
+    "@eslint/js": "^9.39.4",
+    "@types/dompurify": "^3.0.5",
+    "@types/node": "^22.0.0",
+    "eslint": "^9.39.4",
+    "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-xwalk": "github:adobe-rnd/eslint-plugin-xwalk",
     "husky": "9.1.1",
-    "merge-json-cli": "1.0.4",
-    "npm-run-all": "4.1.5",
+    "jsonc-eslint-parser": "^3.1.0",
+    "lint-staged": "^16.4.0",
+    "merge-json-cli": "^1.0.4",
+    "npm-run-all": "^4.1.5",
+    "prettier": "^3.8.1",
     "stylelint": "17.0.0",
-    "stylelint-config-standard": "40.0.0"
+    "stylelint-config-standard": "40.0.0",
+    "typescript": "^5.4.0",
+    "typescript-eslint": "^8.58.0",
+    "vite": "^6.0.0"
   }
 }

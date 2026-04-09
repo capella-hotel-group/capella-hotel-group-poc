@@ -1,14 +1,35 @@
 name: Build
-on: [push]
+on:
+  push:
+    branches-ignore:
+      - main
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
-    - uses: actions/checkout@v6
-    - name: Use Node.js 20
-      uses: actions/setup-node@v6
-      with:
-        node-version: 24
-    - run: npm ci
-    - run: npm run lint
+      - uses: actions/checkout@v6
+      - name: Use Node.js 24
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run build
+
+      - name: Setup git user
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+
+      - name: Commit built files
+        run: |
+          git add dist/ -f
+          if git diff --staged --quiet; then
+            echo "No changes to dist/"
+          else
+            git commit -m "chore: rebuild dist from CI"
+            git push
+          fi

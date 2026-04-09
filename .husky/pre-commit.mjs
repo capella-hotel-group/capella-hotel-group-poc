@@ -1,12 +1,12 @@
-import { exec } from "node:child_process";
+import { exec } from 'node:child_process';
 
-const run = (cmd) => new Promise((resolve, reject) => exec(
-  cmd,
-  (error, stdout) => {
-    if (error) reject(error);
-    else resolve(stdout);
-  }
-));
+const run = (cmd) =>
+  new Promise((resolve, reject) =>
+    exec(cmd, (error, stdout) => {
+      if (error) reject(error);
+      else resolve(stdout);
+    }),
+  );
 
 const changeset = await run('git diff --cached --name-only --diff-filter=ACMR');
 const modifiedFiles = changeset.split('\n').filter(Boolean);
@@ -18,3 +18,7 @@ if (modifledPartials.length > 0) {
   console.log(output);
   await run('git add component-models.json component-definition.json component-filters.json');
 }
+
+// lint and format staged files
+const lintOutput = await run('npx lint-staged');
+console.log(lintOutput);

@@ -63,9 +63,32 @@ function updateMask(container, frame) {
 }
 
 export default async function decorate(block) {
-  const resp = await fetch('/blocks/video-photo-player/template.example.html');
-  const html = await resp.text();
-  block.innerHTML = html;
+  const rows = [...block.children];
+  const data = {};
+  rows.forEach((row) => {
+    const [keyEl, valueEl] = row.children;
+    if (keyEl && valueEl) {
+      const key = keyEl.textContent.trim().toLowerCase().replace(/\s+/g, '-');
+      data[key] = valueEl;
+    }
+  });
+
+  const videoSrc = data.video?.querySelector('a')?.href || '';
+  const imgEl = data.image?.querySelector('img');
+  const imgSrc = imgEl?.src || '';
+  const imgAlt = data['image-alt-text']?.textContent.trim() || imgEl?.alt || '';
+
+  block.innerHTML = `
+    <div class="video-photo-player-media">
+      <video autoplay muted loop playsinline>
+        <source src="${videoSrc}" type="video/mp4">
+      </video>
+      <picture>
+        <img src="${imgSrc}" alt="${imgAlt}">
+      </picture>
+      <div class="frame-window"></div>
+    </div>
+  `;
 
   const container = block.querySelector('.video-photo-player-media');
   const frame = block.querySelector('.frame-window');

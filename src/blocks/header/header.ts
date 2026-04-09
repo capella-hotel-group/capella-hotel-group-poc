@@ -92,7 +92,13 @@ function toggleMenu(nav: HTMLElement, navSections: HTMLElement, forceExpanded: b
 /**
  * Loads and decorates the header nav.
  */
-export default async function decorate(block: HTMLElement): Promise<void> {
+export default async function decorate(block) {
+  if (window.location.pathname.includes('/en/exploration')) {
+    block.closest('header')?.remove();
+    return;
+  }
+
+  // load nav as fragment
   const navMeta = getMetadata('nav');
   const navPath = navMeta ? new URL(navMeta, window.location.href).pathname : '/nav';
   const fragment = await loadFragment(navPath);

@@ -68,7 +68,7 @@ export default async function decorate(block) {
   const rows = [...block.children];
 
   // Row 0: video — first <a> href
-  const videoSrc = resolveDAMUrl(rows[0]?.querySelector('a')?.href || '');
+  const videoSrc = rows[0]?.querySelector('a')?.href || '';
 
   // Row 1: picture — reuse the existing <picture> element
   const picture = rows[1]?.querySelector('picture');

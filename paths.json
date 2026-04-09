@@ -1,8 +1,7 @@
 {
   "mappings": [
     "/content/capella-eds-poc/:/",
-    "/content/dam/capella-eds-poc/:/",
-    "/content/dam/capella-eds-poc/:/content/dam/capella-eds-poc/"
+    "/content/dam/capella-eds-poc/:/"
   ],
   "includes": [
     "/content/capella-eds-poc/",

@@ -11,14 +11,14 @@
     "tsc:watch": "tsc -w",
     "vite:watch": "vite build -w -c vite.config.ts",
     "vite:watch:editor": "vite build -w -c vite.config-editor.ts",
-    "start": "npm-run-all --parallel build:watch aem:up",
+    "start": "npm-run-all --parallel tsc:watch vite:watch vite:watch:editor aem:up",
     "lint:js": "eslint .",
     "lint:css": "stylelint \"src/blocks/**/*.css\" \"src/styles/*.css\"",
-    "lint": "npm run lint:js && npm run lint:css",
-    "lint:fix": "npm run lint:js -- --fix && npm run lint:css -- --fix",
+    "lint": "npm-run-all --parallel lint:js lint:css",
+    "lint:fix": "eslint . --fix && stylelint \"src/blocks/**/*.css\" \"src/styles/*.css\" --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "build:json": "npm-run-all -p build:json:models build:json:definitions build:json:filters",
+    "build:json": "npm-run-all --parallel build:json:models build:json:definitions build:json:filters",
     "build:json:models": "merge-json-cli -i \"src/models/_component-models.json\" -o \"component-models.json\"",
     "build:json:definitions": "merge-json-cli -i \"src/models/_component-definition.json\" -o \"component-definition.json\"",
     "build:json:filters": "merge-json-cli -i \"src/models/_component-filters.json\" -o \"component-filters.json\"",
@@ -29,7 +29,7 @@
       "eslint --fix",
       "prettier --write"
     ],
-    "*.css": [
+    "src/**/*.css": [
       "stylelint --fix",
       "prettier --write"
     ],

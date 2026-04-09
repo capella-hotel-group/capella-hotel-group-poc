@@ -64,35 +64,38 @@ function updateMask(container, frame) {
 
 export default async function decorate(block) {
   const rows = [...block.children];
-  const data = {};
-  rows.forEach((row) => {
-    const [keyEl, valueEl] = row.children;
-    if (keyEl && valueEl) {
-      const key = keyEl.textContent.trim().toLowerCase().replace(/\s+/g, '-');
-      data[key] = valueEl;
-    }
-  });
 
-  const videoSrc = data.video?.querySelector('a')?.href || '';
-  const imgEl = data.image?.querySelector('img');
-  const imgSrc = imgEl?.src || '';
-  const imgAlt = data['image-alt-text']?.textContent.trim() || imgEl?.alt || '';
+  // Row 0: video — first <a> href
+  const videoSrc = rows[0]?.querySelector('a')?.href || '';
 
-  block.innerHTML = `
-    <div class="video-photo-player-media">
-      <video autoplay muted loop playsinline>
-        <source src="${videoSrc}" type="video/mp4">
-      </video>
-      <picture>
-        <img src="${imgSrc}" alt="${imgAlt}">
-      </picture>
-      <div class="frame-window"></div>
-    </div>
-  `;
+  // Row 1: picture — reuse the existing <picture> element
+  const picture = rows[1]?.querySelector('picture');
 
-  const container = block.querySelector('.video-photo-player-media');
-  const frame = block.querySelector('.frame-window');
-  if (container && frame) {
-    makeDraggable(frame, container);
+  const media = document.createElement('div');
+  media.className = 'video-photo-player-media';
+
+  const video = document.createElement('video');
+  video.autoplay = true;
+  video.muted = true;
+  video.loop = true;
+  video.playsInline = true;
+  const source = document.createElement('source');
+  source.src = videoSrc;
+  source.type = 'video/mp4';
+  video.append(source);
+
+  const frame = document.createElement('div');
+  frame.className = 'frame-window';
+
+  media.append(video);
+  if (picture) media.append(picture);
+  media.append(frame);
+
+  block.innerHTML = '';
+  block.append(media);
+
+  if (picture) {
+    makeDraggable(frame, media);
   }
 }
+

@@ -180,6 +180,10 @@
     ]
   },
   {
+    "id": "dev-placeholder",
+    "fields": []
+  },
+  {
     "id": "fragment",
     "fields": [
       {

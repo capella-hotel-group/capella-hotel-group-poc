@@ -175,14 +175,14 @@ function setup(): void {
   window.hlx.codeBasePath = '';
   window.hlx.lighthouse = new URLSearchParams(window.location.search).get('lighthouse') === 'on';
 
-  const scriptEl = document.querySelector<HTMLScriptElement>('script[src$="/scripts/main.js"]');
+  const scriptEl = document.querySelector<HTMLScriptElement>('script[src$="/scripts/scripts.js"]');
   if (scriptEl) {
     try {
       const scriptURL = new URL(scriptEl.src, window.location.href);
       if (scriptURL.host === window.location.host) {
-        [window.hlx.codeBasePath] = scriptURL.pathname.split('/scripts/main.js');
+        [window.hlx.codeBasePath] = scriptURL.pathname.split('/scripts/scripts.js');
       } else {
-        [window.hlx.codeBasePath] = scriptURL.href.split('/scripts/main.js');
+        [window.hlx.codeBasePath] = scriptURL.href.split('/scripts/scripts.js');
       }
     } catch (error) {
       console.log(error);

@@ -9,7 +9,7 @@ import globals from 'globals';
 export default defineConfig([
   // Global ignores (replaces .eslintignore)
   {
-    ignores: ['blocks/', 'chunks/', 'assets/', 'styles/', 'scripts/main.js', 'scripts/aem.js', 'scripts/editor-support.js'],
+    ignores: ['blocks/', 'chunks/', 'assets/', 'styles/', 'scripts/scripts.js', 'scripts/aem.js', 'scripts/editor-support.js'],
   },
 
   // JavaScript files

@@ -1,6 +1,6 @@
+import path from 'node:path';
 import { defineConfig } from 'vite';
 import { readFileSync } from 'node:fs';
-import path from 'node:path';
 import { DIST_DIR, ROOT, SRC_DIR } from './config';
 import { cleanOutputPlugin, generateBlockEntries, versionBannerPlugin } from './vite.helpers';
 
@@ -42,8 +42,8 @@ export default defineConfig({
 
     rollupOptions: {
       input: {
-        // Main entry point — output as scripts/main.js; aem.ts detects codeBasePath via this filename
-        'scripts/main': path.resolve(SRC_DIR, 'app', 'main.ts'),
+        // Main entry point — output as scripts/scripts.js; aem.ts detects codeBasePath via this filename
+        'scripts/scripts': path.resolve(SRC_DIR, 'app', 'main.ts'),
         // aem.ts - compiled as a Rollup entry so it lands at scripts/aem.js
         'scripts/aem': path.resolve(SRC_DIR, 'app', 'aem.ts'),
         // Styles entry (CSS only - no JS output)

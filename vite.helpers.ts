@@ -69,7 +69,7 @@ export function cleanOutputPlugin(isWatch: boolean): Plugin {
     async buildStart() {
       if (isWatch) return; // emptyOutDir handles '-dist' cleanup
       const foldersToRemove = ['blocks', 'styles', 'chunks', 'assets'].map((d) => path.resolve(ROOT, d));
-      const filesToRemove = ['scripts/main.js', 'scripts/aem.js'].map((f) => path.resolve(ROOT, f));
+      const filesToRemove = ['scripts/scripts.js', 'scripts/aem.js'].map((f) => path.resolve(ROOT, f));
       await Promise.all([
         ...foldersToRemove.map((dir) => rm(dir, { recursive: true, force: true })),
         ...filesToRemove.map((file) => rm(file, { force: true })),

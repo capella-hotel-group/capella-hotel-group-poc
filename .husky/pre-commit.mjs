@@ -20,5 +20,5 @@ if (modifledPartials.length > 0) {
 }
 
 // lint and format staged files
-const lintOutput = await run('npx lint-staged');
-console.log(lintOutput);
+// const lintOutput = await run('npx lint-staged');
+// console.log(lintOutput);

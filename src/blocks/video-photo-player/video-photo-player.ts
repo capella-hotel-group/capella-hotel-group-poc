@@ -1,3 +1,5 @@
+import './video-photo-player.css';
+
 function makeDraggable(frame, container) {
   let startX = 0;
   let startY = 0;
@@ -66,7 +68,7 @@ export default async function decorate(block) {
   const rows = [...block.children];
 
   // Row 0: video — first <a> href
-  const videoSrc = rows[0]?.querySelector('a')?.href || '';
+  const videoSrc = resolveDAMUrl(rows[0]?.querySelector('a')?.href || '');
 
   // Row 1: picture — reuse the existing <picture> element
   const picture = rows[1]?.querySelector('picture');
@@ -97,4 +99,18 @@ export default async function decorate(block) {
   if (picture) {
     makeDraggable(frame, media);
   }
+}
+export function resolveDAMUrl(src) {
+  if (!src || window.location.hostname !== 'localhost') return src;
+  const proxyMeta = document.querySelector('meta[property="hlx:proxyUrl"]') as HTMLMetaElement;
+  if (!proxyMeta) return src;
+  const proxyOrigin = new URL(proxyMeta.content).origin;
+  try {
+    const url = new URL(src);
+    if (url.hostname === 'localhost') return `${proxyOrigin}${url.pathname}${url.search}`;
+  } catch {
+    // src is already a relative path
+    return `${proxyOrigin}${src}`;
+  }
+  return src;
 }

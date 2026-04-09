@@ -27,11 +27,9 @@
     mask:
         linear-gradient(#000 0 0) 50% 0 / 300px 500px no-repeat,
         linear-gradient(#000 0 0);
-    mask:
-        linear-gradient(#000 0 0) 50% 0 / 300px 500px no-repeat,
-        linear-gradient(#000 0 0);
     mask-composite: exclude;
-    mask-composite: destination-out;
+
+    /* mask-composite: destination-out; */
 }
 
 .video-photo-player-media picture img {

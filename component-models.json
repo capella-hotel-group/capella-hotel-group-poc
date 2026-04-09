@@ -180,10 +180,6 @@
     ]
   },
   {
-    "id": "dev-placeholder",
-    "fields": []
-  },
-  {
     "id": "fragment",
     "fields": [
       {
@@ -234,5 +230,9 @@
         ]
       }
     ]
+  },
+  {
+    "id": "video-photo-player",
+    "fields": []
   }
 ]

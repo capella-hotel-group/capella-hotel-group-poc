@@ -1,4 +1,3 @@
-import './cards.css';
 import { moveInstrumentation } from '@/app/main';
 import { createOptimizedPicture } from '@/app/aem';
 

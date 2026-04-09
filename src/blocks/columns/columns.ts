@@ -1,4 +1,3 @@
-import './columns.css';
 
 export default function decorate(block: HTMLElement): void {
   const firstRow = block.firstElementChild;

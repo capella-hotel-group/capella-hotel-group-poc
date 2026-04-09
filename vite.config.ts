@@ -1,26 +1,31 @@
 import { defineConfig } from 'vite';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
-import { ROOT, SRC_DIR, DIST_DIR } from './config';
-import { generateBlockEntries, versionBannerPlugin } from './vite.helpers';
+import { DIST_DIR, ROOT, SRC_DIR } from './config';
+import { cleanOutputPlugin, generateBlockEntries, versionBannerPlugin } from './vite.helpers';
 
 const { name, version } = JSON.parse(readFileSync('./package.json', 'utf-8')) as {
   name: string;
   version: string;
 };
 
+// Rollup watch mode errors when any input is a subpath of outDir.
+// In watch mode we output to dist/ and copy back to root after each build.
+const isWatch = process.argv.some((a) => a === '--watch' || a === '-w');
+const outDir = isWatch ? DIST_DIR : ROOT;
+
 const blockEntries = generateBlockEntries();
 
 export default defineConfig({
   root: ROOT,
-  publicDir: 'public',
+  publicDir: false,
 
   define: {
     __APP_NAME__: JSON.stringify(name),
     __APP_VERSION__: JSON.stringify(version),
   },
 
-  plugins: [versionBannerPlugin(version)],
+  plugins: [cleanOutputPlugin(isWatch), versionBannerPlugin(version)],
 
   resolve: {
     alias: {
@@ -29,8 +34,8 @@ export default defineConfig({
   },
 
   build: {
-    outDir: DIST_DIR,
-    emptyOutDir: true,
+    outDir,
+    emptyOutDir: isWatch,
     modulePreload: false,
     cssCodeSplit: true,
     target: 'es2022',
@@ -39,7 +44,7 @@ export default defineConfig({
       input: {
         // Main entry point — output as scripts/main.js; aem.ts detects codeBasePath via this filename
         'scripts/main': path.resolve(SRC_DIR, 'app', 'main.ts'),
-        // aem.ts - compiled as a Rollup entry so it lands at dist/scripts/aem.js
+        // aem.ts - compiled as a Rollup entry so it lands at scripts/aem.js
         'scripts/aem': path.resolve(SRC_DIR, 'app', 'aem.ts'),
         // Styles entry (CSS only - no JS output)
         'styles/styles': path.resolve(SRC_DIR, 'styles', 'styles.css'),

@@ -1,4 +1,3 @@
-import './fragment.css';
 import { decorateMain } from '@/app/main';
 import { loadSections } from '@/app/aem';
 

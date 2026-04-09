@@ -13,7 +13,7 @@
     </script>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta property="og:title" content="Page not found" />
-    <script nonce="aem" src="/dist/scripts/main.js" type="module"></script>
+    <script nonce="aem" src="/scripts/main.js" type="module"></script>
     <script nonce="aem" type="module">
       window.addEventListener('load', () => {
         if (document.referrer) {
@@ -31,10 +31,10 @@
       });
     </script>
     <script nonce="aem" type="module">
-      import { sampleRUM } from '/dist/scripts/aem.js';
+      import { sampleRUM } from '/scripts/aem.js';
       sampleRUM('404', { source: document.referrer });
     </script>
-    <link rel="stylesheet" href="/dist/styles/styles.css" />
+    <link rel="stylesheet" href="/styles/styles.css" />
     <style>
       main.error {
         min-height: calc(100vh - var(--nav-height));
@@ -50,7 +50,7 @@
         font-family: monospace;
       }
     </style>
-    <link rel="stylesheet" href="/dist/styles/lazy-styles.css" />
+    <link rel="stylesheet" href="/styles/lazy-styles.css" />
   </head>
 
   <body>

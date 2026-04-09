@@ -1,3 +1,19 @@
 {
-  "js/ts.tsdk.path": "node_modules/typescript/lib"
+  "js/ts.tsdk.path": "node_modules/typescript/lib",
+  "files.exclude": {
+    "**/.git": true,
+    "**/.svn": true,
+    "**/.hg": true,
+    "**/.DS_Store": true,
+    "**/Thumbs.db": true,
+    "**/.next": true,
+    "**/.nuxt/**": true,
+    "**/.yarn/**": true,
+    "**/CVS": true,
+    "**/bower_components": true,
+    "**/dist": true,
+    "**/node_modules": true,
+    "**/tmp": true
+  },
+  "explorerExclude.backup": {}
 }

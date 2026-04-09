@@ -1,4 +1,4 @@
-import { resolveDAMUrl } from '../../scripts/utils.js';
+import './video-photo-player.css';
 
 function makeDraggable(frame, container) {
   let startX = 0;
@@ -64,7 +64,6 @@ function updateMask(container, frame) {
   picture.style.webkitMaskComposite = 'destination-out';
 }
 
-
 export default async function decorate(block) {
   const rows = [...block.children];
 
@@ -100,4 +99,18 @@ export default async function decorate(block) {
   if (picture) {
     makeDraggable(frame, media);
   }
+}
+export function resolveDAMUrl(src) {
+  if (!src || window.location.hostname !== 'localhost') return src;
+  const proxyMeta = document.querySelector('meta[property="hlx:proxyUrl"]') as HTMLMetaElement;
+  if (!proxyMeta) return src;
+  const proxyOrigin = new URL(proxyMeta.content).origin;
+  try {
+    const url = new URL(src);
+    if (url.hostname === 'localhost') return `${proxyOrigin}${url.pathname}${url.search}`;
+  } catch {
+    // src is already a relative path
+    return `${proxyOrigin}${src}`;
+  }
+  return src;
 }

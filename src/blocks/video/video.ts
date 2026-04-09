@@ -1,6 +1,6 @@
 export default async function decorate(block: HTMLElement): Promise<void> {
   const rows = [...block.children] as HTMLElement[];
-
+  console.log(rows[0]?.querySelector<HTMLAnchorElement>('a')?.href, rows[0]?.querySelector<HTMLAnchorElement>('a')?.innerText);
   const videoSrc = rows[0]?.querySelector<HTMLAnchorElement>('a')?.href ?? '';
   const poster = rows[1]?.querySelector<HTMLImageElement>('img')?.src ?? '';
 

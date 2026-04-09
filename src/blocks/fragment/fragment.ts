@@ -1,4 +1,4 @@
-import { decorateMain } from '@/app/main';
+import { decorateMain } from '@/app/scripts';
 import { loadSections } from '@/app/aem';
 
 /**

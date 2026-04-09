@@ -43,7 +43,7 @@ export default defineConfig({
     rollupOptions: {
       input: {
         // Main entry point — output as scripts/scripts.js; aem.ts detects codeBasePath via this filename
-        'scripts/scripts': path.resolve(SRC_DIR, 'app', 'main.ts'),
+        'scripts/scripts': path.resolve(SRC_DIR, 'app', 'scripts.ts'),
         // aem.ts - compiled as a Rollup entry so it lands at scripts/aem.js
         'scripts/aem': path.resolve(SRC_DIR, 'app', 'aem.ts'),
         // Styles entry (CSS only - no JS output)

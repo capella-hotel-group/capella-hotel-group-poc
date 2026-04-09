@@ -1,4 +1,4 @@
-import { moveInstrumentation } from '@/app/main';
+import { moveInstrumentation } from '@/app/scripts';
 import { createOptimizedPicture } from '@/app/aem';
 
 export default function decorate(block: HTMLElement): void {

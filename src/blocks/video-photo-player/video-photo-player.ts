@@ -90,6 +90,11 @@ export default async function decorate(block) {
   const frame = document.createElement('div');
   frame.className = 'frame-window';
 
+  const label = document.createElement('span');
+  label.className = 'frame-window-label';
+  label.textContent = 'moment';
+  frame.append(label);
+
   media.append(video);
   if (picture) media.append(picture);
   media.append(frame);

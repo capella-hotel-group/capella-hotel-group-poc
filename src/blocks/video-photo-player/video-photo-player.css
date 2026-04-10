@@ -57,3 +57,22 @@
 .frame-window:active {
     cursor: grabbing;
 }
+
+.frame-window-label {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    transform-origin: bottom left;
+    transform: rotate(-90deg);
+    color: #fff;
+    font-family: Calibre, sans-serif;
+    font-size: 96px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
+    text-transform: uppercase;
+    white-space: nowrap;
+    z-index: 2;
+    pointer-events: none;
+    user-select: none;
+}

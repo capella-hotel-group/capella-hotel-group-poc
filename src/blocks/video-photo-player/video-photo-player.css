@@ -10,6 +10,7 @@
     overflow: hidden;
 }
 
+/* Authoring-only fix */
 .adobe-ue-edit .video-photo-player-media {
     max-height: 1080px;
 }

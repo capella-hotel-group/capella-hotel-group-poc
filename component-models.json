@@ -232,6 +232,25 @@
     ]
   },
   {
+    "id": "restaurant-menu-item",
+    "fields": [
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "name",
+        "label": "Restaurant Name",
+        "value": ""
+      },
+      {
+        "component": "reference",
+        "valueType": "string",
+        "name": "image",
+        "label": "Image",
+        "multi": false
+      }
+    ]
+  },
+  {
     "id": "video-photo-player",
     "fields": [
       {
@@ -254,6 +273,23 @@
         "name": "imageAlt",
         "label": "Image Alt Text",
         "value": ""
+      }
+    ]
+  },
+  {
+    "id": "video",
+    "fields": [
+      {
+        "component": "reference",
+        "name": "videoSource",
+        "label": "Video Source",
+        "valueType": "string"
+      },
+      {
+        "component": "reference",
+        "name": "poster",
+        "label": "Poster Image",
+        "valueType": "string"
       }
     ]
   }

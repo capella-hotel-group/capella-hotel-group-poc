@@ -16,7 +16,9 @@
       "cards",
       "columns",
       "fragment",
-      "video-photo-player"
+      "video-photo-player",
+      "restaurant-menu",
+      "video"
     ]
   },
   {
@@ -38,6 +40,12 @@
       "image",
       "button",
       "title"
+    ]
+  },
+  {
+    "id": "restaurant-menu",
+    "components": [
+      "restaurant-menu-item"
     ]
   }
 ]

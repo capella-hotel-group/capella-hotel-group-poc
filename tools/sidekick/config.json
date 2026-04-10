@@ -1,19 +1,5 @@
 {
   "project": "AEM XWalk Boilerplate",
   "editUrlLabel": "AEM Editor",
-  "editUrlPattern": "{{contentSourceUrl}}{{pathname}}?cmd=open",
-  "plugins": [
-    {
-      "id": "submit-review",
-      "title": "Submit for Review",
-      "url": "https://[app-builder-url]/submit-request",
-      "condition": "status.edit && !status.locked"
-    },
-    {
-      "id": "approve-content",
-      "title": "Approve",
-      "url": "https://[app-builder-url]/approve",
-      "condition": "user.isReviewer && status.underReview"
-    }
-  ]
+  "editUrlPattern": "{{contentSourceUrl}}{{pathname}}?cmd=open"
 }

@@ -1,0 +1,10 @@
+
+view:
+  - path
+  - title
+  - description
+  - lastModified
+
+filter:
+  path:
+    - /content/capella-eds-poc

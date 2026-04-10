@@ -1,33 +1,33 @@
 import './video-photo-player.css';
 import { AEM_PUBLISH_DAM } from '@/utils/constants';
 
+function updateMask(container: HTMLElement, frameGroup: HTMLElement) {
+  const containerRect = container.getBoundingClientRect();
+  const frameWindow = frameGroup.querySelector<HTMLElement>('.frame-window');
+  const targetRect = (frameWindow ?? frameGroup).getBoundingClientRect();
+  const x = targetRect.left - containerRect.left;
+  const y = targetRect.top - containerRect.top;
+  const w = targetRect.width;
+  const h = targetRect.height;
+
+  const picture = container.querySelector<HTMLElement>('picture');
+  if (!picture) return;
+  const maskPos = `${x}px ${y}px`;
+  const maskSize = `${w}px ${h}px`;
+  const mask = `linear-gradient(#000 0 0) ${maskPos} / ${maskSize} no-repeat, linear-gradient(#000 0 0)`;
+  picture.style.mask = mask;
+  picture.style.webkitMask = mask;
+  picture.style.maskComposite = 'exclude';
+  picture.style.webkitMaskComposite = 'destination-out';
+}
+
 function makeDraggable(frame: HTMLElement, container: HTMLElement) {
   let startX = 0;
   let startY = 0;
   let startLeft = 0;
   let startTop = 0;
 
-  frame.addEventListener('pointerdown', (e) => {
-    e.preventDefault();
-    frame.setPointerCapture(e.pointerId);
-
-    const containerRect = container.getBoundingClientRect();
-    const frameRect = frame.getBoundingClientRect();
-
-    startX = e.clientX;
-    startY = e.clientY;
-    startLeft = frameRect.left - containerRect.left;
-    startTop = frameRect.top - containerRect.top;
-
-    frame.style.bottom = 'auto';
-    frame.style.left = `${startLeft}px`;
-    frame.style.top = `${startTop}px`;
-
-    frame.addEventListener('pointermove', onMove);
-    frame.addEventListener('pointerup', onUp, { once: true });
-  });
-
-  function onMove(e) {
+  function onMove(e: PointerEvent) {
     const dx = e.clientX - startX;
     const dy = e.clientY - startY;
 
@@ -51,26 +51,26 @@ function makeDraggable(frame: HTMLElement, container: HTMLElement) {
   function onUp() {
     frame.removeEventListener('pointermove', onMove);
   }
-}
 
-function updateMask(container: HTMLElement, frameGroup: HTMLElement) {
-  const containerRect = container.getBoundingClientRect();
-  const frameWindow = frameGroup.querySelector<HTMLElement>('.frame-window');
-  const targetRect = (frameWindow ?? frameGroup).getBoundingClientRect();
-  const x = targetRect.left - containerRect.left;
-  const y = targetRect.top - containerRect.top;
-  const w = targetRect.width;
-  const h = targetRect.height;
+  frame.addEventListener('pointerdown', (e) => {
+    e.preventDefault();
+    frame.setPointerCapture(e.pointerId);
 
-  const picture = container.querySelector<HTMLElement>('picture');
-  if (!picture) return;
-  const maskPos = `${x}px ${y}px`;
-  const maskSize = `${w}px ${h}px`;
-  const mask = `linear-gradient(#000 0 0) ${maskPos} / ${maskSize} no-repeat, linear-gradient(#000 0 0)`;
-  picture.style.mask = mask;
-  picture.style.webkitMask = mask;
-  picture.style.maskComposite = 'exclude';
-  picture.style.webkitMaskComposite = 'destination-out';
+    const containerRect = container.getBoundingClientRect();
+    const frameRect = frame.getBoundingClientRect();
+
+    startX = e.clientX;
+    startY = e.clientY;
+    startLeft = frameRect.left - containerRect.left;
+    startTop = frameRect.top - containerRect.top;
+
+    frame.style.bottom = 'auto';
+    frame.style.left = `${startLeft}px`;
+    frame.style.top = `${startTop}px`;
+
+    frame.addEventListener('pointermove', onMove);
+    frame.addEventListener('pointerup', onUp, { once: true });
+  });
 }
 
 export default async function decorate(block) {

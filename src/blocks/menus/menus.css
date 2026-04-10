@@ -7,7 +7,7 @@
   margin: 0;
   padding: 0;
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   gap: clamp(16px, 4vw, 40px);
   justify-content: center;
   cursor: pointer;
@@ -167,23 +167,3 @@
   }
 }
 
-/* Desktop: 769px and above */
-@media (min-width: 769px) {
-  .menus-wrapper {
-    padding: 0 20px;
-  }
-
-  .menus>.menus-list {
-    gap: 40px;
-  }
-
-  .menus .menus-item {
-    padding: 15px 120px;
-    min-height: 100px;
-  }
-
-  .menus .menus-text {
-    font-size: 96px;
-    white-space: nowrap;
-  }
-}

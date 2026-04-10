@@ -19,7 +19,7 @@ function makeDraggable(frame, container) {
     startLeft = frameRect.left - containerRect.left;
     startTop = frameRect.top - containerRect.top;
 
-    frame.style.transform = 'none';
+    frame.style.bottom = 'auto';
     frame.style.left = `${startLeft}px`;
     frame.style.top = `${startTop}px`;
 
@@ -32,8 +32,11 @@ function makeDraggable(frame, container) {
     const dy = e.clientY - startY;
 
     const containerRect = container.getBoundingClientRect();
-    const maxLeft = containerRect.width - frame.offsetWidth;
-    const maxTop = containerRect.height - frame.offsetHeight;
+    const frameWindow = frame.querySelector<HTMLElement>('.frame-window');
+    const fw = frameWindow ? frameWindow.offsetWidth : frame.offsetWidth;
+    const fh = frameWindow ? frameWindow.offsetHeight : frame.offsetHeight;
+    const maxLeft = containerRect.width - fw;
+    const maxTop = containerRect.height - fh;
 
     const newLeft = Math.min(Math.max(0, startLeft + dx), maxLeft);
     const newTop = Math.min(Math.max(0, startTop + dy), maxTop);
@@ -49,15 +52,18 @@ function makeDraggable(frame, container) {
   }
 }
 
-function updateMask(container, frame) {
+function updateMask(container, frameGroup) {
   const containerRect = container.getBoundingClientRect();
-  const frameRect = frame.getBoundingClientRect();
-  const x = frameRect.left - containerRect.left;
-  const y = frameRect.top - containerRect.top;
+  const frameWindow = frameGroup.querySelector<HTMLElement>('.frame-window');
+  const targetRect = (frameWindow ?? frameGroup).getBoundingClientRect();
+  const x = targetRect.left - containerRect.left;
+  const y = targetRect.top - containerRect.top;
+  const w = targetRect.width;
+  const h = targetRect.height;
 
   const picture = container.querySelector('picture');
   const maskPos = `${x}px ${y}px`;
-  const maskSize = `${frame.offsetWidth}px ${frame.offsetHeight}px`;
+  const maskSize = `${w}px ${h}px`;
   const mask = `linear-gradient(#000 0 0) ${maskPos} / ${maskSize} no-repeat, linear-gradient(#000 0 0)`;
   picture.style.mask = mask;
   picture.style.webkitMask = mask;
@@ -87,23 +93,38 @@ export default async function decorate(block) {
   source.type = 'video/mp4';
   video.append(source);
 
+  const frameGroup = document.createElement('div');
+  frameGroup.className = 'frame-group';
+
   const frame = document.createElement('div');
   frame.className = 'frame-window';
 
   const label = document.createElement('span');
   label.className = 'frame-window-label';
   label.textContent = 'moment';
-  frame.append(label);
+
+  frameGroup.append(label, frame);
 
   media.append(video);
   if (picture) media.append(picture);
-  media.append(frame);
+  media.append(frameGroup);
 
   block.innerHTML = '';
   block.append(media);
 
+  video.addEventListener(
+    'canplay',
+    () => {
+      frameGroup.classList.add('is-ready');
+      if (picture) {
+        frame.addEventListener('animationend', () => updateMask(media, frameGroup), { once: true });
+      }
+    },
+    { once: true },
+  );
+
   if (picture) {
-    makeDraggable(frame, media);
+    makeDraggable(frameGroup, media);
   }
 }
 export function resolveDAMUrl(src) {

@@ -4,6 +4,9 @@ view:
   - title
   - description
   - lastModified
+  - url
+  - author
+  - desc
 
 filter:
   path:

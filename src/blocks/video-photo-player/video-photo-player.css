@@ -10,6 +10,10 @@
     overflow: hidden;
 }
 
+.editor-app .video-photo-player-media {
+    max-height: 100vh;
+}
+
 .video-photo-player-media video {
     position: absolute;
     inset: 0;

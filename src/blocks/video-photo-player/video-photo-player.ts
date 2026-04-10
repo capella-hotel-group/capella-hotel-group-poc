@@ -1,4 +1,5 @@
 import './video-photo-player.css';
+import { AEM_PUBLISH_DAM } from '@/utils/constants';
 
 function makeDraggable(frame, container) {
   let startX = 0;
@@ -101,16 +102,13 @@ export default async function decorate(block) {
   }
 }
 export function resolveDAMUrl(src) {
-  if (!src || window.location.hostname !== 'localhost') return src;
-  const proxyMeta = document.querySelector('meta[property="hlx:proxyUrl"]') as HTMLMetaElement;
-  if (!proxyMeta) return src;
-  const proxyOrigin = new URL(proxyMeta.content).origin;
+  console.log('Resolving DAM URL:', src);
+  const proxyOrigin = new URL(AEM_PUBLISH_DAM).origin;
   try {
     const url = new URL(src);
-    if (url.hostname === 'localhost') return `${proxyOrigin}${url.pathname}${url.search}`;
+    return `${proxyOrigin}${url.pathname}${url.search}`;
   } catch {
     // src is already a relative path
-    return `${proxyOrigin}${src}`;
   }
   return src;
 }

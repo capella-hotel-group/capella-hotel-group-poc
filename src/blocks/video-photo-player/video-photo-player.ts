@@ -32,10 +32,11 @@ function makeDraggable(frame, container) {
     const dy = e.clientY - startY;
 
     const containerRect = container.getBoundingClientRect();
+    const frameRect = frame.getBoundingClientRect();
     const frameWindow = frame.querySelector<HTMLElement>('.frame-window');
-    const fw = frameWindow ? frameWindow.offsetWidth : frame.offsetWidth;
     const fh = frameWindow ? frameWindow.offsetHeight : frame.offsetHeight;
-    const maxLeft = containerRect.width - fw;
+    const groupWidth = frameRect.width;
+    const maxLeft = containerRect.width - groupWidth;
     const maxTop = containerRect.height - fh;
 
     const newLeft = Math.min(Math.max(0, startLeft + dx), maxLeft);

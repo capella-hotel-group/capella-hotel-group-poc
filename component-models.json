@@ -180,6 +180,31 @@
     ]
   },
   {
+    "id": "custom-fragment",
+    "fields": [
+      {
+        "component": "aem-content",
+        "name": "reference",
+        "label": "Fragment"
+      },
+      {
+        "component": "select",
+        "name": "theme",
+        "label": "Theme",
+        "options": [
+          {
+            "name": "Dark",
+            "value": "dark"
+          },
+          {
+            "name": "Light",
+            "value": "light"
+          }
+        ]
+      }
+    ]
+  },
+  {
     "id": "fragment",
     "fields": [
       {

@@ -10,6 +10,7 @@
   flex-wrap: wrap;
   gap: clamp(16px, 4vw, 40px);
   justify-content: center;
+  cursor: pointer;
 }
 
 .menus .menus-item {
@@ -25,10 +26,6 @@
   justify-content: center;
 }
 
-.menus .menus-item:hover {
-  border-color: #999;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
 
 .menus .menus-item:hover .menus-text {
   color: white;
@@ -80,6 +77,8 @@
   object-fit: cover;
   opacity: 0;
   transition: opacity 0.3s ease;
+  border-radius: 100px;
+  overflow: hidden;
 }
 
 .menus .menus-image img {

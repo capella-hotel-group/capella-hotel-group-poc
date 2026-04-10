@@ -267,11 +267,9 @@
         "value": ""
       },
       {
-        "component": "reference",
-        "valueType": "string",
+        "component": "aem-content",
         "name": "link",
-        "label": "Link",
-        "multi": false
+        "label": "Link"
       },
       {
         "component": "reference",

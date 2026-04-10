@@ -19,8 +19,7 @@
       "menus",
       "video-photo-player",
       "video",
-      "custom-fragment",
-      "test-block"
+      "custom-fragment"
     ]
   },
   {
@@ -48,12 +47,6 @@
     "id": "menus",
     "components": [
       "menu-item"
-    ]
-  },
-  {
-    "id": "test-block",
-    "components": [
-      "test-block-item"
     ]
   }
 ]

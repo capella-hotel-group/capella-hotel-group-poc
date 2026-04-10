@@ -54,8 +54,7 @@
         "menus",
         "video-photo-player",
         "video",
-        "custom-fragment",
-        "test-block"
+        "custom-fragment"
       ]
     }
   ]

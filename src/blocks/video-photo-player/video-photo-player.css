@@ -53,7 +53,7 @@
     inset: 0;
     width: 255px;
     height: 460px;
-    background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNTUiIGhlaWdodD0iNDYwIiBmaWxsPSJub25lIiB2aWV3Qm94PSIwIDAgMjU1IDQ2MCI+PHBhdGggc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjQuOTc0IiBkPSJNMi40ODcgMi40ODdoMjUwLjAyNnY0NTUuMDI2SDIuNDg3eiIvPjxwYXRoIGZpbGw9IiNmZmYiIGQ9Im0yMzAgNDQ0LTEuNDUtMS4zcS0yLjUyNS0yLjI3NS00LjE3NS0zLjkyNXQtMi42MjUtMi45NjJxLS45NzUtMS4zMTMtMS4zNjItMi40MTNhNi43IDYuNyAwIDAgMS0uMzg4LTIuMjVxMC0yLjM1IDEuNTc1LTMuOTI1dDMuOTI1LTEuNTc1cTEuMyAwIDIuNDc1LjU1YTUuOSA1LjkgMCAwIDEgMi4wMjUgMS41NSA1LjkgNS45IDAgMCAxIDIuMDI1LTEuNTUgNS44IDUuOCAwIDAgMSAyLjQ3NS0uNTVxMi4zNSAwIDMuOTI1IDEuNTc1VDI0MCA0MzEuMTVhNi43IDYuNyAwIDAgMS0uMzg3IDIuMjVxLS4zODggMS4xLTEuMzYzIDIuNDEzdC0yLjYyNSAyLjk2Mi00LjE3NSAzLjkyNXptMC0yLjdxMi40LTIuMTUgMy45NS0zLjY4NyAxLjU1LTEuNTM4IDIuNDUtMi42NzUuOS0xLjEzOSAxLjI1LTIuMDI1LjM1LS44ODguMzUtMS43NjMgMC0xLjUtMS0yLjV0LTIuNS0xYTMuODYgMy44NiAwIDAgMC0yLjE3NS42NjNxLTEgLjY2Mi0xLjM3NSAxLjY4N2gtMS45cS0uMzc1LTEuMDI1LTEuMzc1LTEuNjg3YTMuODYgMy44NiAwIDAgMC0yLjE3NS0uNjYzcS0xLjUgMC0yLjUgMXQtMSAyLjVxMCAuODc1LjM1IDEuNzYzdDEuMjUgMi4wMjUgMi40NSAyLjY3NVQyMzAgNDQxLjMiLz48ZyBjbGlwLXBhdGg9InVybCgjYSkiPjxwYXRoIGZpbGw9IiNmZmYiIGQ9Im0yMzAgMTUtMi41OCA1LjQ5NWg1LjE2eiIvPjxwYXRoIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLW1pdGVybGltaXQ9IjEwIiBzdHJva2Utd2lkdGg9IjEuNTI4IiBkPSJNMjMwIDI2LjgzNnYtNy4zNDciLz48cGF0aCBmaWxsPSIjZmZmIiBkPSJtMjMwIDM1IDIuNTgtNS40OTVoLTUuMTU5eiIvPjxwYXRoIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLW1pdGVybGltaXQ9IjEwIiBzdHJva2Utd2lkdGg9IjEuNTI4IiBkPSJNMjMwIDIzLjE2NHY3LjM0NiIvPjxwYXRoIGZpbGw9IiNmZmYiIGQ9Im0yNDAgMjUtNS40OTUtMi41Nzl2NS4xNnoiLz48cGF0aCBzdHJva2U9IiNmZmYiIHN0cm9rZS1taXRlcmxpbWl0PSIxMCIgc3Ryb2tlLXdpZHRoPSIxLjUyOCIgZD0iTTIyOC4xNjQgMjVoNy4zNDciLz48cGF0aCBmaWxsPSIjZmZmIiBkPSJtMjIwIDI1IDUuNDk1IDIuNTh2LTUuMTU5eiIvPjxwYXRoIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLW1pdGVybGltaXQ9IjEwIiBzdHJva2Utd2lkdGg9IjEuNTI4IiBkPSJNMjMxLjgzNiAyNWgtNy4zNDciLz48L2c+PGRlZnM+PGNsaXBQYXRoIGlkPSJhIj48cGF0aCBmaWxsPSIjZmZmIiBkPSJNMjIwIDE1aDIwdjIwaC0yMHoiLz48L2NsaXBQYXRoPjwvZGVmcz48L3N2Zz4=');
+    background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNTUiIGhlaWdodD0iNDYwIiBmaWxsPSJub25lIiB2aWV3Qm94PSIwIDAgMjU1IDQ2MCI+CiAgPHBhdGggc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjQuOTc0IiBkPSJNMi40ODcgMi40ODdoMjUwLjAyNnY0NTUuMDI2SDIuNDg3eiIgLz4KICA8ZyBjbGlwLXBhdGg9InVybCgjYSkiPgogICAgPHBhdGggZmlsbD0iI2ZmZiIgZD0ibTIzMCAxNS0yLjU4IDUuNDk1aDUuMTZ6IiAvPgogICAgPHBhdGggc3Ryb2tlPSIjZmZmIiBzdHJva2UtbWl0ZXJsaW1pdD0iMTAiIHN0cm9rZS13aWR0aD0iMS41MjgiIGQ9Ik0yMzAgMjYuODM2di03LjM0NyIgLz4KICAgIDxwYXRoIGZpbGw9IiNmZmYiIGQ9Im0yMzAgMzUgMi41OC01LjQ5NWgtNS4xNTl6IiAvPgogICAgPHBhdGggc3Ryb2tlPSIjZmZmIiBzdHJva2UtbWl0ZXJsaW1pdD0iMTAiIHN0cm9rZS13aWR0aD0iMS41MjgiIGQ9Ik0yMzAgMjMuMTY0djcuMzQ2IiAvPgogICAgPHBhdGggZmlsbD0iI2ZmZiIgZD0ibTI0MCAyNS01LjQ5NS0yLjU3OXY1LjE2eiIgLz4KICAgIDxwYXRoIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLW1pdGVybGltaXQ9IjEwIiBzdHJva2Utd2lkdGg9IjEuNTI4IiBkPSJNMjI4LjE2NCAyNWg3LjM0NyIgLz4KICAgIDxwYXRoIGZpbGw9IiNmZmYiIGQ9Im0yMjAgMjUgNS40OTUgMi41OHYtNS4xNTl6IiAvPgogICAgPHBhdGggc3Ryb2tlPSIjZmZmIiBzdHJva2UtbWl0ZXJsaW1pdD0iMTAiIHN0cm9rZS13aWR0aD0iMS41MjgiIGQ9Ik0yMzEuODM2IDI1aC03LjM0NyIgLz4KICA8L2c+CiAgPGRlZnM+CiAgICA8Y2xpcFBhdGggaWQ9ImEiPgogICAgICA8cGF0aCBmaWxsPSIjZmZmIiBkPSJNMjIwIDE1aDIwdjIwaC0yMHoiIC8+CiAgICA8L2NsaXBQYXRoPgogIDwvZGVmcz4KPC9zdmc+');
     background-repeat: no-repeat;
     background-size: contain;
     transform-origin: bottom left;
@@ -64,6 +64,74 @@
 
 .frame-group.is-ready .frame-window {
     animation: frame-window-scale-up 0.4s ease-out forwards;
+}
+
+.frame-window-heart {
+    position: absolute;
+    bottom: 16px;
+    right: 16px;
+    pointer-events: none;
+    opacity: 0;
+}
+
+.frame-window-heart.is-visible {
+    animation: frame-heart-fade-in 0.2s ease-out forwards;
+}
+
+.frame-window-heart.is-beating {
+    opacity: 1;
+    animation: frame-heart-beat 1.2s ease-in-out infinite;
+}
+
+@keyframes frame-heart-fade-in {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes frame-heart-beat {
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    15% {
+        transform: scale(1.25);
+    }
+
+    30% {
+        transform: scale(1);
+    }
+
+    45% {
+        transform: scale(1.15);
+    }
+
+    60% {
+        transform: scale(1);
+    }
+}
+
+@keyframes frame-heart-pop-up {
+    0% {
+        transform: scale(0);
+    }
+
+    60% {
+        transform: scale(1.4);
+    }
+
+    80% {
+        transform: scale(0.7);
+    }
+
+    100% {
+        transform: scale(1);
+    }
 }
 
 @keyframes frame-window-scale-up {

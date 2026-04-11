@@ -1,1 +1,2 @@
-export const AEM_PUBLISH_DAM = 'https://publish-p152536-e2003150.adobeaemcloud.com/';
+// Shared constants across the application
+// Add project-wide constants here as needed

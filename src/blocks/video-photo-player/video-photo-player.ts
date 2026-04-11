@@ -1,5 +1,4 @@
-import './video-photo-player.css';
-import { AEM_PUBLISH_DAM } from '@/utils/constants';
+import { resolveDAMUrl } from '@/utils/env';
 
 function updateMask(container: HTMLElement, frameGroup: HTMLElement) {
   const containerRect = container.getBoundingClientRect();
@@ -151,15 +150,4 @@ export default async function decorate(block) {
   if (picture) {
     makeDraggable(frameGroup, media);
   }
-}
-export function resolveDAMUrl(src) {
-  console.log('Resolving DAM URL:', src);
-  const proxyOrigin = new URL(AEM_PUBLISH_DAM).origin;
-  try {
-    const url = new URL(src);
-    return `${proxyOrigin}${url.pathname}${url.search}`;
-  } catch {
-    // src is already a relative path
-  }
-  return src;
 }

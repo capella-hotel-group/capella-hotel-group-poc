@@ -47,6 +47,7 @@ export default defineConfig([
       'no-use-before-define': ['error', { functions: false, classes: true, variables: true }],
       'no-unused-vars': 'off',
       '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+      '@typescript-eslint/no-empty-object-type': 'off', // Allow empty object types for flexible event maps and similar patterns
     },
   },
 

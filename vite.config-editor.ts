@@ -41,7 +41,15 @@ export default defineConfig({
       input: {
         'editor-support': path.resolve(SRC_DIR, 'app', 'editor', 'editor-support.ts'),
       },
+      external: [
+        path.resolve(SRC_DIR, 'app', 'scripts.ts'),
+        path.resolve(SRC_DIR, 'app', 'aem.ts'),
+      ],
       output: {
+        paths: {
+          [path.resolve(SRC_DIR, 'app', 'scripts.ts')]: '/scripts/scripts.js',
+          [path.resolve(SRC_DIR, 'app', 'aem.ts')]: '/scripts/aem.js',
+        },
         entryFileNames: '[name].js',
         chunkFileNames: 'chunks/[name]-[hash].js',
         format: 'es',

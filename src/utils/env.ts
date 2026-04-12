@@ -39,10 +39,7 @@ export function getEnv(): ENV {
  * Derived from ENV_CONFIG — update ENV_CONFIG to change these values.
  */
 export const ENV_PUBLISH_URLS: Record<ENV, string> = Object.fromEntries(
-  ([ENV.PROD, ENV.STAGE, ENV.DEV, ENV.RDE]).map((env) => [
-    env,
-    ENV_CONFIG.find((e) => e.env === env)!.publishUrl,
-  ]),
+  [ENV.PROD, ENV.STAGE, ENV.DEV, ENV.RDE].map((env) => [env, ENV_CONFIG.find((e) => e.env === env)!.publishUrl]),
 ) as Record<ENV, string>;
 
 /**
@@ -52,8 +49,9 @@ export const ENV_PUBLISH_URLS: Record<ENV, string> = Object.fromEntries(
  */
 export function getPublishBaseUrl(): string {
   const hostname = typeof window !== 'undefined' ? window.location.hostname : '';
-  const entry = ENV_CONFIG.find((e) => e.hostnames.length > 0 && e.hostnames.includes(hostname))
-    ?? ENV_CONFIG[ENV_CONFIG.length - 1];
+  const entry =
+    ENV_CONFIG.find((e) => e.hostnames.length > 0 && e.hostnames.includes(hostname)) ??
+    ENV_CONFIG[ENV_CONFIG.length - 1];
   return entry.publishUrl;
 }
 
@@ -84,4 +82,18 @@ export function resolveDAMUrl(src: string): string {
     // Relative path → prepend publish origin
     return `${publishBaseUrl}${src}`;
   }
+}
+
+/**
+ * Detects if the page is being viewed in the AEM Universal Editor.
+ * @returns {boolean} True if in Universal Editor, false otherwise.
+ */
+export function isUniversalEditor() {
+  return (
+    window.location.search.includes('universal-editor=true') ||
+    window.location.pathname.startsWith('/editor.html') ||
+    window.location.hash.includes('universal-editor') ||
+    window.location.hostname.includes('adobeaemcloud') ||
+    !!document.querySelector('[data-universal-editor]')
+  );
 }

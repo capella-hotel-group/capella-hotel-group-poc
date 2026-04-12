@@ -203,6 +203,36 @@
           }
         },
         {
+          "title": "Test Event Bus",
+          "id": "test-event-bus",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/franklin/components/block/v1/block",
+                "template": {
+                  "name": "Test Event Bus",
+                  "filter": "none"
+                }
+              }
+            }
+          }
+        },
+        {
+          "title": "Test Global State",
+          "id": "test-global-state",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/franklin/components/block/v1/block",
+                "template": {
+                  "name": "Test Global State",
+                  "filter": "none"
+                }
+              }
+            }
+          }
+        },
+        {
           "title": "Video Photo Player",
           "id": "video-photo-player",
           "description": "A block with a fullscreen video and an overlapping picture with a draggable transparent window.",

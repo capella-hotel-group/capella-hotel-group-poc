@@ -19,7 +19,9 @@
       "menus",
       "video-photo-player",
       "video",
-      "custom-fragment"
+      "custom-fragment",
+      "test-event-bus",
+      "test-global-state"
     ]
   },
   {

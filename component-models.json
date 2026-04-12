@@ -281,6 +281,30 @@
     ]
   },
   {
+    "id": "test-event-bus",
+    "fields": [
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "label",
+        "label": "Label",
+        "value": ""
+      }
+    ]
+  },
+  {
+    "id": "test-global-state",
+    "fields": [
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "label",
+        "label": "Label",
+        "value": ""
+      }
+    ]
+  },
+  {
     "id": "video-photo-player",
     "fields": [
       {

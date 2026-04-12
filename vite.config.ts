@@ -36,7 +36,7 @@ export default defineConfig({
   build: {
     outDir,
     emptyOutDir: isWatch,
-    modulePreload: false,
+    modulePreload: { polyfill: false },
     cssCodeSplit: true,
     target: 'es2022',
 
@@ -56,7 +56,15 @@ export default defineConfig({
       output: {
         // Keep entry file names exactly as declared above
         entryFileNames: '[name].js',
-        chunkFileNames: 'chunks/[name]-[hash].js',
+        chunkFileNames: (chunkInfo) => {
+          // aem-core is stable infrastructure — use a fixed path so head.html can modulepreload it
+          if (chunkInfo.name === 'aem-core') return 'chunks/aem-core.js';
+          return 'chunks/[name]-[hash].js';
+        },
+        manualChunks: (id) => {
+          if (id.includes('src/app/aem.ts')) return 'aem-core';
+          return undefined;
+        },
         assetFileNames: (assetInfo) => {
           const name = assetInfo.name ?? '';
           if (name.endsWith('.css')) {

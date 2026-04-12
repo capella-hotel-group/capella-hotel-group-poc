@@ -1,3 +1,4 @@
+import DOMPurify from 'dompurify';
 import { decorateMain } from '@/app/scripts';
 import { loadSections } from '@/app/aem';
 
@@ -12,7 +13,7 @@ export async function loadFragment(path: string): Promise<HTMLElement | null> {
     const resp = await fetch(`${cleanPath}.plain.html`);
     if (resp.ok) {
       const main = document.createElement('main');
-      main.innerHTML = await resp.text();
+      main.innerHTML = DOMPurify.sanitize(await resp.text(), { USE_PROFILES: { html: true } });
 
       // Reset base path for media assets relative to fragment origin
       const resetAttributeBase = (tag: string, attr: string): void => {

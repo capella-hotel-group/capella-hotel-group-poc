@@ -135,6 +135,8 @@ function loadDelayed(): void {
 }
 
 async function loadPage(): Promise<void> {
+  if (window.hlx.pageLoaded) return;
+  window.hlx.pageLoaded = true;
   console.log(`app=${__APP_NAME__} version=${__APP_VERSION__}`);
   await loadEager(document);
   await loadLazy(document);

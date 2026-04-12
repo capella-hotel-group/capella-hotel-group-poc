@@ -12,6 +12,7 @@ interface HlxConfig {
   lighthouse: boolean;
   RUM_MASK_URL?: string;
   RUM_MANUAL_ENHANCE?: boolean;
+  pageLoaded?: boolean;
   patchBlockConfig?: Array<(config: BlockConfig) => BlockConfig>;
   rum?: {
     weight: number;

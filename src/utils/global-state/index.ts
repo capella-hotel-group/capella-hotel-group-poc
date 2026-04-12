@@ -5,8 +5,13 @@ export type { GlobalState, StateListener, StateSelector, SetStateFn, Unsubscribe
 // ─── Initial state ────────────────────────────────────────────────────────────
 
 const INITIAL_STATE: GlobalState = {
-  currentSection: null,
-  scrollProgress: 0,
+  // scrollProgress: 0,
+  // currentSection: null,
+  testCounter: 0,
+  viewport: {
+    width: window.innerWidth,
+    height: window.innerHeight,
+  },
 };
 
 // ─── Module-level closure ─────────────────────────────────────────────────────

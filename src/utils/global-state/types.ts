@@ -1,6 +1,7 @@
 export type GlobalState = {
-  currentSection: string | null;
-  scrollProgress: number;
+  testCounter?: number;
+  // currentSection: string | null;
+  // scrollProgress: number;
   viewport?: {
     width: number;
     height: number;

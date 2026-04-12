@@ -3,7 +3,13 @@
     "stylelint-config-standard"
   ],
   "rules": {
-    "rule-empty-line-before": null
+    "rule-empty-line-before": null,
+    "value-keyword-case": [
+      "lower",
+      {
+        "camelCaseSvgKeywords": true
+      }
+    ]
   },
   "ignoreFiles": [
     "dist/**/*.css",

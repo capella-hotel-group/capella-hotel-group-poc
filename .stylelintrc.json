@@ -9,7 +9,17 @@
       {
         "camelCaseSvgKeywords": true
       }
-    ]
+    ],
+    "selector-class-pattern": [
+      "^([a-z][a-z0-9]*)(-[a-z0-9]+)*(--[a-z][a-z0-9]*(-[a-z0-9]+)*)?$",
+      {
+        "message": "Class names must be kebab-case; BEM modifiers (--modifier) are allowed"
+      }
+    ],
+    "keyframes-name-pattern": null,
+    "alpha-value-notation": "number",
+    "no-descending-specificity": null,
+    "declaration-block-no-redundant-longhand-properties": null
   },
   "ignoreFiles": [
     "dist/**/*.css",

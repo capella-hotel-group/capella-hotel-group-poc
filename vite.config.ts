@@ -36,7 +36,7 @@ export default defineConfig({
   build: {
     outDir,
     emptyOutDir: isWatch,
-    modulePreload: { polyfill: false },
+    modulePreload: false,
     cssCodeSplit: true,
     target: 'es2022',
 

@@ -39,6 +39,11 @@ export default async function decorate(block: HTMLElement): Promise<void> {
   const path = link ? (link.getAttribute('href') ?? '') : (block.textContent?.trim() ?? '');
   const fragment = await loadFragment(path);
   if (fragment) {
-    block.replaceWith(fragment);
+    const fragmentSection = fragment.querySelector<HTMLElement>(':scope .section');
+    if (fragmentSection) {
+      block.classList.add(...fragmentSection.classList);
+      block.classList.remove('section');
+      block.replaceChildren(...fragmentSection.childNodes);
+    }
   }
 }

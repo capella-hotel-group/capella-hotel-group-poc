@@ -1,41 +1,52 @@
 import { moveInstrumentation } from '@/app/scripts';
 import { createOptimizedPicture } from '@/app/aem';
+import { resolveDAMUrl } from '@/utils/env';
 
 export default async function decorate(block: HTMLElement): Promise<void> {
   const rows = [...block.children];
 
-  const wrapper = document.createElement('div');
-  wrapper.className = 'hidden-stories-inner';
+  // Row 0: video — first <a> href
+  const videoSrc = resolveDAMUrl(rows[0]?.querySelector('a')?.href ?? '');
 
-  rows.forEach((row) => {
-    const cell = row.firstElementChild;
-    if (!cell) return;
+  // Row 1: overlay image — reuse the existing <picture> element
+  const picture = rows[1]?.querySelector('picture') ?? null;
 
-    const anchor = cell.querySelector<HTMLAnchorElement>('a[href]');
-    const picture = cell.querySelector('picture');
+  const media = document.createElement('div');
+  media.className = 'hidden-stories-media';
 
-    if (anchor && !picture) {
-      // video row
-      const videoWrapper = document.createElement('div');
-      videoWrapper.className = 'hidden-stories-video';
-      moveInstrumentation(cell, videoWrapper);
-      videoWrapper.append(...cell.children);
-      wrapper.append(videoWrapper);
-    } else if (picture) {
-      // image row
-      const figure = document.createElement('figure');
-      figure.className = 'hidden-stories-image';
-      moveInstrumentation(cell, figure);
-      figure.append(...cell.children);
-      wrapper.append(figure);
-    }
-  });
+  const video = document.createElement('video');
+  video.autoplay = true;
+  video.muted = true;
+  video.loop = true;
+  video.playsInline = true;
 
-  wrapper.querySelectorAll<HTMLImageElement>('picture > img').forEach((img) => {
-    const optimized = createOptimizedPicture(img.src, img.alt, false, [{ width: '800' }]);
-    moveInstrumentation(img, optimized.querySelector('img'));
-    img.closest('picture')?.replaceWith(optimized);
-  });
+  const source = document.createElement('source');
+  source.src = videoSrc;
+  source.type = 'video/mp4';
+  video.append(source);
+  media.append(video);
 
-  block.replaceChildren(wrapper);
+  if (picture) {
+    const img = picture.querySelector<HTMLImageElement>('img');
+    const optimizedPic = img
+      ? createOptimizedPicture(img.src, img.alt, true, [{ width: '2000' }])
+      : picture;
+
+    if (img) moveInstrumentation(img, optimizedPic.querySelector('img'));
+
+    const overlay = document.createElement('div');
+    overlay.className = 'hidden-stories-overlay';
+    overlay.append(optimizedPic);
+    media.append(overlay);
+
+    video.addEventListener(
+      'canplay',
+      () => {
+        overlay.classList.add('is-fading');
+      },
+      { once: true },
+    );
+  }
+
+  block.replaceChildren(media);
 }

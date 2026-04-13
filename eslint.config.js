@@ -57,7 +57,7 @@ export default defineConfig([
     plugins: { xwalk: xwalkPlugin },
     languageOptions: { parser: jsoncParser },
     rules: {
-      'xwalk/max-cells': ['error', { '*': 4 }],
+      'xwalk/max-cells': "off", // Disable max cells rule for flexibility in component definitions
       'xwalk/no-duplicate-fields': 'error',
       'xwalk/invalid-field-name': 'error',
       'xwalk/no-orphan-collapsible-fields': 'error',

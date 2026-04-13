@@ -1,303 +1,319 @@
-.hidden-stories > .hidden-stories-wrapper {
-  max-width: unset;
-  padding: 0;
+.hidden-stories>.hidden-stories-wrapper {
+    max-width: unset;
+    padding: 0;
 }
 
 .hidden-stories-media {
-  position: relative;
-  width: 100%;
-  aspect-ratio: 1492 / 995;
-  overflow: hidden;
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1492 / 995;
+    overflow: hidden;
 }
 
 .hidden-stories-blocker {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
+    position: absolute;
+    inset: 0;
+    z-index: 1;
 }
 
 .hidden-stories-media video {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  /* hide native browser video UI (e.g. Safari tap controls) */
-  -webkit-media-controls: none;
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+
+    /* hide native browser video UI (e.g. Safari tap controls) */
+    -webkit-media-controls: none;
 }
 
 .hidden-stories-overlay {
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  transition: opacity 0.8s ease;
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    transition: opacity 0.8s ease;
 }
 
 .hidden-stories-overlay.is-fading {
-  opacity: 0;
-  pointer-events: none;
+    opacity: 0;
+    pointer-events: none;
 }
 
 .hidden-stories-switcher {
-  position: absolute;
-  top: 25%;
-  left: 16.5%;
-  width: 140px;
-  height: 44px;
-  z-index: 3;
-  display: inline-flex;
-  align-items: center;
-  border-radius: 999px;
-  cursor: pointer;
-
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: url(#hidden-stories-glass-filter);
-  -webkit-backdrop-filter: blur(4px);
-  box-shadow:
-    inset 1px 1px 0 0 rgb(255 255 255 / 18%),
-    inset -1px -1px 0 0 rgb(255 255 255 / 12%),
-    0 4px 8px 0 rgb(0 0 0 / 20%),
-    0 6px 20px 0 rgb(0 0 0 / 20%);
-  transition: all 0.3s cubic-bezier(0.2, 0.9, 0.3, 1.5);
+    position: absolute;
+    top: 25%;
+    left: 16.5%;
+    width: 140px;
+    height: 44px;
+    z-index: 3;
+    display: inline-flex;
+    align-items: center;
+    border-radius: 999px;
+    cursor: pointer;
+    background: rgb(255 255 255 / 0.05);
+    backdrop-filter: url("#hidden-stories-glass-filter");
+    backdrop-filter: blur(4px);
+    box-shadow:
+        inset 1px 1px 0 0 rgb(255 255 255 / 0.18),
+        inset -1px -1px 0 0 rgb(255 255 255 / 0.12),
+        0 4px 8px 0 rgb(0 0 0 / 0.2),
+        0 6px 20px 0 rgb(0 0 0 / 0.2);
+    transition: all 0.3s cubic-bezier(0.2, 0.9, 0.3, 1.5);
 }
 
 .hidden-stories-switcher:hover {
-  background: rgba(255, 255, 255, 0.09);
-  box-shadow:
-    inset 1px 1px 0 0 rgb(255 255 255 / 25%),
-    inset -1px -1px 0 0 rgb(255 255 255 / 16%),
-    0 6px 16px 0 rgb(0 0 0 / 25%),
-    0 8px 28px 0 rgb(0 0 0 / 22%);
+    background: rgb(255 255 255 / 0.09);
+    box-shadow:
+        inset 1px 1px 0 0 rgb(255 255 255 / 0.25),
+        inset -1px -1px 0 0 rgb(255 255 255 / 0.16),
+        0 6px 16px 0 rgb(0 0 0 / 0.25),
+        0 8px 28px 0 rgb(0 0 0 / 0.22);
 }
 
 .hidden-stories-switcher-thumb {
-  position: absolute;
-  top: 5px;
-  left: 5px;
-  width: 34px;
-  height: 34px;
-  border-radius: 999px;
-  transform: translateX(0);
-  transition:
-    transform 0.38s cubic-bezier(0.4, 0, 0.2, 1),
-    background 0.38s ease,
-    box-shadow 0.38s ease,
-    opacity 0.3s ease;
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    width: 34px;
+    height: 34px;
+    border-radius: 999px;
+    transform: translateX(0);
+    transition:
+        transform 0.38s cubic-bezier(0.4, 0, 0.2, 1),
+        background 0.38s ease,
+        box-shadow 0.38s ease,
+        opacity 0.3s ease;
 
-  /* day: warm ivory */
-  background: radial-gradient(circle at 35% 35%, #f5ede4, #ddc8b4);
-  box-shadow:
-    0 2px 8px rgb(0 0 0 / 30%),
-    0 1px 0 rgb(255 255 255 / 50%) inset;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
+    /* day: warm ivory */
+    background: radial-gradient(circle at 35% 35%, #f5ede4, #ddc8b4);
+    box-shadow:
+        0 2px 8px rgb(0 0 0 / 0.3),
+        0 1px 0 rgb(255 255 255 / 0.5) inset;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .hidden-stories-switcher.is-night .hidden-stories-switcher-thumb {
-  /* switcher width (140px) - thumb width (34px) - left (5px) - right (5px) = 96px */
-  transform: translateX(96px);
+    /* switcher width (140px) - thumb width (34px) - left (5px) - right (5px) = 96px */
+    transform: translateX(96px);
 
-  /* night: deep charcoal */
-  background: radial-gradient(circle at 35% 35%, #3a3230, #1c1614);
-  box-shadow:
-    0 2px 8px rgb(0 0 0 / 50%),
-    0 1px 0 rgb(255 255 255 / 8%) inset;
+    /* night: deep charcoal */
+    background: radial-gradient(circle at 35% 35%, #3a3230, #1c1614);
+    box-shadow:
+        0 2px 8px rgb(0 0 0 / 0.5),
+        0 1px 0 rgb(255 255 255 / 0.08) inset;
 }
 
 .hidden-stories-switcher-thumb svg {
-  transition: opacity 0.25s ease;
+    transition: opacity 0.25s ease;
 }
 
 .hidden-stories-switcher-thumb svg.night {
-  display: none;
+    display: none;
 }
 
 .hidden-stories-switcher.is-night .hidden-stories-switcher-thumb svg.day {
-  display: none;
+    display: none;
 }
 
 .hidden-stories-switcher.is-night .hidden-stories-switcher-thumb svg.night {
-  display: block;
+    display: block;
 }
 
 .hidden-stories-switcher-label {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  color: rgb(255 245 235 / 85%);
-  font-size: 16px;
-  font-style: normal;
-  font-weight: 300;
-  letter-spacing: 0.04em;
-  line-height: normal;
-  width: 96px;
-  text-align: center;
-  pointer-events: none;
-  text-shadow: 0 1px 4px rgb(0 0 0 / 40%);
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    color: rgb(255 245 235 / 0.85);
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 300;
+    letter-spacing: 0.04em;
+    line-height: normal;
+    width: 96px;
+    text-align: center;
+    pointer-events: none;
+    text-shadow: 0 1px 4px rgb(0 0 0 / 0.4);
 }
 
 .hidden-stories-switcher-label.day {
-  right: 0;
-  opacity: 1;
-  transition: opacity 0.35s ease;
-  padding-right: 6px;
+    right: 0;
+    opacity: 1;
+    transition: opacity 0.35s ease;
+    padding-right: 6px;
 }
 
 .hidden-stories-switcher-label.night {
-  left: 0;
-  opacity: 0;
-  transition: opacity 0.35s ease;
-  padding-left: 6px;
+    left: 0;
+    opacity: 0;
+    transition: opacity 0.35s ease;
+    padding-left: 6px;
 }
 
 .hidden-stories-switcher.is-night .hidden-stories-switcher-label.day {
-  opacity: 0;
+    opacity: 0;
 }
 
 .hidden-stories-switcher.is-night .hidden-stories-switcher-label.night {
-  opacity: 1;
+    opacity: 1;
 }
 
 .hidden-stories-story-wrapper {
-  position: absolute;
-  top: 73%;
-  left: 29%;
-  z-index: 3;
-  width: 48px;
-  height: 48px;
+    position: absolute;
+    top: 73%;
+    left: 29%;
+    z-index: 3;
+    width: 48px;
+    height: 48px;
 }
 
 .hidden-stories-add-btn {
-  position: relative;
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: url(#hidden-stories-glass-filter);
-  -webkit-backdrop-filter: blur(4px);
-  box-shadow:
-    inset 1px 1px #ffffff2e,
-    inset -1px -1px #ffffff1f,
-    0 4px 8px #0003,
-    0 6px 20px #0003;
-  transition: all 0.3s cubic-bezier(0.2, 0.9, 0.3, 1.5);
+    position: relative;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgb(255 255 255 / 0.05);
+    backdrop-filter: url("#hidden-stories-glass-filter");
+    backdrop-filter: blur(4px);
+    box-shadow:
+        inset 1px 1px #ffffff2e,
+        inset -1px -1px #ffffff1f,
+        0 4px 8px #0003,
+        0 6px 20px #0003;
+    transition: all 0.3s cubic-bezier(0.2, 0.9, 0.3, 1.5);
 }
 
 .hidden-stories-add-btn svg {
-  width: 24px;
-  height: 24px;
-  flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
 }
 
 .hidden-stories-add-btn:hover {
-  background: rgba(255, 255, 255, 0.09);
-  box-shadow:
-    inset 1px 1px 0 0 rgb(255 255 255 / 25%),
-    inset -1px -1px 0 0 rgb(255 255 255 / 16%),
-    0 6px 16px 0 rgb(0 0 0 / 25%),
-    0 8px 28px 0 rgb(0 0 0 / 22%);
+    background: rgb(255 255 255 / 0.09);
+    box-shadow:
+        inset 1px 1px 0 0 rgb(255 255 255 / 0.25),
+        inset -1px -1px 0 0 rgb(255 255 255 / 0.16),
+        0 6px 16px 0 rgb(0 0 0 / 0.25),
+        0 8px 28px 0 rgb(0 0 0 / 0.22);
 }
 
 .hidden-stories-modal {
-  position: absolute;
-  top: 50%;
-  left: 100%;
-  transform: translateY(-50%);
-  margin-left: 16px;
-  z-index: 4;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.3s ease;
+    position: absolute;
+    top: 50%;
+    left: 100%;
+    transform: translateY(-50%);
+    margin-left: 16px;
+    z-index: 4;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
 }
 
 .hidden-stories-modal.is-open {
-  pointer-events: auto;
-  opacity: 1;
+    pointer-events: auto;
+    opacity: 1;
 }
 
 .hidden-stories-modal.is-closing {
-  opacity: 0;
-  pointer-events: none;
+    opacity: 0;
+    pointer-events: none;
 }
 
 .hidden-stories-modal-card {
-  width: 320px;
-  border-radius: 16px;
-  padding: 10px;
-  overflow: hidden;
-  transform: scaleY(0);
-  transform-origin: center;
-  transition: none;
-
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: url(#hidden-stories-glass-filter);
-  -webkit-backdrop-filter: blur(4px);
-  border: 1px solid rgb(255 245 230 / 32%);
-  box-shadow:
-    inset 1px 1px 0 0 rgb(255 255 255 / 18%),
-    inset -1px -1px 0 0 rgb(255 255 255 / 12%),
-    0 4px 8px 0 rgb(0 0 0 / 20%),
-    0 6px 20px 0 rgb(0 0 0 / 20%);
+    width: 320px;
+    border-radius: 16px;
+    padding: 10px;
+    overflow: hidden;
+    transform: scaleY(0);
+    transform-origin: center;
+    transition: none;
+    background: rgb(255 255 255 / 0.05);
+    backdrop-filter: url("#hidden-stories-glass-filter");
+    backdrop-filter: blur(4px);
+    border: 1px solid rgb(255 245 230 / 0.32);
+    box-shadow:
+        inset 1px 1px 0 0 rgb(255 255 255 / 0.18),
+        inset -1px -1px 0 0 rgb(255 255 255 / 0.12),
+        0 4px 8px 0 rgb(0 0 0 / 0.2),
+        0 6px 20px 0 rgb(0 0 0 / 0.2);
 }
 
 .hidden-stories-modal.is-open .hidden-stories-modal-card {
-  animation: hs-card-bounce 0.35s ease-out forwards;
+    animation: hs-card-bounce 0.35s ease-out forwards;
 }
 
 @keyframes hs-card-bounce {
-  0%   { transform: scaleY(0); }
-  55%  { transform: scaleY(1.08); }
-  75%  { transform: scaleY(0.96); }
-  100% { transform: scaleY(1); }
+    0% {
+        transform: scaleY(0);
+    }
+
+    55% {
+        transform: scaleY(1.08);
+    }
+
+    75% {
+        transform: scaleY(0.96);
+    }
+
+    100% {
+        transform: scaleY(1);
+    }
 }
 
 .hidden-stories-modal.is-closing .hidden-stories-modal-card {
-  animation: hs-card-collapse 0.25s ease-in forwards;
+    animation: hs-card-collapse 0.25s ease-in forwards;
 }
 
 @keyframes hs-card-collapse {
-  0%   { transform: scaleY(1); opacity: 1; }
-  100% { transform: scaleY(0); opacity: 0; }
+    0% {
+        transform: scaleY(1);
+        opacity: 1;
+    }
+
+    100% {
+        transform: scaleY(0);
+        opacity: 0;
+    }
 }
 
 .hidden-stories-modal-image {
-  width: 100%;
-  border-radius: 8px;
-  overflow: hidden;
-  margin-bottom: 12px;
-  line-height: 0;
+    width: 100%;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 12px;
+    line-height: 0;
 }
 
 .hidden-stories-modal-image picture,
 .hidden-stories-modal-image img {
-  width: 100%;
-  height: auto;
-  display: block;
-  object-fit: cover;
-  border-radius: 8px;
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: cover;
+    border-radius: 8px;
 }
 
 .hidden-stories-modal-text {
-  margin-top: 10px;
-  color: #ebebea;
-  font-family: Calibre, var(--body-font-family), sans-serif;
-  font-size: 16px;
-  font-style: normal;
-  font-weight: 300;
-  line-height: 100%;
-  white-space: pre-line;
+    margin-top: 10px;
+    color: #ebebea;
+    font-family: Calibre, var(--body-font-family), sans-serif;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 300;
+    line-height: 100%;
+    white-space: pre-line;
 }
 
 .hidden-stories-overlay picture,
 .hidden-stories-overlay picture img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
 }

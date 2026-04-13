@@ -26,6 +26,7 @@ const hasSrcChanges = modifiedFiles.some(
 if (hasSrcChanges) {
   const buildOutput = await run('npm run build');
   console.log(buildOutput);
+  await run('git add blocks/ scripts/ styles/ chunks/');
 }
 
 // lint and format staged files

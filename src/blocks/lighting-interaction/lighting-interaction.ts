@@ -1,5 +1,6 @@
 import { createOptimizedPicture } from '@/app/aem';
 import { moveInstrumentation } from '@/app/scripts';
+import type { SceneConfig } from './scene';
 
 export default async function decorate(block: HTMLElement): Promise<void> {
   const rows = [...block.querySelectorAll<HTMLElement>(':scope > div')];
@@ -9,15 +10,21 @@ export default async function decorate(block: HTMLElement): Promise<void> {
   const background = document.createElement('div');
   background.className = 'lighting-interaction-background';
 
+  let imageUrl = '';
   const pic = backgroundRow?.querySelector<HTMLPictureElement>('picture');
   if (pic) {
     const img = pic.querySelector<HTMLImageElement>('img');
     if (img) {
+      imageUrl = img.src;
       const optimized = createOptimizedPicture(img.src, img.alt, true, [{ width: '1440' }]);
       moveInstrumentation(pic, optimized);
       background.append(optimized);
     }
   }
+
+  // Canvas for the 3D scene (hidden until activated)
+  const canvas = document.createElement('canvas');
+  canvas.className = 'lighting-interaction-canvas';
 
   // Content overlay
   const content = document.createElement('div');
@@ -41,5 +48,31 @@ export default async function decorate(block: HTMLElement): Promise<void> {
     content.append(tagline);
   }
 
-  block.replaceChildren(background, content);
+  // DOM stack: background (z=0) → canvas (z=0, above bg by DOM order) → ::before (z=1) → content (z=2)
+  block.replaceChildren(background, canvas, content);
+
+  // No image means no 3D scene to load
+  if (!imageUrl) return;
+
+  let initialized = false;
+
+  block.addEventListener('click', async () => {
+    if (initialized) return;
+    initialized = true;
+
+    block.classList.add('lighting-interaction--loading');
+
+    try {
+      const { initScene } = await import('./scene');
+      const sceneConfig: SceneConfig = { imageUrl };
+      await initScene(canvas, sceneConfig);
+      block.classList.remove('lighting-interaction--loading');
+      block.classList.add('lighting-interaction--active');
+    } catch (err) {
+      console.error('lighting-interaction: failed to start scene', err);
+      // Reset so the user can retry
+      initialized = false;
+      block.classList.remove('lighting-interaction--loading');
+    }
+  });
 }

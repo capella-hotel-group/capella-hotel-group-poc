@@ -1,10 +1,10 @@
 ## ADDED Requirements
 
 ### Requirement: Invoke via prompt command
-The prompt SHALL be invocable in Copilot Chat using `/create-block-from-figma` followed by a block name (kebab-case) and a Figma URL.
+The prompt SHALL be invocable in Copilot Chat using `/aem-create-block-from-figma` followed by a block name (kebab-case), a Figma URL, and an optional description.
 
 #### Scenario: Valid inputs provided
-- **WHEN** the developer runs `/create-block-from-figma my-block https://figma.com/design/...`
+- **WHEN** the developer runs `/aem-create-block-from-figma my-block https://figma.com/design/...`
 - **THEN** the agent parses the block name and Figma URL and proceeds to fetch design data
 
 #### Scenario: Block name is not kebab-case
@@ -16,7 +16,7 @@ The prompt SHALL be invocable in Copilot Chat using `/create-block-from-figma` f
 - **THEN** the agent MUST ask the developer whether to overwrite or abort before generating any files
 
 #### Scenario: No input provided
-- **WHEN** the developer runs `/create-block-from-figma` with no arguments
+- **WHEN** the developer runs `/aem-create-block-from-figma` with no arguments
 - **THEN** the agent SHALL ask for the block name and Figma URL before proceeding
 
 ### Requirement: Fetch Figma design data via MCP

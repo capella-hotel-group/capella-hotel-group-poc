@@ -11,9 +11,9 @@ I'll scaffold:
 
 ---
 
-**Input**: `/create-block-from-figma <block-name> <figma-url>`
+**Input**: `/aem-create-block-from-figma <block-name> <figma-url> [description]`
 
-Both arguments are required. `<block-name>` must be kebab-case. `<figma-url>` must be a valid `figma.com` URL.
+`<block-name>` and `<figma-url>` are required. `<block-name>` must be kebab-case. `<figma-url>` must be a valid `figma.com` URL. `[description]` is optional free text — use it to describe interactions, states, animation timing, or cross-block context that Figma MCP cannot infer visually.
 
 ---
 
@@ -367,6 +367,20 @@ If the command succeeds, confirm:
 > "`src/models/_section.json` updated, and `component-models.json`, `component-definition.json`, `component-filters.json` regenerated. The `<block-name>` block is now available in AEM."
 
 If `build:json` fails, show the error and ask the developer to run it manually.
+
+---
+
+## Step 7 — Verify build
+
+Run the full Vite build to confirm the new block compiles without errors:
+
+```bash
+npm run build
+```
+
+- If the build **passes**: confirm to the developer that the block compiled successfully and the output is at `blocks/<block-name>/<block-name>.js`
+- If the build **fails**: show the compiler error, identify the likely cause (type error, missing import, invalid CSS token), fix it in the generated files, and re-run `npm run build` until it passes
+- Do NOT leave a failing build — fix all errors before finishing
 
 ---
 

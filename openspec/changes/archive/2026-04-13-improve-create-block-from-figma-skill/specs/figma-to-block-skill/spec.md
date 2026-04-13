@@ -1,4 +1,4 @@
-## ADDED Requirements
+## MODIFIED Requirements
 
 ### Requirement: Skill has correct YAML frontmatter
 The `SKILL.md` file SHALL have frontmatter that correctly identifies the skill and its requirements.
@@ -18,12 +18,7 @@ The skill SHALL be structured so that any Copilot agent (including OpenSpec appl
 - **WHEN** the Figma MCP tools are not available at skill invocation time
 - **THEN** the skill SHALL return an error message rather than proceeding
 
-### Requirement: Skill logic mirrors the prompt
-The skill's workflow steps SHALL mirror those in the prompt file so behavior is consistent regardless of invocation method.
-
-#### Scenario: Both prompt and skill produce identical output
-- **WHEN** given the same block name and Figma URL
-- **THEN** invoking via the prompt command and via the skill SHALL produce structurally identical `_<block-name>.json`, `<block-name>.ts`, and `<block-name>.css` files
+## ADDED Requirements
 
 ### Requirement: Accept optional developer description
 The skill SHALL accept an optional `description` parameter that supplements the Figma MCP data with interaction intent, animation notes, cross-block context, or accessibility requirements that cannot be inferred visually.
@@ -55,11 +50,6 @@ The skill SHALL identify when a Figma node represents a component with multiple 
 - **WHEN** the developer provides separate Figma URLs for each state frame
 - **THEN** the skill SHALL fetch all nodes sequentially, merge the field analysis, and treat each node as a distinct state
 
-#### Scenario: Trigger type confirmation required
-- **WHEN** multiple states or frames are detected from any source
-- **THEN** the skill MUST ask how states are triggered (CSS-only, JS-driven, or visual reference only) before generating any code
-- **AND** the skill SHALL NOT assume trigger type from frame names alone
-
 #### Scenario: More than 3 JS-driven states detected
 - **WHEN** the state list has more than 3 states that require JavaScript (not CSS pseudo-classes)
 - **THEN** the skill MUST pause and ask the developer to confirm or reduce the list before generating any code
@@ -69,7 +59,7 @@ The skill SHALL identify when a Figma node represents a component with multiple 
 - **THEN** the skill SHALL NOT treat these as multi-state — they are handled via CSS with no JavaScript involvement
 
 ### Requirement: Generate state-aware TypeScript and CSS
-When JS-driven multi-state is confirmed, the skill SHALL generate code using the `data-state` attribute pattern.
+When multi-state is confirmed, the skill SHALL generate code using the `data-state` attribute pattern.
 
 #### Scenario: JS-driven state transitions generated
 - **WHEN** multi-state is confirmed with JS-driven states
@@ -79,7 +69,3 @@ When JS-driven multi-state is confirmed, the skill SHALL generate code using the
 #### Scenario: Multi-step sequence generated
 - **WHEN** states follow a `step-N` sequence pattern
 - **THEN** the generated TypeScript SHALL include a `currentStep` variable and a `goToStep(n)` helper that updates `block.dataset.step`
-
-#### Scenario: Visual reference only selected
-- **WHEN** the developer selects "visual reference only" as the trigger type
-- **THEN** the skill SHALL generate a standard CSS-only TypeScript template and comprehensive CSS covering all frames with no state logic

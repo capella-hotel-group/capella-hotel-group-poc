@@ -222,9 +222,38 @@ export default async function decorate(block: HTMLElement): Promise<void> {
 
   modal.append(modalCard);
 
+  let closeHandler: ((e: AnimationEvent) => void) | null = null;
+
   addBtn.addEventListener('click', () => {
-    const isOpen = modal.classList.toggle('is-open');
-    modal.setAttribute('aria-hidden', String(!isOpen));
+    const isOpen = modal.classList.contains('is-open');
+    const isClosing = modal.classList.contains('is-closing');
+
+    if (isOpen && !isClosing) {
+      // Start closing
+      modal.classList.add('is-closing');
+      closeHandler = (e: AnimationEvent) => {
+        if (e.animationName !== 'hs-card-collapse') return;
+        modal.classList.remove('is-open', 'is-closing');
+        modal.setAttribute('aria-hidden', 'true');
+        modalCard.removeEventListener('animationend', closeHandler!);
+        closeHandler = null;
+      };
+      modalCard.addEventListener('animationend', closeHandler);
+    } else {
+      // Open (or re-open while still closing)
+      if (closeHandler) {
+        modalCard.removeEventListener('animationend', closeHandler);
+        closeHandler = null;
+      }
+      modal.classList.remove('is-closing');
+      modal.classList.add('is-open');
+      modal.setAttribute('aria-hidden', 'false');
+      // Force animation restart
+      modalCard.style.animation = 'none';
+      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+      modalCard.offsetHeight;
+      modalCard.style.animation = '';
+    }
   });
 
   // --- story wrapper: groups button + modal ---

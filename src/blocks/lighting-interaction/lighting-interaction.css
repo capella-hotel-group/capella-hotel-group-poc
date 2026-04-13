@@ -4,6 +4,11 @@
     padding: 0;
 }
 
+/* Authoring-only fix */
+.adobe-ue-edit .lighting-interaction-wrapper {
+    max-height: 1080px;
+}
+
 .lighting-interaction {
     position: relative;
     overflow: hidden;

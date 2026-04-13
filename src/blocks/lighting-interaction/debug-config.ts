@@ -36,6 +36,14 @@ export const debugConfig: {
   // --- Foreground pointer strength ---
   /** Override ADVANCE_FG_POINTER_STRENGTH for the foreground plane. Default 0.03. */
   fgPointerStrength?: number;
+
+  // --- Decor pointer influence radius ---
+  /** Gaussian radius (local units, 0.0–2.0) controlling how far from the pointer decor vertices react. Default 0.8. */
+  decorPointerInfluenceRadius?: number;
+
+  // --- Headline plane ---
+  /** Enable the canvas-texture headline plane in advance mode (hides DOM text). Default false. */
+  headlineInteraction?: boolean;
 } = {
   advance: true,
   showDecorLeft: true,
@@ -49,4 +57,6 @@ export const debugConfig: {
   velocityDecayRate: undefined,
   velocityDecayThreshold: undefined,
   fgPointerStrength: undefined,
+  decorPointerInfluenceRadius: undefined,
+  headlineInteraction: true,
 };

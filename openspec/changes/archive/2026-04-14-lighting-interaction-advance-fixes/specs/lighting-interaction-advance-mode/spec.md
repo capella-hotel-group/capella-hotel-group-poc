@@ -1,10 +1,4 @@
-## Purpose
-
-Defines the advance mode for the lighting-interaction block. In advance mode the background plane is static and three transparent overlay planes (decoration-left, decoration-right, foreground) animate on top of it. Decoration planes use a rigid-body rotation model (branch-bending); the foreground uses a per-vertex sin wave. Pointer velocity adds localised influence weighted by proximity to the pointer position.
-
----
-
-## Requirements
+## MODIFIED Requirements
 
 ### Requirement: Block supports an advance mode flag
 The block SHALL read a boolean `advance` field from the authored CMS content. The AEM Universal Editor field for `advance` SHALL use `"component": "boolean"` (renders as a toggle). When the field is absent or `false`, the block SHALL behave identically to the existing non-advance implementation. When `true`, the block SHALL activate the advance animation layer system. The `debug-config.ts` advance override SHALL take precedence over the CMS value when it is not `undefined`.
@@ -27,8 +21,10 @@ The block SHALL read a boolean `advance` field from the authored CMS content. Th
 - **WHEN** an author opens the block properties panel in Universal Editor
 - **THEN** a boolean toggle labelled "Advance Mode" is visible and togglable
 
+## ADDED Requirements
+
 ### Requirement: Decor layers animate as rotating branches
-The `updateDecorLayer` function SHALL implement a rigid-body rotation model. All vertices in a single decoration plane SHALL share a single frame rotation angle `θ = sinAmplitude × sin(advAngle + phaseOffset)`. Each vertex displacement SHALL be the difference between the rotated offset vector `(ax, ay)` (from the anchor) and the original offset vector: `dispX = ax×(cosθ−1) − ay×sinθ`, `dispY = ax×sinθ + ay×(cosθ−1)`. The `phaseScale` and `velocityScale` parameters SHALL NOT exist in `UpdateDecorLayerParams`.
+The `updateDecorLayer` function SHALL implement a rigid-body rotation model. All vertices in a single decoration plane SHALL share a single frame rotation angle `θ = sinAmplitude × sin(advAngle + phaseOffset)`. Each vertex displacement SHALL be the difference between the rotated offset vector `(ax, ay)` (from the anchor) and the original offset vector: `dispX = ax×(cosθ−1) − ay×sinθ`, `dispY = ax×sinθ + ay×(cosθ−1)`. The `phaseScale` and `velocityScale` parameters SHALL be removed from `UpdateDecorLayerParams`; they have no role in the rotation model.
 
 #### Scenario: Vertices near anchor barely displace
 - **WHEN** `updateDecorLayer` is called with non-zero `sinAmplitude`

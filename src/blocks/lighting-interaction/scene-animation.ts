@@ -15,41 +15,49 @@ export interface UpdateDecorLayerParams {
   advAngle: number;
   phaseOffset: number;
   sinAmplitude: number;
-  phaseScale: number;
-  velocityScale: number;
   smoothDeltaX: number;
   smoothDeltaY: number;
   pointerStrength: number;
+  /** Pointer position in plane local space (NDC x/y). Used for proximity weighting. */
+  hitLocalX: number;
+  hitLocalY: number;
+  /** Gaussian influence radius around the pointer (local units). Larger = wider spread. */
+  pointerInfluenceRadius: number;
 }
 
 /**
- * Applies sin-loop rotation animation to a decoration plane.
- * Vertices further from the anchor point swing with proportionally greater amplitude.
- * Pointer velocity is proximity-weighted (near-anchor = low influence) and edge-clamped.
+ * Applies a rigid-body rotation animation to a decoration plane (branch-bending model).
+ * All vertices share a single frame angle θ = sinAmplitude × sin(advAngle + phaseOffset).
+ * Each vertex is displaced by rotating its offset vector (ax, ay) from the anchor:
+ *   dispX = ax*(cosθ−1) − ay*sinθ
+ *   dispY = ax*sinθ  + ay*(cosθ−1)
+ * Tangential displacement naturally scales with distance, producing the "branch tip moves
+ * further than the base" effect.
+ * Pointer influence is weighted by a Gaussian falloff from the pointer position:
+ * vertices close to the pointer receive full velocity influence; far vertices receive little.
  */
 export function updateDecorLayer(p: UpdateDecorLayerParams): void {
-  // Maximum possible distance from the anchor to any vertex in a 2x2 plane
-  // anchored on its edge — the diagonal from anchor to opposite corner.
-  const maxDist = Math.sqrt(8);
+  const theta = p.sinAmplitude * Math.sin(p.advAngle + p.phaseOffset);
+  const sinT = Math.sin(theta);
+  const cosT = Math.cos(theta);
+  const r2 = p.pointerInfluenceRadius * p.pointerInfluenceRadius;
+
   for (let i = 0; i < p.vertCount; i++) {
     const ax = p.restX[i] - p.anchorX;
     const ay = p.restY[i] - p.anchorY;
-    const dist = Math.sqrt(ax * ax + ay * ay);
 
-    // Sin wave with per-plane phase offset: amplitude scales with vertex distance from anchor
-    p.dispY[i] =
-      Math.sin(p.advAngle + p.phaseOffset + dist * p.phaseScale) *
-      p.sinAmplitude *
-      dist *
-      p.velocityScale;
+    // Rotation displacement — tangential to radius, scales naturally with distance
+    const rotDispX = ax * (cosT - 1) - ay * sinT;
+    const rotDispY = ax * sinT + ay * (cosT - 1);
 
-    // Proximity weight: 0 at anchor, 1 at max distance — vertices near the anchor barely move
-    const proxWeight = dist / maxDist;
+    // Gaussian proximity weight from pointer: 1 at pointer, falls off with distance
+    const dpx = p.restX[i] - p.hitLocalX;
+    const dpy = p.restY[i] - p.hitLocalY;
+    const pointerWeight = Math.exp(-(dpx * dpx + dpy * dpy) / r2);
 
-    // Additive pointer influence, proximity-weighted and edge-clamped
-    p.dispX[i] = p.smoothDeltaX * p.pointerStrength * proxWeight * p.borderMask[i];
-    p.dispY[i] =
-      (p.dispY[i] + p.smoothDeltaY * p.pointerStrength * proxWeight) * p.borderMask[i];
+    // Combine rotation with pointer-proximity-weighted influence; pin border vertices
+    p.dispX[i] = (rotDispX + p.smoothDeltaX * p.pointerStrength * pointerWeight) * p.borderMask[i];
+    p.dispY[i] = (rotDispY + p.smoothDeltaY * p.pointerStrength * pointerWeight) * p.borderMask[i];
 
     p.posAttr.setXYZ(i, p.restX[i] + p.dispX[i], p.restY[i] + p.dispY[i], 0);
   }

@@ -21,21 +21,20 @@ import {
 import { createDebugOverlayCanvas, drawVelocityVector } from './scene-debug';
 
 // --- Standard mode config ---
-const INFLUENCE_RADIUS = 0.8; // local-space radius of pointer influence (plane half-height = 1 unit)
-const DISPLACEMENT_STRENGTH = 0.1; // impulse multiplier per frame
-const VELOCITY_DECAY_RATE = 0.05; // exponential decay rate per frame (0–1); higher = faster fade
+const INFLUENCE_RADIUS = 0.2; // 0.8 local-space radius of pointer influence (plane half-height = 1 unit)
+const DISPLACEMENT_STRENGTH = 0.18; // impulse multiplier per frame
+const VELOCITY_DECAY_RATE = 0.032; // exponential decay rate per frame (0–1); higher = faster fade
 const VELOCITY_DECAY_THRESHOLD = 0.0001; // snap smoothDelta to zero below this magnitude
 const SPRING_DAMPING = 0.8; // per-frame decay that springs vertices back to rest
-const Z_FACTOR = 0.16; // z-displacement magnitude relative to xy displacement
+const Z_FACTOR = 0.3; // 0.16 z-displacement magnitude relative to xy displacement
 
 // --- Advance mode config ---
-const ADVANCE_SIN_AMPLITUDE = 0.06; // peak Y displacement for a decor vertex at dist=1 from anchor
+const ADVANCE_SIN_AMPLITUDE = 0.08; // peak Y displacement for a decor vertex at dist=1 from anchor
 const ADVANCE_SIN_FREQ = 0.015; // angle increment per frame (radians); controls wave speed
-const ADVANCE_PHASE_SCALE = 2.5; // distance-to-phase multiplier; larger = tighter wave spacing
-const ADVANCE_DECOR_VELOCITY_SCALE = 1.0; // final amplitude scale on the distance-proportional decor wave
 const ADVANCE_FG_AMPLITUDE = 0.03; // peak X displacement for foreground vertices
-const ADVANCE_POINTER_STRENGTH = 0.05; // uniform pointer-velocity scale for all overlay planes
-const ADVANCE_FG_POINTER_STRENGTH = 0.03; // separate foreground pointer-velocity scale
+const ADVANCE_POINTER_STRENGTH = 0.45; // uniform pointer-velocity scale for all overlay planes
+const ADVANCE_FG_POINTER_STRENGTH = 0.06; // separate foreground pointer-velocity scale
+const ADVANCE_DECOR_POINTER_RADIUS = 1.2; // Gaussian influence radius around pointer for decor layers (local units)
 const DECOR_PHASE_RIGHT = Math.PI * 0.7; // phase offset applied to right decor wave
 
 export interface SceneConfig {
@@ -46,6 +45,7 @@ export interface SceneConfig {
   foregroundUrl?: string;
   headingEl?: HTMLElement | null;
   taglineEl?: HTMLElement | null;
+  headlineInteraction?: boolean;
 }
 
 let animationId: number | null = null;
@@ -182,16 +182,18 @@ export async function initScene(canvas: HTMLCanvasElement, config: SceneConfig):
 
     await Promise.all(loadPromises);
 
-    headlinePlane = createHeadlinePlane(
-      config.headingEl ?? null,
-      config.taglineEl ?? null,
-      scene,
-      container,
-      initAspect,
-    );
-    if (headlinePlane) {
-      const block = canvas.closest('.lighting-interaction');
-      block?.classList.add('lighting-interaction--text-swapped');
+    if (debugConfig.headlineInteraction ?? config.headlineInteraction) {
+      headlinePlane = createHeadlinePlane(
+        config.headingEl ?? null,
+        config.taglineEl ?? null,
+        scene,
+        container,
+        initAspect,
+      );
+      if (headlinePlane) {
+        const block = canvas.closest('.lighting-interaction');
+        block?.classList.add('lighting-interaction--text-swapped');
+      }
     }
   }
 
@@ -268,11 +270,12 @@ export async function initScene(canvas: HTMLCanvasElement, config: SceneConfig):
           advAngle,
           phaseOffset: 0,
           sinAmplitude: ADVANCE_SIN_AMPLITUDE,
-          phaseScale: ADVANCE_PHASE_SCALE,
-          velocityScale: ADVANCE_DECOR_VELOCITY_SCALE,
           smoothDeltaX: smoothDelta.x,
           smoothDeltaY: smoothDelta.y,
           pointerStrength: ADVANCE_POINTER_STRENGTH,
+          hitLocalX: currentNDC.x,
+          hitLocalY: currentNDC.y,
+          pointerInfluenceRadius: debugConfig.decorPointerInfluenceRadius ?? ADVANCE_DECOR_POINTER_RADIUS,
         });
       }
 
@@ -290,11 +293,12 @@ export async function initScene(canvas: HTMLCanvasElement, config: SceneConfig):
           advAngle,
           phaseOffset: DECOR_PHASE_RIGHT,
           sinAmplitude: ADVANCE_SIN_AMPLITUDE,
-          phaseScale: ADVANCE_PHASE_SCALE,
-          velocityScale: ADVANCE_DECOR_VELOCITY_SCALE,
           smoothDeltaX: smoothDelta.x,
           smoothDeltaY: smoothDelta.y,
           pointerStrength: ADVANCE_POINTER_STRENGTH,
+          hitLocalX: currentNDC.x,
+          hitLocalY: currentNDC.y,
+          pointerInfluenceRadius: debugConfig.decorPointerInfluenceRadius ?? ADVANCE_DECOR_POINTER_RADIUS,
         });
       }
 

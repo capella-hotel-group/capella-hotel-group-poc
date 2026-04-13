@@ -179,7 +179,12 @@ function getTextRenderInfo(
   dpr: number,
 ): { y: number; font: string; color: string; textContent: string } {
   const rect = el.getBoundingClientRect();
-  const style = getComputedStyle(el);
+  // Traverse to the deepest element child to read font rules that target h1/h2/p
+  let leaf: HTMLElement = el;
+  while (leaf.firstElementChild) {
+    leaf = leaf.firstElementChild as HTMLElement;
+  }
+  const style = getComputedStyle(leaf);
   const fontSize = parseFloat(style.fontSize);
   const fontFamily = style.fontFamily;
   const fontWeight = style.fontWeight;

@@ -226,8 +226,9 @@
   border-radius: 16px;
   padding: 10px;
   overflow: hidden;
-  transform: translateX(12px);
-  transition: transform 0.3s cubic-bezier(0.2, 0.9, 0.3, 1.5);
+  transform: scaleY(0);
+  transform-origin: center;
+  transition: none;
 
   background: rgba(255, 255, 255, 0.05);
   backdrop-filter: url(#hidden-stories-glass-filter);
@@ -241,7 +242,14 @@
 }
 
 .hidden-stories-modal.is-open .hidden-stories-modal-card {
-  transform: translateX(0);
+  animation: hs-card-bounce 0.35s ease-out forwards;
+}
+
+@keyframes hs-card-bounce {
+  0%   { transform: scaleY(0); }
+  55%  { transform: scaleY(1.08); }
+  75%  { transform: scaleY(0.96); }
+  100% { transform: scaleY(1); }
 }
 
 .hidden-stories-modal-image {

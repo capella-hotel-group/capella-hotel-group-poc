@@ -1,5 +1,6 @@
 import { createOptimizedPicture } from '@/app/aem';
 import { moveInstrumentation } from '@/app/scripts';
+import { debugConfig } from './debug-config';
 import type { SceneConfig } from './scene';
 
 export default async function decorate(block: HTMLElement): Promise<void> {
@@ -55,7 +56,8 @@ export default async function decorate(block: HTMLElement): Promise<void> {
   if (!imageUrl) return;
 
   // --- Advance mode: read flag and overlay image URLs ---
-  const advance = advanceRow?.querySelector<HTMLElement>(':scope > div')?.textContent?.trim() === 'true';
+  const cmsAdvanceText = advanceRow?.querySelector<HTMLElement>(':scope > div')?.textContent?.trim();
+  const advance = debugConfig.advance ?? cmsAdvanceText === 'true';
   const decorLeftUrl = decorLeftRow?.querySelector<HTMLImageElement>('img')?.src;
   const decorRightUrl = decorRightRow?.querySelector<HTMLImageElement>('img')?.src;
   const foregroundUrl = foregroundRow?.querySelector<HTMLImageElement>('img')?.src;

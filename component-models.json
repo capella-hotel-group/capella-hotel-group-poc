@@ -300,7 +300,7 @@
         "valueType": "string"
       },
       {
-        "component": "checkbox",
+        "component": "boolean",
         "name": "advance",
         "label": "Advance Mode",
         "valueType": "boolean"

@@ -6,13 +6,8 @@
 .hidden-stories-media {
   position: relative;
   width: 100%;
-  height: 100dvh;
+  aspect-ratio: 1492 / 995;
   overflow: hidden;
-}
-
-/* Authoring-only fix */
-.adobe-ue-edit .hidden-stories-media {
-  max-height: 1080px;
 }
 
 .hidden-stories-blocker {
@@ -58,7 +53,6 @@
   background: rgba(255, 255, 255, 0.05);
   backdrop-filter: url(#hidden-stories-glass-filter);
   -webkit-backdrop-filter: blur(4px);
-  border: 1px solid rgb(255 245 230 / 32%);
   box-shadow:
     inset 1px 1px 0 0 rgb(255 255 255 / 18%),
     inset -1px -1px 0 0 rgb(255 255 255 / 12%),
@@ -166,6 +160,118 @@
   opacity: 1;
 }
 
+.hidden-stories-story-wrapper {
+  position: absolute;
+  top: 73%;
+  left: 29%;
+  z-index: 3;
+  width: 48px;
+  height: 48px;
+}
+
+.hidden-stories-add-btn {
+  position: relative;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: url(#hidden-stories-glass-filter);
+  -webkit-backdrop-filter: blur(4px);
+  box-shadow:
+    inset 1px 1px #ffffff2e,
+    inset -1px -1px #ffffff1f,
+    0 4px 8px #0003,
+    0 6px 20px #0003;
+  transition: all 0.3s cubic-bezier(0.2, 0.9, 0.3, 1.5);
+}
+
+.hidden-stories-add-btn svg {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+.hidden-stories-add-btn:hover {
+  background: rgba(255, 255, 255, 0.09);
+  box-shadow:
+    inset 1px 1px 0 0 rgb(255 255 255 / 25%),
+    inset -1px -1px 0 0 rgb(255 255 255 / 16%),
+    0 6px 16px 0 rgb(0 0 0 / 25%),
+    0 8px 28px 0 rgb(0 0 0 / 22%);
+}
+
+.hidden-stories-modal {
+  position: absolute;
+  top: 50%;
+  left: 100%;
+  transform: translateY(-50%);
+  margin-left: 16px;
+  z-index: 4;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.hidden-stories-modal.is-open {
+  pointer-events: auto;
+  opacity: 1;
+}
+
+.hidden-stories-modal-card {
+  width: 320px;
+  border-radius: 16px;
+  padding: 10px;
+  overflow: hidden;
+  transform: translateX(12px);
+  transition: transform 0.3s cubic-bezier(0.2, 0.9, 0.3, 1.5);
+
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: url(#hidden-stories-glass-filter);
+  -webkit-backdrop-filter: blur(4px);
+  border: 1px solid rgb(255 245 230 / 32%);
+  box-shadow:
+    inset 1px 1px 0 0 rgb(255 255 255 / 18%),
+    inset -1px -1px 0 0 rgb(255 255 255 / 12%),
+    0 4px 8px 0 rgb(0 0 0 / 20%),
+    0 6px 20px 0 rgb(0 0 0 / 20%);
+}
+
+.hidden-stories-modal.is-open .hidden-stories-modal-card {
+  transform: translateX(0);
+}
+
+.hidden-stories-modal-image {
+  width: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 12px;
+  line-height: 0;
+}
+
+.hidden-stories-modal-image picture,
+.hidden-stories-modal-image img {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.hidden-stories-modal-text {
+  margin-top: 10px;
+  color: #ebebea;
+  font-family: Calibre, var(--body-font-family), sans-serif;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 300;
+  line-height: 100%;
+  white-space: pre-line;
+}
+
 .hidden-stories-overlay picture,
 .hidden-stories-overlay picture img {
   width: 100%;
@@ -173,5 +279,3 @@
   object-fit: cover;
   display: block;
 }
-
-

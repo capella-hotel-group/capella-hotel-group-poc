@@ -19,6 +19,16 @@ if (modifledPartials.length > 0) {
   await run('git add component-models.json component-definition.json component-filters.json');
 }
 
+// run full build when source files are staged
+const hasSrcChanges = modifiedFiles.some(
+  (f) => f.startsWith('src/') || f.endsWith('.ts') || f.endsWith('.css'),
+);
+if (hasSrcChanges) {
+  const buildOutput = await run('npm run build');
+  console.log(buildOutput);
+  await run('git add blocks/ scripts/ styles/ chunks/');
+}
+
 // lint and format staged files
 // const lintOutput = await run('npx lint-staged');
 // console.log(lintOutput);

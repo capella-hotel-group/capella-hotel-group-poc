@@ -94,7 +94,7 @@
 }
 
 /* Small Mobile: 320px - 480px */
-@media (max-width: 480px) {
+@media (width <= 480px) {
   .menus-wrapper {
     padding: 0 12px;
   }
@@ -111,6 +111,7 @@
   .menus .menus-text {
     font-size: clamp(12px, 4vw, 18px);
     white-space: normal;
+    /* stylelint-disable-next-line declaration-property-value-keyword-no-deprecated */
     word-break: break-word;
   }
 
@@ -132,7 +133,7 @@
 }
 
 /* Tablet: 481px - 768px */
-@media (min-width: 481px) and (max-width: 768px) {
+@media (width >= 481px) and (width <= 768px) {
   .menus-wrapper {
     padding: 0 16px;
   }
@@ -166,4 +167,3 @@
     }
   }
 }
-

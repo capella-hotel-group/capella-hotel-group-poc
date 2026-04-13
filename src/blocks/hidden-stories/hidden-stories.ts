@@ -11,18 +11,23 @@ export default async function decorate(block: HTMLElement): Promise<void> {
     const cell = row.firstElementChild;
     if (!cell) return;
 
-    if (cell.querySelector('picture')) {
+    const anchor = cell.querySelector<HTMLAnchorElement>('a[href]');
+    const picture = cell.querySelector('picture');
+
+    if (anchor && !picture) {
+      // video row
+      const videoWrapper = document.createElement('div');
+      videoWrapper.className = 'hidden-stories-video';
+      moveInstrumentation(cell, videoWrapper);
+      videoWrapper.append(...cell.children);
+      wrapper.append(videoWrapper);
+    } else if (picture) {
+      // image row
       const figure = document.createElement('figure');
       figure.className = 'hidden-stories-image';
       moveInstrumentation(cell, figure);
       figure.append(...cell.children);
       wrapper.append(figure);
-    } else {
-      const body = document.createElement('div');
-      body.className = 'hidden-stories-body';
-      moveInstrumentation(cell, body);
-      body.append(...cell.children);
-      wrapper.append(body);
     }
   });
 

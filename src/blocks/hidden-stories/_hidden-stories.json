@@ -23,16 +23,16 @@
         {
           "component": "reference",
           "valueType": "string",
-          "name": "image",
-          "label": "Image",
+          "name": "video",
+          "label": "Video",
           "multi": false
         },
         {
-          "component": "richtext",
-          "name": "text",
-          "value": "",
-          "label": "Text",
-          "valueType": "string"
+          "component": "reference",
+          "valueType": "string",
+          "name": "image",
+          "label": "Overlay Image",
+          "multi": false
         }
       ]
     }

@@ -1,2 +1,2 @@
-/*! v1.0.0 | h4e0a058b*/
-.hidden-stories-inner{display:flex;flex-direction:column;gap:24px}.hidden-stories-image{margin:0;line-height:0}.hidden-stories-image picture img{width:100%;aspect-ratio:16 / 9;object-fit:cover;display:block}.hidden-stories-body{color:var(--text-color)}.hidden-stories-body h2,.hidden-stories-body h3{margin-block-start:0}
+/*! v1.0.0 | hb5d57f81*/
+.hidden-stories-inner{position:relative;width:100%}.hidden-stories-video{width:100%;line-height:0}.hidden-stories-video a{display:block;width:100%}.hidden-stories-image{margin:0;line-height:0;position:absolute;inset:0}.hidden-stories-image picture img{width:100%;height:100%;object-fit:cover;display:block}

@@ -54,7 +54,8 @@
         "menus",
         "video-photo-player",
         "video",
-        "custom-fragment"
+        "custom-fragment",
+        "hidden-stories"
       ]
     }
   ]

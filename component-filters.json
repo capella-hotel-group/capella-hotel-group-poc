@@ -20,8 +20,7 @@
       "video-photo-player",
       "video",
       "custom-fragment",
-      "test-event-bus",
-      "test-global-state"
+      "hidden-stories"
     ]
   },
   {
@@ -43,6 +42,12 @@
       "image",
       "button",
       "title"
+    ]
+  },
+  {
+    "id": "hidden-stories",
+    "components": [
+      "hidden-story"
     ]
   },
   {

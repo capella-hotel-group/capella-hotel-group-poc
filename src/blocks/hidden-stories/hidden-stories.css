@@ -47,40 +47,78 @@
   position: absolute;
   top: 25%;
   left: 16.5%;
-  width: 110px;
-  height: 40px;
+  width: 140px;
+  height: 44px;
   z-index: 3;
   display: inline-flex;
   align-items: center;
-  background-color: rgb(0 0 0 / 40%);
-  backdrop-filter: blur(6px);
   border-radius: 999px;
-  gap: 0;
   cursor: pointer;
+
+  /* true glassmorphism: thin warm-tinted glass layer */
+  background: rgb(210 185 160 / 18%);
+  backdrop-filter: blur(10px) brightness(1.06);
+  -webkit-backdrop-filter: blur(10px) brightness(1.06);
+
+  /* glass edge highlight (top) + subtle inner shadow (bottom) + soft outer float */
+  border: 1px solid rgb(255 240 220 / 18%);
+  box-shadow:
+    0 8px 32px rgb(0 0 0 / 18%),
+    0 1px 0 rgb(255 248 235 / 22%) inset;
+
+  transition:
+    background 0.4s ease,
+    box-shadow 0.4s ease,
+    border-color 0.4s ease;
+}
+
+.hidden-stories-switcher:hover {
+  background: rgb(225 200 175 / 24%);
+  border-color: rgb(255 245 225 / 28%);
+  box-shadow:
+    0 10px 40px rgb(0 0 0 / 22%),
+    0 0 20px rgb(210 180 140 / 12%),
+    0 1px 0 rgb(255 248 235 / 28%) inset;
 }
 
 .hidden-stories-switcher-thumb {
   position: absolute;
-  top: 6px;
-  left: 6px;
-  width: 28px;
-  height: 28px;
+  top: 5px;
+  left: 5px;
+  width: 34px;
+  height: 34px;
   border-radius: 999px;
   transform: translateX(0);
   transition:
-    transform 0.3s ease,
-    background-color 0.3s ease;
-  background-color: #f0eae8;
-  cursor: pointer;
+    transform 0.38s cubic-bezier(0.4, 0, 0.2, 1),
+    background 0.38s ease,
+    box-shadow 0.38s ease,
+    opacity 0.3s ease;
+
+  /* day: warm ivory */
+  background: radial-gradient(circle at 35% 35%, #f5ede4, #ddc8b4);
+  box-shadow:
+    0 2px 8px rgb(0 0 0 / 30%),
+    0 1px 0 rgb(255 255 255 / 50%) inset;
+
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .hidden-stories-switcher.is-night .hidden-stories-switcher-thumb {
-  background-color: #272727;
-  /* switcher width (110px) - thumb width (28px) - left offset (6px) - right offset (6px) = 70px */
-  transform: translateX(70px);
+  /* switcher width (140px) - thumb width (34px) - left (5px) - right (5px) = 96px */
+  transform: translateX(96px);
+
+  /* night: deep charcoal */
+  background: radial-gradient(circle at 35% 35%, #3a3230, #1c1614);
+  box-shadow:
+    0 2px 8px rgb(0 0 0 / 50%),
+    0 1px 0 rgb(255 255 255 / 8%) inset;
+}
+
+.hidden-stories-switcher-thumb svg {
+  transition: opacity 0.25s ease;
 }
 
 .hidden-stories-switcher-thumb svg.night {
@@ -99,25 +137,28 @@
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  color: #fff;
-  font-size: 14px;
+  color: rgb(255 245 235 / 85%);
+  font-size: 13px;
   font-style: normal;
   font-weight: 300;
+  letter-spacing: 0.04em;
   line-height: normal;
-  width: 80px;
+  width: 96px;
   text-align: center;
+  pointer-events: none;
+  text-shadow: 0 1px 4px rgb(0 0 0 / 40%);
 }
 
 .hidden-stories-switcher-label.day {
   right: 0;
   opacity: 1;
-  transition: opacity 0.3s ease;
+  transition: opacity 0.35s ease;
 }
 
 .hidden-stories-switcher-label.night {
   left: 0;
   opacity: 0;
-  transition: opacity 0.3s ease;
+  transition: opacity 0.35s ease;
 }
 
 .hidden-stories-switcher.is-night .hidden-stories-switcher-label.day {

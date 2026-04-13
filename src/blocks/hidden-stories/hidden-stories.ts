@@ -130,7 +130,7 @@ export default async function decorate(block: HTMLElement): Promise<void> {
     if (disabled) {
       switcher.setAttribute('aria-disabled', 'true');
       switcher.style.pointerEvents = 'none';
-      thumb.style.opacity = '0.4';
+    thumb.style.opacity = '0.35';
     } else {
       switcher.removeAttribute('aria-disabled');
       switcher.style.pointerEvents = '';

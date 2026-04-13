@@ -130,11 +130,11 @@ export default async function decorate(block: HTMLElement): Promise<void> {
     if (disabled) {
       switcher.setAttribute('aria-disabled', 'true');
       switcher.style.pointerEvents = 'none';
-      switcher.style.opacity = '0.5';
+      thumb.style.opacity = '0.4';
     } else {
       switcher.removeAttribute('aria-disabled');
       switcher.style.pointerEvents = '';
-      switcher.style.opacity = '';
+      thumb.style.opacity = '';
     }
   }
 
@@ -163,25 +163,7 @@ export default async function decorate(block: HTMLElement): Promise<void> {
     }
   });
 
-  // --- debug progress bar (TODO: remove) ---
-  const debugBar = document.createElement('div');
-  debugBar.className = 'hidden-stories-debug';
-  const debugFill = document.createElement('div');
-  debugFill.className = 'hidden-stories-debug-fill';
-  const debugLabel = document.createElement('span');
-  debugLabel.className = 'hidden-stories-debug-label';
-  debugBar.append(debugFill, debugLabel);
-
-  function updateDebug() {
-    const dur = video.duration || 0;
-    const pct = dur > 0 ? (video.currentTime / dur) * 100 : 0;
-    debugFill.style.width = `${pct}%`;
-    debugLabel.textContent = `${video.currentTime.toFixed(2)}s / ${dur.toFixed(2)}s`;
-    requestAnimationFrame(updateDebug);
-  }
-  requestAnimationFrame(updateDebug);
-
-  media.append(video, blocker, switcher, overlay, debugBar);
+  media.append(video, blocker, switcher, overlay);
   block.replaceChildren(media);
 }
 

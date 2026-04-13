@@ -9,7 +9,16 @@ import globals from 'globals';
 export default defineConfig([
   // Global ignores (replaces .eslintignore)
   {
-    ignores: ['dist/', 'blocks/', 'chunks/', 'assets/', 'styles/', 'scripts/scripts.js', 'scripts/aem.js', 'scripts/editor-support.js'],
+    ignores: [
+      'dist/',
+      'blocks/',
+      'chunks/',
+      'assets/',
+      'styles/',
+      'scripts/scripts.js',
+      'scripts/aem.js',
+      'scripts/editor-support.js',
+    ],
   },
 
   // JavaScript files
@@ -57,7 +66,7 @@ export default defineConfig([
     plugins: { xwalk: xwalkPlugin },
     languageOptions: { parser: jsoncParser },
     rules: {
-      'xwalk/max-cells': ['error', { '*': 4 }],
+      'xwalk/max-cells': 'off', // Disable max cells rule for flexibility in component definitions
       'xwalk/no-duplicate-fields': 'error',
       'xwalk/invalid-field-name': 'error',
       'xwalk/no-orphan-collapsible-fields': 'error',

@@ -55,30 +55,25 @@
   border-radius: 999px;
   cursor: pointer;
 
-  /* true glassmorphism: thin warm-tinted glass layer */
-  background: rgb(210 185 160 / 18%);
-  backdrop-filter: blur(10px) brightness(1.06);
-  -webkit-backdrop-filter: blur(10px) brightness(1.06);
-
-  /* glass edge highlight (top) + subtle inner shadow (bottom) + soft outer float */
-  border: 1px solid rgb(255 240 220 / 18%);
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: url(#hidden-stories-glass-filter);
+  -webkit-backdrop-filter: blur(4px);
+  border: 1px solid rgb(255 245 230 / 32%);
   box-shadow:
-    0 8px 32px rgb(0 0 0 / 18%),
-    0 1px 0 rgb(255 248 235 / 22%) inset;
-
-  transition:
-    background 0.4s ease,
-    box-shadow 0.4s ease,
-    border-color 0.4s ease;
+    inset 1px 1px 0 0 rgb(255 255 255 / 18%),
+    inset -1px -1px 0 0 rgb(255 255 255 / 12%),
+    0 4px 8px 0 rgb(0 0 0 / 20%),
+    0 6px 20px 0 rgb(0 0 0 / 20%);
+  transition: all 0.3s cubic-bezier(0.2, 0.9, 0.3, 1.5);
 }
 
 .hidden-stories-switcher:hover {
-  background: rgb(225 200 175 / 24%);
-  border-color: rgb(255 245 225 / 28%);
+  background: rgba(255, 255, 255, 0.09);
   box-shadow:
-    0 10px 40px rgb(0 0 0 / 22%),
-    0 0 20px rgb(210 180 140 / 12%),
-    0 1px 0 rgb(255 248 235 / 28%) inset;
+    inset 1px 1px 0 0 rgb(255 255 255 / 25%),
+    inset -1px -1px 0 0 rgb(255 255 255 / 16%),
+    0 6px 16px 0 rgb(0 0 0 / 25%),
+    0 8px 28px 0 rgb(0 0 0 / 22%);
 }
 
 .hidden-stories-switcher-thumb {
@@ -138,7 +133,7 @@
   top: 50%;
   transform: translateY(-50%);
   color: rgb(255 245 235 / 85%);
-  font-size: 13px;
+  font-size: 16px;
   font-style: normal;
   font-weight: 300;
   letter-spacing: 0.04em;
@@ -153,12 +148,14 @@
   right: 0;
   opacity: 1;
   transition: opacity 0.35s ease;
+  padding-right: 6px;
 }
 
 .hidden-stories-switcher-label.night {
   left: 0;
   opacity: 0;
   transition: opacity 0.35s ease;
+  padding-left: 6px;
 }
 
 .hidden-stories-switcher.is-night .hidden-stories-switcher-label.day {

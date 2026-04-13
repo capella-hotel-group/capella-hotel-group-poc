@@ -19,7 +19,29 @@ function makeSvgIcon(cls: string, pathHtml: string): SVGSVGElement {
   return svg;
 }
 
+function ensureGlassFilter(): void {
+  const FILTER_ID = 'hidden-stories-glass-filter';
+  if (document.getElementById(FILTER_ID)) return;
+
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  svg.setAttribute('style', 'display:none');
+  svg.setAttribute('aria-hidden', 'true');
+  svg.innerHTML = `
+    <filter id="${FILTER_ID}" color-interpolation-filters="linearRGB"
+            filterUnits="objectBoundingBox" primitiveUnits="userSpaceOnUse">
+      <feDisplacementMap in="SourceGraphic" in2="SourceGraphic"
+        scale="18" xChannelSelector="R" yChannelSelector="B"
+        x="0%" y="0%" width="100%" height="100%" result="displaced"/>
+      <feGaussianBlur stdDeviation="3 3"
+        x="0%" y="0%" width="100%" height="100%"
+        in="displaced" edgeMode="none" result="blur"/>
+    </filter>`;
+  document.body.append(svg);
+}
+
 export default async function decorate(block: HTMLElement): Promise<void> {
+  ensureGlassFilter();
+
   const rows = [...block.children];
 
   // Row 0: video — first <a> href

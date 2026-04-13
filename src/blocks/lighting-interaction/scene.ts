@@ -10,8 +10,8 @@ import {
   WebGLRenderer,
 } from 'three';
 import { debugConfig } from './debug-config';
-import { loadTextureCoverUV, loadOverlayPlane } from './scene-loader';
-import type { OverlayLayer } from './scene-loader';
+import { loadTextureCoverUV, loadOverlayPlane, createHeadlinePlane } from './scene-loader';
+import type { OverlayLayer, HeadlinePlane } from './scene-loader';
 import {
   applySpringBack,
   applyStandardDisplacement,
@@ -35,6 +35,8 @@ const ADVANCE_PHASE_SCALE = 2.5; // distance-to-phase multiplier; larger = tight
 const ADVANCE_DECOR_VELOCITY_SCALE = 1.0; // final amplitude scale on the distance-proportional decor wave
 const ADVANCE_FG_AMPLITUDE = 0.03; // peak X displacement for foreground vertices
 const ADVANCE_POINTER_STRENGTH = 0.05; // uniform pointer-velocity scale for all overlay planes
+const ADVANCE_FG_POINTER_STRENGTH = 0.03; // separate foreground pointer-velocity scale
+const DECOR_PHASE_RIGHT = Math.PI * 0.7; // phase offset applied to right decor wave
 
 export interface SceneConfig {
   imageUrl: string;
@@ -42,6 +44,8 @@ export interface SceneConfig {
   decorLeftUrl?: string;
   decorRightUrl?: string;
   foregroundUrl?: string;
+  headingEl?: HTMLElement | null;
+  taglineEl?: HTMLElement | null;
 }
 
 let animationId: number | null = null;
@@ -118,6 +122,7 @@ export async function initScene(canvas: HTMLCanvasElement, config: SceneConfig):
   let decorRight: OverlayLayer | null = null;
   let foreground: OverlayLayer | null = null;
   let fgSeeds: Float32Array | null = null;
+  let headlinePlane: HeadlinePlane | null = null;
 
   if (config.advance) {
     const loadPromises: Promise<void>[] = [];
@@ -176,6 +181,18 @@ export async function initScene(canvas: HTMLCanvasElement, config: SceneConfig):
     }
 
     await Promise.all(loadPromises);
+
+    headlinePlane = createHeadlinePlane(
+      config.headingEl ?? null,
+      config.taglineEl ?? null,
+      scene,
+      container,
+      initAspect,
+    );
+    if (headlinePlane) {
+      const block = canvas.closest('.lighting-interaction');
+      block?.classList.add('lighting-interaction--text-swapped');
+    }
   }
 
   // --- Debug velocity overlay ---
@@ -245,9 +262,11 @@ export async function initScene(canvas: HTMLCanvasElement, config: SceneConfig):
           vertCount: decorLeft.vertCount,
           dispX: decorLeft.dispX,
           dispY: decorLeft.dispY,
+          borderMask: decorLeft.borderMask,
           anchorX: -1,
           anchorY: 0,
           advAngle,
+          phaseOffset: 0,
           sinAmplitude: ADVANCE_SIN_AMPLITUDE,
           phaseScale: ADVANCE_PHASE_SCALE,
           velocityScale: ADVANCE_DECOR_VELOCITY_SCALE,
@@ -265,9 +284,11 @@ export async function initScene(canvas: HTMLCanvasElement, config: SceneConfig):
           vertCount: decorRight.vertCount,
           dispX: decorRight.dispX,
           dispY: decorRight.dispY,
+          borderMask: decorRight.borderMask,
           anchorX: 1,
           anchorY: 0,
           advAngle,
+          phaseOffset: DECOR_PHASE_RIGHT,
           sinAmplitude: ADVANCE_SIN_AMPLITUDE,
           phaseScale: ADVANCE_PHASE_SCALE,
           velocityScale: ADVANCE_DECOR_VELOCITY_SCALE,
@@ -285,13 +306,51 @@ export async function initScene(canvas: HTMLCanvasElement, config: SceneConfig):
           vertCount: foreground.vertCount,
           dispX: foreground.dispX,
           dispY: foreground.dispY,
+          borderMask: foreground.borderMask,
           fgSeeds,
           advAngle,
           fgAmplitude: ADVANCE_FG_AMPLITUDE,
           smoothDeltaX: smoothDelta.x,
           smoothDeltaY: smoothDelta.y,
-          pointerStrength: ADVANCE_POINTER_STRENGTH,
+          fgPointerStrength: debugConfig.fgPointerStrength ?? ADVANCE_FG_POINTER_STRENGTH,
         });
+      }
+
+      if (headlinePlane) {
+        // Headline plane uses standard Gaussian displacement, driven by NDC pointer position
+        // (NDC x == local x for a full-frustum plane scaled by aspect).
+        if (sMag > 0.0001) {
+          headlinePlane.hasActiveDisplacement = true;
+          applyStandardDisplacement({
+            vertCount: headlinePlane.vertCount,
+            restX: headlinePlane.restX,
+            restY: headlinePlane.restY,
+            dispX: headlinePlane.dispX,
+            dispY: headlinePlane.dispY,
+            dispZ: headlinePlane.dispZ,
+            hitLocalX: currentNDC.x,
+            hitLocalY: currentNDC.y,
+            smoothDeltaX: smoothDelta.x,
+            smoothDeltaY: smoothDelta.y,
+            sMag,
+            influenceRadius: INFLUENCE_RADIUS,
+            displacementStrength: DISPLACEMENT_STRENGTH,
+            zFactor: Z_FACTOR,
+          });
+        }
+        if (headlinePlane.hasActiveDisplacement) {
+          headlinePlane.hasActiveDisplacement = applySpringBack({
+            posAttr: headlinePlane.posAttr,
+            vertCount: headlinePlane.vertCount,
+            restX: headlinePlane.restX,
+            restY: headlinePlane.restY,
+            restZ: headlinePlane.restZ,
+            dispX: headlinePlane.dispX,
+            dispY: headlinePlane.dispY,
+            dispZ: headlinePlane.dispZ,
+            springDamping: SPRING_DAMPING,
+          });
+        }
       }
     } else {
       // Standard mode: pointer-driven vertex displacement on background
@@ -361,6 +420,7 @@ export async function initScene(canvas: HTMLCanvasElement, config: SceneConfig):
     for (const layer of overlayLayers) {
       layer.onResize(newAspect);
     }
+    headlinePlane?.onResize(newAspect);
     if (debugCanvas) {
       debugCanvas.width = newW;
       debugCanvas.height = newH;

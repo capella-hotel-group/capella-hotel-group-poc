@@ -9,9 +9,11 @@ export interface UpdateDecorLayerParams {
   vertCount: number;
   dispX: Float32Array;
   dispY: Float32Array;
+  borderMask: Float32Array;
   anchorX: number;
   anchorY: number;
   advAngle: number;
+  phaseOffset: number;
   sinAmplitude: number;
   phaseScale: number;
   velocityScale: number;
@@ -23,20 +25,31 @@ export interface UpdateDecorLayerParams {
 /**
  * Applies sin-loop rotation animation to a decoration plane.
  * Vertices further from the anchor point swing with proportionally greater amplitude.
- * Pointer velocity is stacked additively on top of the sin displacement.
+ * Pointer velocity is proximity-weighted (near-anchor = low influence) and edge-clamped.
  */
 export function updateDecorLayer(p: UpdateDecorLayerParams): void {
+  // Maximum possible distance from the anchor to any vertex in a 2x2 plane
+  // anchored on its edge — the diagonal from anchor to opposite corner.
+  const maxDist = Math.sqrt(8);
   for (let i = 0; i < p.vertCount; i++) {
     const ax = p.restX[i] - p.anchorX;
     const ay = p.restY[i] - p.anchorY;
     const dist = Math.sqrt(ax * ax + ay * ay);
 
-    // Sin wave: amplitude scales with vertex distance from anchor
-    p.dispY[i] = Math.sin(p.advAngle + dist * p.phaseScale) * p.sinAmplitude * dist * p.velocityScale;
+    // Sin wave with per-plane phase offset: amplitude scales with vertex distance from anchor
+    p.dispY[i] =
+      Math.sin(p.advAngle + p.phaseOffset + dist * p.phaseScale) *
+      p.sinAmplitude *
+      dist *
+      p.velocityScale;
 
-    // Additive pointer influence, stacked after the sin displacement
-    p.dispX[i] = p.smoothDeltaX * p.pointerStrength;
-    p.dispY[i] += p.smoothDeltaY * p.pointerStrength;
+    // Proximity weight: 0 at anchor, 1 at max distance — vertices near the anchor barely move
+    const proxWeight = dist / maxDist;
+
+    // Additive pointer influence, proximity-weighted and edge-clamped
+    p.dispX[i] = p.smoothDeltaX * p.pointerStrength * proxWeight * p.borderMask[i];
+    p.dispY[i] =
+      (p.dispY[i] + p.smoothDeltaY * p.pointerStrength * proxWeight) * p.borderMask[i];
 
     p.posAttr.setXYZ(i, p.restX[i] + p.dispX[i], p.restY[i] + p.dispY[i], 0);
   }
@@ -52,27 +65,28 @@ export interface UpdateForegroundLayerParams {
   vertCount: number;
   dispX: Float32Array;
   dispY: Float32Array;
+  borderMask: Float32Array;
   fgSeeds: Float32Array;
   advAngle: number;
   fgAmplitude: number;
   smoothDeltaX: number;
   smoothDeltaY: number;
-  pointerStrength: number;
+  fgPointerStrength: number;
 }
 
 /**
  * Applies X-only sin wave to the foreground plane.
  * Each vertex has a unique phase seed for wave undulation.
- * Pointer velocity is stacked additively on both axes.
+ * Pointer velocity is stacked additively and edge-clamped.
  */
 export function updateForegroundLayer(p: UpdateForegroundLayerParams): void {
   for (let i = 0; i < p.vertCount; i++) {
     // Sin displacement on X only, seeded per-vertex for wave phasing
-    p.dispX[i] = Math.sin(p.advAngle + p.fgSeeds[i]) * p.fgAmplitude;
+    const sinX = Math.sin(p.advAngle + p.fgSeeds[i]) * p.fgAmplitude;
 
-    // Additive pointer influence on both axes
-    p.dispX[i] += p.smoothDeltaX * p.pointerStrength;
-    p.dispY[i] = p.smoothDeltaY * p.pointerStrength;
+    // Additive pointer influence on both axes, edge-clamped
+    p.dispX[i] = (sinX + p.smoothDeltaX * p.fgPointerStrength) * p.borderMask[i];
+    p.dispY[i] = p.smoothDeltaY * p.fgPointerStrength * p.borderMask[i];
 
     p.posAttr.setXYZ(i, p.restX[i] + p.dispX[i], p.restY[i] + p.dispY[i], 0);
   }

@@ -72,7 +72,15 @@ export default async function decorate(block: HTMLElement): Promise<void> {
 
     try {
       const { initScene } = await import('./scene');
-      const sceneConfig: SceneConfig = { imageUrl, advance, decorLeftUrl, decorRightUrl, foregroundUrl };
+      const sceneConfig: SceneConfig = {
+        imageUrl,
+        advance,
+        decorLeftUrl,
+        decorRightUrl,
+        foregroundUrl,
+        headingEl: block.querySelector<HTMLElement>('.lighting-interaction-heading'),
+        taglineEl: block.querySelector<HTMLElement>('.lighting-interaction-tagline'),
+      };
       await initScene(canvas, sceneConfig);
       block.classList.remove('lighting-interaction--loading');
       block.classList.add('lighting-interaction--active');

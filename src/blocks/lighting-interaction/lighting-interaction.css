@@ -52,6 +52,12 @@
     padding-bottom: var(--spacing-xl, 80px);
 }
 
+.lighting-interaction--text-swapped .lighting-interaction-content {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
 .lighting-interaction-heading {
     color: var(--text-color);
 }

@@ -32,6 +32,10 @@ export const debugConfig: {
   velocityDecayRate?: number;
   /** Snap smoothDelta to zero once magnitude falls below this threshold. Default 0.0001. */
   velocityDecayThreshold?: number;
+
+  // --- Foreground pointer strength ---
+  /** Override ADVANCE_FG_POINTER_STRENGTH for the foreground plane. Default 0.03. */
+  fgPointerStrength?: number;
 } = {
   advance: true,
   showDecorLeft: true,
@@ -44,4 +48,5 @@ export const debugConfig: {
   velocityVectorScale: undefined,
   velocityDecayRate: undefined,
   velocityDecayThreshold: undefined,
+  fgPointerStrength: undefined,
 };

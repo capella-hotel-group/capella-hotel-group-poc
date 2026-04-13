@@ -45,10 +45,10 @@ export const debugConfig: {
   /** Enable the canvas-texture headline plane in advance mode (hides DOM text). Default false. */
   headlineInteraction?: boolean;
 } = {
-  advance: true,
-  showDecorLeft: true,
-  showDecorRight: true,
-  showForeground: true,
+  advance: undefined,
+  showDecorLeft: undefined,
+  showDecorRight: undefined,
+  showForeground: undefined,
   wireframeDecorLeft: undefined,
   wireframeDecorRight: undefined,
   wireframeForeground: undefined,

@@ -1,38 +1,26 @@
-.hidden-stories-list {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 32px;
-}
-
-.hidden-stories-item {
+.hidden-stories-inner {
     display: flex;
     flex-direction: column;
-    overflow: hidden;
-    background-color: var(--background-color);
+    gap: 24px;
 }
 
-.hidden-stories-item-image {
+.hidden-stories-image {
     margin: 0;
     line-height: 0;
 }
 
-.hidden-stories-item-image picture img {
+.hidden-stories-image picture img {
     width: 100%;
     aspect-ratio: 16 / 9;
     object-fit: cover;
     display: block;
 }
 
-.hidden-stories-item-body {
-    padding: 24px;
-    flex: 1;
+.hidden-stories-body {
     color: var(--text-color);
 }
 
-.hidden-stories-item-body h2,
-.hidden-stories-item-body h3 {
+.hidden-stories-body h2,
+.hidden-stories-body h3 {
     margin-block-start: 0;
 }

@@ -257,7 +257,7 @@
     ]
   },
   {
-    "id": "hidden-story",
+    "id": "hidden-stories",
     "fields": [
       {
         "component": "reference",

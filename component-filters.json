@@ -45,12 +45,6 @@
     ]
   },
   {
-    "id": "hidden-stories",
-    "components": [
-      "hidden-story"
-    ]
-  },
-  {
     "id": "menus",
     "components": [
       "menu-item"

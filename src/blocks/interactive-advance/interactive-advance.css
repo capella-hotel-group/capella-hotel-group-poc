@@ -1,0 +1,80 @@
+.interactive-advance {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+    background-color: var(--dark-color);
+}
+
+.interactive-advance-placeholder {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: opacity 0.4s ease;
+    z-index: 1;
+}
+
+.interactive-advance-placeholder picture,
+.interactive-advance-placeholder img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 0;
+}
+
+.interactive-advance-placeholder-cta {
+    position: relative;
+    z-index: 1;
+    font-family: var(--heading-font-family);
+    font-size: var(--heading-font-size-m);
+    color: var(--background-color);
+    background-color: rgb(0 0 0 / 40%);
+    padding: 12px 28px;
+    border: 2px solid var(--background-color);
+    letter-spacing: 0.05em;
+    pointer-events: none;
+    text-transform: uppercase;
+}
+
+.interactive-advance-placeholder-loading {
+    cursor: wait;
+    pointer-events: none;
+}
+
+.interactive-advance-placeholder-loading .interactive-advance-placeholder-cta::after {
+    content: '';
+    display: inline-block;
+    width: 0.75em;
+    height: 0.75em;
+    margin-left: 10px;
+    vertical-align: middle;
+    border: 2px solid var(--background-color);
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: ia-spin 0.7s linear infinite;
+}
+
+.interactive-advance-placeholder-hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.interactive-advance-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+@keyframes ia-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}

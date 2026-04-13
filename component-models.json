@@ -276,6 +276,51 @@
     ]
   },
   {
+    "id": "interactive-advance",
+    "fields": [
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "placeholder-text",
+        "label": "Placeholder CTA Text",
+        "value": "Explore in 3D"
+      },
+      {
+        "component": "reference",
+        "valueType": "string",
+        "name": "placeholder-image",
+        "label": "Placeholder Background Image",
+        "multi": false
+      }
+    ]
+  },
+  {
+    "id": "lighting-interaction",
+    "fields": [
+      {
+        "component": "reference",
+        "valueType": "string",
+        "name": "background",
+        "label": "Background Image",
+        "multi": false
+      },
+      {
+        "component": "richtext",
+        "name": "heading",
+        "value": "",
+        "label": "Heading",
+        "valueType": "string"
+      },
+      {
+        "component": "richtext",
+        "name": "tagline",
+        "value": "",
+        "label": "Tagline",
+        "valueType": "string"
+      }
+    ]
+  },
+  {
     "id": "menu-item",
     "fields": [
       {

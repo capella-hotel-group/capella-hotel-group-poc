@@ -185,7 +185,83 @@ export default async function decorate(block: HTMLElement): Promise<void> {
     }
   });
 
-  media.append(video, blocker, switcher, overlay);
+  // --- add button ---
+  const addBtn = document.createElement('button');
+  addBtn.className = 'btn-reset hidden-stories-add-btn';
+  addBtn.setAttribute('aria-label', 'Add');
+  const addIcon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  addIcon.setAttribute('width', '24');
+  addIcon.setAttribute('height', '24');
+  addIcon.setAttribute('viewBox', '0 0 24 24');
+  addIcon.setAttribute('fill', 'none');
+  addIcon.setAttribute('aria-hidden', 'true');
+  addIcon.innerHTML = '<path d="M11 13H0V11H11V0H13V11H24V13H13V24H11V13Z" fill="#F0EAE8"/>';
+  addBtn.append(addIcon);
+
+  // --- card modal ---
+  const modal = document.createElement('div');
+  modal.className = 'hidden-stories-modal';
+  modal.setAttribute('aria-hidden', 'true');
+
+  const modalCard = document.createElement('div');
+  modalCard.className = 'hidden-stories-modal-card';
+
+  if (picture) {
+    const modalImg = picture.cloneNode(true) as HTMLElement;
+    modalImg.className = 'hidden-stories-modal-image';
+    modalCard.append(modalImg);
+  }
+
+  const modalText = document.createElement('p');
+  modalText.className = 'hidden-stories-modal-text';
+  const textCell = rows[1]?.children[1];
+  modalText.textContent =
+    textCell?.textContent?.trim() ||
+    'Spend a leisurely afternoon at The Living Room where you can enjoy a curated selection of light refreshments and beverages. Available for your reading pleasure is a curated selection of books, magazines and historical books that document the nation\'s rich past.\n\nThe Living Room is open from 9 a.m. to 9 p.m. daily. Afternoon tea is available from 3 p.m. to 5 p.m. daily.';
+  modalCard.append(modalText);
+
+  modal.append(modalCard);
+
+  let closeHandler: ((e: AnimationEvent) => void) | null = null;
+
+  addBtn.addEventListener('click', () => {
+    const isOpen = modal.classList.contains('is-open');
+    const isClosing = modal.classList.contains('is-closing');
+
+    if (isOpen && !isClosing) {
+      // Start closing
+      modal.classList.add('is-closing');
+      closeHandler = (e: AnimationEvent) => {
+        if (e.animationName !== 'hs-card-collapse') return;
+        modal.classList.remove('is-open', 'is-closing');
+        modal.setAttribute('aria-hidden', 'true');
+        modalCard.removeEventListener('animationend', closeHandler!);
+        closeHandler = null;
+      };
+      modalCard.addEventListener('animationend', closeHandler);
+    } else {
+      // Open (or re-open while still closing)
+      if (closeHandler) {
+        modalCard.removeEventListener('animationend', closeHandler);
+        closeHandler = null;
+      }
+      modal.classList.remove('is-closing');
+      modal.classList.add('is-open');
+      modal.setAttribute('aria-hidden', 'false');
+      // Force animation restart
+      modalCard.style.animation = 'none';
+      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+      modalCard.offsetHeight;
+      modalCard.style.animation = '';
+    }
+  });
+
+  // --- story wrapper: groups button + modal ---
+  const storyWrapper = document.createElement('div');
+  storyWrapper.className = 'hidden-stories-story-wrapper';
+  storyWrapper.append(addBtn, modal);
+
+  media.append(video, blocker, switcher, overlay, storyWrapper);
   block.replaceChildren(media);
 }
 

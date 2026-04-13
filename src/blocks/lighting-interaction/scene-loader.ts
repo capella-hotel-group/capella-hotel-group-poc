@@ -34,7 +34,9 @@ export interface BackgroundTextureResult {
  */
 export async function loadTextureCoverUV(url: string): Promise<BackgroundTextureResult> {
   const texture = await new Promise<Texture>((resolve, reject) => {
-    new TextureLoader().load(url, resolve, undefined, reject);
+    const loader = new TextureLoader();
+    loader.crossOrigin = 'anonymous';
+    loader.load(url, resolve, undefined, reject);
   });
 
   texture.colorSpace = SRGBColorSpace;

@@ -33,10 +33,10 @@ export const debugConfig: {
   /** Snap smoothDelta to zero once magnitude falls below this threshold. Default 0.0001. */
   velocityDecayThreshold?: number;
 } = {
-  advance: undefined,
-  showDecorLeft: undefined,
-  showDecorRight: undefined,
-  showForeground: undefined,
+  advance: true,
+  showDecorLeft: true,
+  showDecorRight: true,
+  showForeground: true,
   wireframeDecorLeft: undefined,
   wireframeDecorRight: undefined,
   wireframeForeground: undefined,

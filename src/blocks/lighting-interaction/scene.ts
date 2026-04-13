@@ -166,7 +166,10 @@ export async function initScene(canvas: HTMLCanvasElement, config: SceneConfig):
           overlayLayers.push(layer);
           fgSeeds = new Float32Array(layer.vertCount);
           for (let i = 0; i < layer.vertCount; i++) {
-            fgSeeds[i] = Math.random() * Math.PI * 2;
+            // Map vertex X position (-1..1) to a phase offset spanning 0..0.5*PI so
+            // the total phase difference across the entire plane is ~π/2 — a gentle
+            // horizontal wave sweep rather than chaotic per-vertex ripples.
+            fgSeeds[i] = ((layer.restX[i] + 1) / 2) * (Math.PI * 0.5);
           }
         }),
       );

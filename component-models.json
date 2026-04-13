@@ -276,25 +276,6 @@
     ]
   },
   {
-    "id": "interactive-advance",
-    "fields": [
-      {
-        "component": "text",
-        "valueType": "string",
-        "name": "placeholder-text",
-        "label": "Placeholder CTA Text",
-        "value": "Explore in 3D"
-      },
-      {
-        "component": "reference",
-        "valueType": "string",
-        "name": "placeholder-image",
-        "label": "Placeholder Background Image",
-        "multi": false
-      }
-    ]
-  },
-  {
     "id": "lighting-interaction",
     "fields": [
       {
@@ -317,6 +298,33 @@
         "value": "",
         "label": "Tagline",
         "valueType": "string"
+      },
+      {
+        "component": "checkbox",
+        "name": "advance",
+        "label": "Advance Mode",
+        "valueType": "boolean"
+      },
+      {
+        "component": "reference",
+        "valueType": "string",
+        "name": "decoration-left",
+        "label": "Decoration Left",
+        "multi": false
+      },
+      {
+        "component": "reference",
+        "valueType": "string",
+        "name": "decoration-right",
+        "label": "Decoration Right",
+        "multi": false
+      },
+      {
+        "component": "reference",
+        "valueType": "string",
+        "name": "foreground",
+        "label": "Foreground",
+        "multi": false
       }
     ]
   },

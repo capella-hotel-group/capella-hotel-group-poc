@@ -4,7 +4,7 @@ import type { SceneConfig } from './scene';
 
 export default async function decorate(block: HTMLElement): Promise<void> {
   const rows = [...block.querySelectorAll<HTMLElement>(':scope > div')];
-  const [backgroundRow, headingRow, taglineRow] = rows;
+  const [backgroundRow, headingRow, taglineRow, advanceRow, decorLeftRow, decorRightRow, foregroundRow] = rows;
 
   // Background image
   const background = document.createElement('div');
@@ -54,6 +54,12 @@ export default async function decorate(block: HTMLElement): Promise<void> {
   // No image means no 3D scene to load
   if (!imageUrl) return;
 
+  // --- Advance mode: read flag and overlay image URLs ---
+  const advance = advanceRow?.querySelector<HTMLElement>(':scope > div')?.textContent?.trim() === 'true';
+  const decorLeftUrl = decorLeftRow?.querySelector<HTMLImageElement>('img')?.src;
+  const decorRightUrl = decorRightRow?.querySelector<HTMLImageElement>('img')?.src;
+  const foregroundUrl = foregroundRow?.querySelector<HTMLImageElement>('img')?.src;
+
   let initialized = false;
 
   block.addEventListener('click', async () => {
@@ -64,7 +70,7 @@ export default async function decorate(block: HTMLElement): Promise<void> {
 
     try {
       const { initScene } = await import('./scene');
-      const sceneConfig: SceneConfig = { imageUrl };
+      const sceneConfig: SceneConfig = { imageUrl, advance, decorLeftUrl, decorRightUrl, foregroundUrl };
       await initScene(canvas, sceneConfig);
       block.classList.remove('lighting-interaction--loading');
       block.classList.add('lighting-interaction--active');

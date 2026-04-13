@@ -58,12 +58,15 @@ export default defineConfig({
         entryFileNames: '[name].js',
         chunkFileNames: (chunkInfo) => {
           // Stable infrastructure chunks — fixed paths so head.html can modulepreload them
-          if (chunkInfo.name === 'aem-core' || chunkInfo.name === 'dompurify') return 'chunks/[name].js';
+          if (['aem-core', 'dompurify', 'three', 'env'].includes(chunkInfo.name))
+            return 'chunks/[name].js';
           return 'chunks/[name]-[hash].js';
         },
         manualChunks: (id) => {
           if (id.includes('src/app/aem.ts')) return 'aem-core';
           if (id.includes('node_modules/dompurify')) return 'dompurify';
+          if (id.includes('node_modules/three')) return 'three';
+          if (id.includes('src/utils/env.ts') || id.includes('src/configs/environments.ts')) return 'env';
           return undefined;
         },
         assetFileNames: (assetInfo) => {

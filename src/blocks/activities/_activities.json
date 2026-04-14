@@ -42,6 +42,19 @@
           "name": "backgroundVideo",
           "label": "Background Video",
           "multi": false
+        },
+        {
+          "component": "richtext",
+          "valueType": "string",
+          "name": "description",
+          "label": "Description"
+        },
+        {
+          "component": "aem-tag",
+          "valueType": "string",
+          "name": "categories",
+          "label": "Categories",
+          "multi": true
         }
       ]
     },
@@ -60,19 +73,6 @@
           "valueType": "string",
           "name": "intro",
           "label": "Intro"
-        },
-        {
-          "component": "richtext",
-          "valueType": "string",
-          "name": "description",
-          "label": "Description"
-        },
-        {
-          "component": "aem-tag",
-          "valueType": "string",
-          "name": "categories",
-          "label": "Categories",
-          "multi": true
         }
       ]
     }

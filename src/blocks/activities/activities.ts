@@ -40,9 +40,12 @@ function evalTween(tw: Tween, now: number): { value: number; done: boolean } {
 
 function buildSlides(itemRows: HTMLElement[]): HTMLElement[] {
   return itemRows.map((row) => {
-    const slide = document.createElement('li');
+    const wrapper = document.createElement('li');
+    wrapper.className = 'activities-slide-wrapper';
+    moveInstrumentation(row, wrapper);
+
+    const slide = document.createElement('div');
     slide.className = 'activities-slide';
-    moveInstrumentation(row, slide);
 
     const picture = row.querySelector('picture');
     const img = picture?.querySelector<HTMLImageElement>('img');
@@ -60,7 +63,8 @@ function buildSlides(itemRows: HTMLElement[]): HTMLElement[] {
       }
     });
 
-    return slide;
+    wrapper.append(slide);
+    return wrapper;
   });
 }
 
@@ -120,8 +124,9 @@ function initSlider(slider: HTMLElement, track: HTMLElement, slides: HTMLElement
   }
 
   function applySlide(node: HTMLElement, state: SlideState): void {
-    node.style.transform = `scale(${state.scale})`;
-    node.style.opacity = String(state.opacity);
+    const inner = node.querySelector<HTMLElement>('.activities-slide') ?? node;
+    inner.style.transform = `scale(${state.scale})`;
+    inner.style.opacity = String(state.opacity);
   }
 
   // Only is-active class used now — for z-index only, not CSS transform/opacity

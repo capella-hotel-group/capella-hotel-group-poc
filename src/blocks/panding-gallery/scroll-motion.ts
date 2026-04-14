@@ -2,6 +2,10 @@ import { PointerVelocityTracker } from '@/utils/pointer-velocity';
 
 const DEFAULT_COLUMN_WEIGHTS = [1.0, 0.7, 1.2, 0.85, 1.1];
 const DEFAULT_SWAP_PADDING = 200;
+// Maps normalised wheel delta (0–1 range) to pixel displacement per frame
+const SCROLL_SPEED_SCALE = 6;
+// Exponential decay rate for scroll-mode momentum (0–1). Lower = longer tail.
+const DEFAULT_SCROLL_DECAY_RATE = 0.05;
 
 export interface ScrollMotionConfig {
   block: HTMLElement;
@@ -9,6 +13,12 @@ export interface ScrollMotionConfig {
   inputMode?: 'scroll' | 'pointer';
   columnWeights?: number[];
   swapPadding?: number;
+  /**
+   * Exponential decay rate applied to scroll-mode velocity each frame (0–1).
+   * Lower value = slower deceleration / longer momentum tail.
+   * Default: 0.05 (~20 frames to ~36% remaining velocity).
+   */
+  scrollDecayRate?: number;
 }
 
 export class ScrollMotionController {
@@ -35,6 +45,10 @@ export class ScrollMotionController {
   // Input state
   private pendingDeltaX = 0;
   private pendingDeltaY = 0;
+  // Scroll-mode momentum velocity (persists across frames, decays exponentially)
+  private scrollVelocityX = 0;
+  private scrollVelocityY = 0;
+  private readonly scrollDecayRate: number;
   private tracker: PointerVelocityTracker | null = null;
 
   // RAF
@@ -48,6 +62,7 @@ export class ScrollMotionController {
     this.inputMode = config.inputMode ?? 'scroll';
     this.columnWeights = config.columnWeights ?? [...DEFAULT_COLUMN_WEIGHTS];
     this.swapPadding = config.swapPadding ?? DEFAULT_SWAP_PADDING;
+    this.scrollDecayRate = config.scrollDecayRate ?? DEFAULT_SCROLL_DECAY_RATE;
 
     this.offsetY = new Array(this.columns.length).fill(0) as number[];
     this.colLogicalX = new Array(this.columns.length).fill(0) as number[];
@@ -117,8 +132,8 @@ export class ScrollMotionController {
     } else {
       this.wheelHandler = (e: WheelEvent): void => {
         e.preventDefault();
-        const yfactor = (e.deltaMode === 1 ? 20 : 1) * 2.5;
-        const xfactor = yfactor * 50.0;
+        const yfactor = e.deltaMode === 1 ? 20 : 1;
+        const xfactor = yfactor * 10.0;
         this.pendingDeltaX += (e.deltaX * -xfactor) / 100;
         this.pendingDeltaY += (e.deltaY * -yfactor) / 100;
       };
@@ -134,13 +149,16 @@ export class ScrollMotionController {
 
     if (this.tracker) {
       this.tracker.update();
-      dx = this.tracker.smoothDelta.x * 40;
-      dy = this.tracker.smoothDelta.y * 40;
+      dx = this.tracker.smoothDelta.x * SCROLL_SPEED_SCALE;
+      dy = this.tracker.smoothDelta.y * SCROLL_SPEED_SCALE;
     } else {
-      dx = this.pendingDeltaX;
-      dy = this.pendingDeltaY;
+      // Fold wheel input into velocity, then apply exponential decay for momentum
+      this.scrollVelocityX = (this.scrollVelocityX + this.pendingDeltaX) * (1 - this.scrollDecayRate);
+      this.scrollVelocityY = (this.scrollVelocityY + this.pendingDeltaY) * (1 - this.scrollDecayRate);
       this.pendingDeltaX = 0;
       this.pendingDeltaY = 0;
+      dx = this.scrollVelocityX;
+      dy = this.scrollVelocityY;
     }
 
     // X: uniform across all columns
@@ -153,7 +171,7 @@ export class ScrollMotionController {
       const col = this.columns[c];
 
       // Y: per-column weighted
-      this.offsetY[c] += dy * this.columnWeights[c] * 40;
+      this.offsetY[c] += dy * this.columnWeights[c] * SCROLL_SPEED_SCALE;
 
       // --- Y infinity loop: per-item teleportation ---
       const items = col.children;

@@ -107,7 +107,14 @@ export default async function decorate(block: HTMLElement): Promise<void> {
   ro.observe(block);
 
   // --- Tooltip: follows pointer with lerp, fades on scroll ---
-  new PointerTooltip(block, 'SCROLL OR CLICK');
+  const tooltip = new PointerTooltip(block, 'SCROLL OR CLICK');
+  const tooltipObserver = new MutationObserver(() => {
+    if (!document.contains(block)) {
+      tooltip.destroy();
+      tooltipObserver.disconnect();
+    }
+  });
+  tooltipObserver.observe(document.body, { childList: true, subtree: true });
 
   // --- Phase 2: interactive scroll layer on click ---
   let initialized = false;
@@ -126,6 +133,13 @@ export default async function decorate(block: HTMLElement): Promise<void> {
         inputMode,
       });
       controller.start();
+      const motionObserver = new MutationObserver(() => {
+        if (!document.contains(block)) {
+          controller.cleanup();
+          motionObserver.disconnect();
+        }
+      });
+      motionObserver.observe(document.body, { childList: true, subtree: true });
       block.classList.remove('panding-gallery--loading');
       block.classList.add('panding-gallery--active');
     } catch (err) {

@@ -96,15 +96,19 @@
 .activities .activities-slide-text {
     position: absolute;
     inset: 0;
-    display: none;
+    display: flex;
     align-items: center;
     justify-content: center;
     padding: 0 32px;
     z-index: 1;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 400ms ease;
 }
 
 .activities .activities-slide-wrapper.is-active .activities-slide-text {
-    display: flex;
+    opacity: 1;
+    pointer-events: auto;
 }
 
 .activities .activities-slide-text * {

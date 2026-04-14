@@ -425,8 +425,8 @@
       {
         "component": "reference",
         "valueType": "string",
-        "name": "hinh",
-        "label": "Hinh",
+        "name": "image",
+        "label": "Image",
         "multi": false
       },
       {

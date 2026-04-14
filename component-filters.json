@@ -58,6 +58,7 @@
   {
     "id": "hover-effect",
     "components": [
+      "hover-effect-logo",
       "hover-effect-item"
     ]
   },

@@ -142,6 +142,18 @@
     ]
   },
   {
+    "id": "activities",
+    "fields": [
+      {
+        "component": "reference",
+        "valueType": "string",
+        "name": "backgroundVideo",
+        "label": "Background Video",
+        "multi": false
+      }
+    ]
+  },
+  {
     "id": "activity",
     "fields": [
       {
@@ -294,6 +306,18 @@
     ]
   },
   {
+    "id": "hover-effect-logo",
+    "fields": [
+      {
+        "component": "reference",
+        "valueType": "string",
+        "name": "image",
+        "label": "Logo Image",
+        "multi": false
+      }
+    ]
+  },
+  {
     "id": "hover-effect-item",
     "fields": [
       {
@@ -302,13 +326,6 @@
         "name": "image",
         "label": "Image",
         "multi": false
-      },
-      {
-        "component": "text",
-        "valueType": "string",
-        "name": "imageAlt",
-        "label": "Alt",
-        "value": ""
       },
       {
         "component": "text",

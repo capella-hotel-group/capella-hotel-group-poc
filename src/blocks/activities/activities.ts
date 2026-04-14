@@ -1,14 +1,14 @@
 import { moveInstrumentation } from '@/app/scripts';
 import { resolveDAMUrl } from '@/utils/env';
 
-const SLIDE_W = 420;
+const SLIDE_W = 426;
 const SLIDE_GAP = 24;
 const SWIPE_THRESHOLD = 60;
 const ANIM_DURATION = 500;
 const SCALE_ACTIVE = 1;
 const SCALE_INACTIVE = 0.75;
 const OPACITY_ACTIVE = 1;
-const OPACITY_INACTIVE = 0.5;
+const OPACITY_INACTIVE = 1;
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 interface Tween {
@@ -69,8 +69,25 @@ function initSlider(slider: HTMLElement, track: HTMLElement, slides: HTMLElement
 
   const N = slides.length;
 
-  const prependClones = slides.map((s) => s.cloneNode(true) as HTMLElement);
-  const appendClones = slides.map((s) => s.cloneNode(true) as HTMLElement);
+  function cloneWithoutInstrumentation(el: HTMLElement): HTMLElement {
+    const clone = el.cloneNode(true) as HTMLElement;
+    clone
+      .querySelectorAll<HTMLElement>(
+        '[data-aue-resource],[data-aue-prop],[data-aue-type],[data-aue-label],[data-aue-filter],[data-aue-behavior]',
+      )
+      .forEach((node) => {
+        Object.keys(node.dataset)
+          .filter((k) => k.startsWith('aue'))
+          .forEach((k) => delete node.dataset[k]);
+      });
+    Object.keys(clone.dataset)
+      .filter((k) => k.startsWith('aue'))
+      .forEach((k) => delete clone.dataset[k]);
+    return clone;
+  }
+
+  const prependClones = slides.map(cloneWithoutInstrumentation);
+  const appendClones = slides.map(cloneWithoutInstrumentation);
   track.prepend(...prependClones);
   track.append(...appendClones);
 
@@ -223,21 +240,6 @@ function initSlider(slider: HTMLElement, track: HTMLElement, slides: HTMLElement
     vIdx = vNew;
     startRAF();
   }
-
-  // ── Arrow buttons ──────────────────────────────────────────────────────────
-  const btnPrev = document.createElement('button');
-  btnPrev.className = 'activities-btn activities-btn--prev';
-  btnPrev.setAttribute('aria-label', 'Previous slide');
-  btnPrev.textContent = '\u2039';
-  btnPrev.addEventListener('click', () => go(vIdx - 1));
-
-  const btnNext = document.createElement('button');
-  btnNext.className = 'activities-btn activities-btn--next';
-  btnNext.setAttribute('aria-label', 'Next slide');
-  btnNext.textContent = '\u203a';
-  btnNext.addEventListener('click', () => go(vIdx + 1));
-
-  slider.append(btnPrev, btnNext);
 
   // ── Swipe ──────────────────────────────────────────────────────────────────
   track.addEventListener('pointerdown', (e) => {

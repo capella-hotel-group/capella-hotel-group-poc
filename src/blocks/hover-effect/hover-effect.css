@@ -1,7 +1,34 @@
 /* hover-effect block */
 .hover-effect {
-    padding: 80px 0;
+    position: relative;
+    min-height: 100vh;
     text-align: center;
+    background-color: #f0eae8;
+}
+
+.hover-effect-inner {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 40px;
+}
+
+.hover-effect-logo {
+    position: absolute;
+    top: 60px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.hover-effect-logo img {
+    width: 40px;
+    height: 64px;
+    object-fit: contain;
+    display: block;
 }
 
 .hover-effect-list {
@@ -11,7 +38,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 16px;
+    gap: 40px;
 }
 
 .hover-effect-item {
@@ -20,8 +47,11 @@
 
 .hover-effect-link {
     position: relative;
-    display: inline-block;
-    padding: 12px 48px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 130px;
+    padding: 0 48px;
     text-decoration: none;
 }
 
@@ -31,7 +61,10 @@
     border-radius: 100px;
     overflow: hidden;
     opacity: 0;
-    transition: opacity 0.4s ease;
+    transform: scale(1.08);
+    transition:
+        opacity 0.5s ease-in-out,
+        transform 0.5s ease-in-out;
     pointer-events: none;
 }
 
@@ -60,30 +93,25 @@
     position: relative;
     z-index: 1;
     font-family: var(--heading-font-family);
-    font-size: var(--heading-font-size-xxl);
+    font-size: clamp(48px, 8vw, 96px);
     font-weight: 300;
     color: var(--text-color);
     line-height: 1;
-    transition: color 0.4s ease;
+    text-decoration: none;
+    transition: color 0.5s ease-in-out;
     white-space: nowrap;
 }
 
-.hover-effect-item:hover .hover-effect-item-bg,
-.hover-effect-item:focus-within .hover-effect-item-bg {
+.hover-effect-link:hover .hover-effect-item-bg,
+.hover-effect-link:focus-visible .hover-effect-item-bg {
     opacity: 1;
+    transform: scale(1);
 }
 
-.hover-effect-item:hover .hover-effect-item-label,
-.hover-effect-item:focus-within .hover-effect-item-label {
+.hover-effect-link:hover .hover-effect-item-label,
+.hover-effect-link:focus-visible .hover-effect-item-label {
     color: white;
 }
 
 @media (width >= 900px) {
-    .hover-effect {
-        padding: 120px 0;
-    }
-
-    .hover-effect-list {
-        gap: 32px;
-    }
 }

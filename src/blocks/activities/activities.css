@@ -55,17 +55,18 @@
 
 /* ── Slide (transform & opacity driven by JS RAF, not CSS) ── */
 .activities .activities-slide {
-    flex: 0 0 420px;
-    height: 480px;
+    flex: 0 0 426px;
+    aspect-ratio: 426 / 600;
+    height: auto;
     position: relative;
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
     display: flex;
-    align-items: flex-end;
+    align-items: center;
     justify-content: center;
     overflow: hidden;
-    border-radius: 8px;
+    border-radius: 999px;
     will-change: transform, opacity;
     user-select: none;
 }
@@ -86,52 +87,32 @@
 /* ── Slide text ── */
 .activities .activities-slide-text {
     position: absolute;
-    bottom: 24px;
-    left: 0;
-    right: 0;
-    padding: 0 20px;
-    color: #fff;
-    text-align: center;
+    inset: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 0 32px;
     z-index: 1;
+}
+
+.activities .activities-slide.is-active .activities-slide-text {
+    display: flex;
 }
 
 .activities .activities-slide-text * {
     margin: 0;
-    font-size: var(--body-font-size-s);
-    line-height: 1.4;
+    color: #fff;
+    text-align: center;
+    font-family: GoudyWtcT, serif;
+    font-size: 56px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
 }
 
 /* ── Arrow buttons ── */
 .activities .activities-btn {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    z-index: 2;
-    background: rgb(255 255 255 / 0.15);
-    border: none;
-    color: #fff;
-    font-size: 2.5rem;
-    line-height: 1;
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background 0.2s;
-}
-
-.activities .activities-btn:hover {
-    background: rgb(255 255 255 / 0.3);
-}
-
-.activities .activities-btn--prev {
-    left: 24px;
-}
-
-.activities .activities-btn--next {
-    right: 24px;
+    display: none;
 }
 
 @media (width < 600px) {

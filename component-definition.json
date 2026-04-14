@@ -233,6 +233,21 @@
           }
         },
         {
+          "title": "Hover Effect Logo",
+          "id": "hover-effect-logo",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/franklin/components/block/v1/block/item",
+                "template": {
+                  "name": "Hover Effect Logo",
+                  "model": "hover-effect-logo"
+                }
+              }
+            }
+          }
+        },
+        {
           "title": "Hover Effect Item",
           "id": "hover-effect-item",
           "plugins": {

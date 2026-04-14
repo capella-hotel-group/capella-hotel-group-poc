@@ -16,6 +16,21 @@
       }
     },
     {
+      "title": "Hover Effect Logo",
+      "id": "hover-effect-logo",
+      "plugins": {
+        "xwalk": {
+          "page": {
+            "resourceType": "core/franklin/components/block/v1/block/item",
+            "template": {
+              "name": "Hover Effect Logo",
+              "model": "hover-effect-logo"
+            }
+          }
+        }
+      }
+    },
+    {
       "title": "Hover Effect Item",
       "id": "hover-effect-item",
       "plugins": {
@@ -33,6 +48,18 @@
   ],
   "models": [
     {
+      "id": "hover-effect-logo",
+      "fields": [
+        {
+          "component": "reference",
+          "valueType": "string",
+          "name": "image",
+          "label": "Logo Image",
+          "multi": false
+        }
+      ]
+    },
+    {
       "id": "hover-effect-item",
       "fields": [
         {
@@ -41,13 +68,6 @@
           "name": "image",
           "label": "Image",
           "multi": false
-        },
-        {
-          "component": "text",
-          "valueType": "string",
-          "name": "imageAlt",
-          "label": "Alt",
-          "value": ""
         },
         {
           "component": "text",
@@ -68,7 +88,7 @@
   "filters": [
     {
       "id": "hover-effect",
-      "components": ["hover-effect-item"]
+      "components": ["hover-effect-logo", "hover-effect-item"]
     }
   ]
 }

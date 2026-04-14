@@ -1,6 +1,6 @@
 ---
-description: "Use when creating, modifying, or reviewing AEM Edge Delivery blocks. Covers block structure, the decorate() pattern, CSS naming, AEM Universal Editor integration, and performance conventions."
-applyTo: "src/blocks/**"
+description: 'Use when creating, modifying, or reviewing AEM Edge Delivery blocks. Covers block structure, the decorate() pattern, CSS naming, AEM Universal Editor integration, and performance conventions.'
+applyTo: 'src/blocks/**'
 ---
 
 # Block Authoring — Capella Hotel Group PoC
@@ -66,6 +66,7 @@ Use a BEM-adjacent pattern scoped to the block name:
 ```
 
 Examples:
+
 - `.cards` → root
 - `.cards-card` → a card item
 - `.cards-card-image` → image inside card
@@ -119,10 +120,10 @@ Each block needs a JSON model file for xwalk (Universal Editor):
 
 AEM EDS loads blocks in three phases — be aware of which phase applies:
 
-| Phase | Function | Use For |
-|-------|----------|---------|
-| Eager | `loadEager()` | LCP-critical blocks (hero, first section) |
-| Lazy | `loadLazy()` | Most blocks — header, all sections, footer |
+| Phase   | Function        | Use For                                                                 |
+| ------- | --------------- | ----------------------------------------------------------------------- |
+| Eager   | `loadEager()`   | LCP-critical blocks (hero, first section)                               |
+| Lazy    | `loadLazy()`    | Most blocks — header, all sections, footer                              |
 | Delayed | `loadDelayed()` | Non-critical: analytics, chat, personalization (imported 3s after load) |
 
 Blocks in the delayed phase should be in `src/app/delayed.ts`.
@@ -203,3 +204,14 @@ Build your entire new DOM tree first, then call `block.replaceChildren(...newEle
 ### 8. New blocks must be added to `_section.json` filters
 
 Adding files under `src/blocks/` is not enough for the block to appear in the Universal Editor insert menu. The block's ID must also be listed in the `components` array of the `section` filter in `src/models/_section.json`, followed by `npm run build:json`.
+
+### 9. Image alt text is embedded in the `<img>` — do NOT model a separate `imageAlt` field
+
+AEM stores the alt text authored via the asset picker directly on the `<img alt="...">` attribute. There is no separate cell in the rendered DOM for alt text. When your model has an `image` (reference) field, read the alt via `img.alt` in the decorator:
+
+```typescript
+const img = picture.querySelector<HTMLImageElement>('img');
+const optimized = createOptimizedPicture(img.src, img.alt, false, [{ width: '750' }]);
+```
+
+Do **not** add a separate `imageAlt` field to the xwalk model — it will produce a phantom cell in the DOM and shift all subsequent cell indices, causing fields like `label` and `link` to be read from the wrong cell.

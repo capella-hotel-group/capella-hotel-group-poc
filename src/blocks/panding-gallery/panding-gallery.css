@@ -7,6 +7,11 @@
     background-color: var(--color-dark, #1a1a1a);
 }
 
+/* Authoring-only fix */
+.adobe-ue-edit .panding-gallery {
+    max-height: 1080px;
+}
+
 /* Parallax columns container */
 .panding-gallery-columns {
     display: flex;

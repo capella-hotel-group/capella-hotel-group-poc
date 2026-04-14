@@ -58,7 +58,9 @@
         "custom-fragment",
         "hidden-stories",
         "activities",
-        "panding-gallery"
+        "panding-gallery",
+        "hover-effect",
+        "activities"
       ]
     }
   ]

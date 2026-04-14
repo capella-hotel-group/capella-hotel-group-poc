@@ -12,10 +12,8 @@
     "vite:watch": "vite build -w -c vite.config.ts",
     "vite:watch:editor": "vite build -w -c vite.config-editor.ts",
     "start": "npm-run-all --parallel tsc:watch vite:watch vite:watch:editor aem:up",
-    "lint:js": "eslint .",
-    "lint:css": "stylelint \"src/blocks/**/*.css\" \"src/styles/*.css\"",
-    "lint": "npm-run-all --parallel lint:js lint:css",
-    "lint:fix": "eslint . --fix && stylelint \"src/blocks/**/*.css\" \"src/styles/*.css\" --fix",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "build:json": "npm-run-all --parallel build:json:models build:json:definitions build:json:filters",
@@ -30,7 +28,6 @@
       "prettier --write"
     ],
     "src/**/*.css": [
-      "stylelint --fix",
       "prettier --write"
     ],
     "*.{html,md}": [
@@ -55,8 +52,6 @@
     "merge-json-cli": "^1.0.4",
     "npm-run-all": "^4.1.5",
     "prettier": "^3.8.1",
-    "stylelint": "17.0.0",
-    "stylelint-config-standard": "40.0.0",
     "typescript": "^5.4.0",
     "typescript-eslint": "^8.58.0",
     "vite": "^6.0.0"

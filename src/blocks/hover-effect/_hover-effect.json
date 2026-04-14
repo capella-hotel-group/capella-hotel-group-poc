@@ -1,30 +1,30 @@
 {
   "definitions": [
     {
-      "title": "Activities",
-      "id": "activities",
+      "title": "Hover Effect",
+      "id": "hover-effect",
       "plugins": {
         "xwalk": {
           "page": {
             "resourceType": "core/franklin/components/block/v1/block",
             "template": {
-              "name": "Activities",
-              "filter": "activities"
+              "name": "Hover Effect",
+              "filter": "hover-effect"
             }
           }
         }
       }
     },
     {
-      "title": "Activity",
-      "id": "activity",
+      "title": "Hover Effect Item",
+      "id": "hover-effect-item",
       "plugins": {
         "xwalk": {
           "page": {
             "resourceType": "core/franklin/components/block/v1/block/item",
             "template": {
-              "name": "Activity",
-              "model": "activity"
+              "name": "Hover Effect Item",
+              "model": "hover-effect-item"
             }
           }
         }
@@ -33,7 +33,7 @@
   ],
   "models": [
     {
-      "id": "activity",
+      "id": "hover-effect-item",
       "fields": [
         {
           "component": "reference",
@@ -45,18 +45,30 @@
         {
           "component": "text",
           "valueType": "string",
-          "name": "text",
-          "label": "Text"
+          "name": "imageAlt",
+          "label": "Alt",
+          "value": ""
+        },
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "label",
+          "label": "Label",
+          "value": ""
+        },
+        {
+          "component": "aem-content",
+          "valueType": "string",
+          "name": "link",
+          "label": "Link"
         }
       ]
     }
   ],
   "filters": [
     {
-      "id": "activities",
-      "components": [
-        "activity"
-      ]
+      "id": "hover-effect",
+      "components": ["hover-effect-item"]
     }
   ]
 }

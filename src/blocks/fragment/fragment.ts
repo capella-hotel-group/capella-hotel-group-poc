@@ -40,11 +40,16 @@ export default async function decorate(block: HTMLElement): Promise<void> {
   const path = link ? (link.getAttribute('href') ?? '') : (block.textContent?.trim() ?? '');
   const fragment = await loadFragment(path);
   if (fragment) {
-    const fragmentSection = fragment.querySelector<HTMLElement>(':scope .section');
-    if (fragmentSection) {
+    const fragmentSections = fragment.querySelectorAll<HTMLElement>(':scope .section');
+    if (fragmentSections.length === 1) {
+      // Single section: inline content into the current block, merging section classes
+      const fragmentSection = fragmentSections[0];
       block.classList.add(...fragmentSection.classList);
       block.classList.remove('section');
       block.replaceChildren(...fragmentSection.childNodes);
+    } else if (fragmentSections.length > 1) {
+      // Multiple sections: embed all sections as-is
+      block.replaceChildren(...Array.from(fragmentSections));
     }
   }
 }

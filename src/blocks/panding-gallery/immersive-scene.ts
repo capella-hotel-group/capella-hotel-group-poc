@@ -82,7 +82,7 @@ export class ImmersiveScene {
 
     // --- Renderer ---
     const renderer = new WebGLRenderer({ canvas, antialias: true, alpha: true });
-    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.setPixelRatio(1); // we handle HiDPI manually via composer.setSize; prevents double-scaling issues
     renderer.setSize(W, H, false);
     this.renderer = renderer;
 

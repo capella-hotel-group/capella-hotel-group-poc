@@ -52,7 +52,7 @@ void main() {
  * Effect magnitude scales with scrollEnergy (0→1).
  */
 export class RadialRGBShiftPass extends ShaderPass {
-  constructor(influenceRadius = 0.4, maxShift = 0.006) {
+  constructor(influenceRadius = 0.4, maxShift = 0.01) {
     super({
       uniforms: {
         tDiffuse: { value: null },

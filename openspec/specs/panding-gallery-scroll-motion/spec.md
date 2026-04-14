@@ -123,3 +123,25 @@ The scroll-motion module SHALL cancel its `requestAnimationFrame` loop and remov
 - **THEN** the RAF loop is cancelled
 - **AND** all registered event listeners are removed
 - **AND** no further DOM updates occur
+
+### Requirement: Scroll-mode velocity decays exponentially (momentum)
+
+In scroll mode, the motion controller SHALL accumulate wheel input into a velocity vector and apply exponential decay each frame, so that the grid continues moving after the user stops scrolling and gradually decelerates to a stop.
+
+The decay formula per frame: `velocity = (velocity + pendingInput) * (1 - decayRate)`
+
+The decay rate SHALL be configurable via `scrollDecayRate` in `ScrollMotionConfig` (default: `0.05`). Lower values produce a longer momentum tail; higher values produce a shorter, sharper stop.
+
+#### Scenario: Grid coasts after wheel stops
+
+- **WHEN** the user stops scrolling the mouse wheel
+- **THEN** the grid continues moving in the same direction
+- **AND** the velocity decreases each frame by the decay factor
+- **AND** the grid eventually comes to rest
+
+#### Scenario: Decay rate is configurable
+
+- **WHEN** the controller is initialised with `scrollDecayRate: 0.01`
+- **THEN** the momentum tail is noticeably longer than the default `0.05`
+- **WHEN** the controller is initialised with `scrollDecayRate: 0.15`
+- **THEN** the grid decelerates more sharply than the default

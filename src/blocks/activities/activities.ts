@@ -69,8 +69,25 @@ function initSlider(slider: HTMLElement, track: HTMLElement, slides: HTMLElement
 
   const N = slides.length;
 
-  const prependClones = slides.map((s) => s.cloneNode(true) as HTMLElement);
-  const appendClones = slides.map((s) => s.cloneNode(true) as HTMLElement);
+  function cloneWithoutInstrumentation(el: HTMLElement): HTMLElement {
+    const clone = el.cloneNode(true) as HTMLElement;
+    clone
+      .querySelectorAll<HTMLElement>(
+        '[data-aue-resource],[data-aue-prop],[data-aue-type],[data-aue-label],[data-aue-filter],[data-aue-behavior]',
+      )
+      .forEach((node) => {
+        Object.keys(node.dataset)
+          .filter((k) => k.startsWith('aue'))
+          .forEach((k) => delete node.dataset[k]);
+      });
+    Object.keys(clone.dataset)
+      .filter((k) => k.startsWith('aue'))
+      .forEach((k) => delete clone.dataset[k]);
+    return clone;
+  }
+
+  const prependClones = slides.map(cloneWithoutInstrumentation);
+  const appendClones = slides.map(cloneWithoutInstrumentation);
   track.prepend(...prependClones);
   track.append(...appendClones);
 

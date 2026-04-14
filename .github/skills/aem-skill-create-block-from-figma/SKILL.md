@@ -481,6 +481,17 @@ When invoked by another agent, include the result:
 
 ---
 
+## Optional Next Steps
+
+After the block builds successfully, these skills are available if needed:
+
+- **`aem-skill-testing-blocks`** — validate the block in a real browser (lint, responsive check, screenshot)
+- **`aem-skill-code-review`** — self-review before opening a PR (TypeScript patterns, CSS scoping, security)
+
+These are optional — invoke them if the developer asks or if the block is complex enough to warrant it.
+
+---
+
 ## Guardrails
 
 - Figma MCP unavailable → stop with setup message, no files generated

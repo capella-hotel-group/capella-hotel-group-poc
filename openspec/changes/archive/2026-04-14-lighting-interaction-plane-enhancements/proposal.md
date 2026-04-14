@@ -13,12 +13,14 @@ The advance mode overlay planes currently have several animation quality issues:
 ## Capabilities
 
 ### New Capabilities
+
 - `overlay-plane-edge-clamping`: Pinning outer-border vertices of overlay planes to zero displacement to prevent viewport coverage gaps.
 - `decor-plane-anchor-proximity`: Attenuating pointer velocity influence by proximity to the anchor point and adding per-plane phase seed offsets.
 - `foreground-pointer-strength`: Separate pointer velocity scale constant for the foreground plane.
 - `headline-canvas-plane`: A Three.js plane that composites the heading/tagline text onto a `CanvasTexture` and responds to pointer displacement like the background in standard mode.
 
 ### Modified Capabilities
+
 - `scene-debug-config`: Add `fgPointerStrength?: number` override field to `debugConfig` for the new foreground-specific pointer strength.
 
 ## Impact

@@ -27,9 +27,9 @@ const Z_FACTOR = 0.3; // 0.16 z-displacement magnitude relative to xy displaceme
 const ADVANCE_SIN_AMPLITUDE = 0.1; // peak Y displacement for a decor vertex at dist=1 from anchor
 const ADVANCE_SIN_FREQ = 0.012; // angle increment per frame (radians); controls wave speed
 const ADVANCE_FG_AMPLITUDE = 0.03; // peak X displacement for foreground vertices
-const ADVANCE_POINTER_STRENGTH = 0.2; // uniform pointer-velocity scale for all overlay planes
+const ADVANCE_POINTER_STRENGTH = 0.32; // uniform pointer-velocity scale for all overlay planes
 const ADVANCE_FG_POINTER_STRENGTH = 0.06; // separate foreground pointer-velocity scale
-const ADVANCE_DECOR_POINTER_RADIUS = 1.8; // Gaussian influence radius around pointer for decor layers (local units)
+const ADVANCE_DECOR_POINTER_RADIUS = 1.2; // Gaussian influence radius around pointer for decor layers (local units)
 const DECOR_PHASE_RIGHT = Math.PI * 1.3; // phase offset applied to right decor wave
 
 export interface SceneConfig {

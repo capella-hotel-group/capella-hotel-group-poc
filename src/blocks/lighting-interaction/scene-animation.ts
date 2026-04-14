@@ -37,6 +37,7 @@ export interface UpdateDecorLayerParams {
  * vertices close to the pointer receive full velocity influence; far vertices receive little.
  */
 export function updateDecorLayer(p: UpdateDecorLayerParams): void {
+  const maxDist = Math.sqrt(8);
   const theta = p.sinAmplitude * Math.sin(p.advAngle + p.phaseOffset);
   const sinT = Math.sin(theta);
   const cosT = Math.cos(theta);
@@ -53,9 +54,16 @@ export function updateDecorLayer(p: UpdateDecorLayerParams): void {
     // Gaussian proximity weight from pointer: 1 at pointer, falls off with distance
     const dpx = p.restX[i] - p.hitLocalX;
     const dpy = p.restY[i] - p.hitLocalY;
-    const pointerWeight = Math.exp(-(dpx * dpx + dpy * dpy) / r2);
+    const pointerGaussian = Math.exp(-(dpx * dpx + dpy * dpy) / r2);
 
-    // Combine rotation with pointer-proximity-weighted influence; pin border vertices
+    // Anchor proximity weight: 0 at anchor, 1 at max distance — vertices near the anchor
+    // receive less pointer influence even if they happen to be close to the pointer.
+    const distFromAnchor = Math.sqrt(ax * ax + ay * ay);
+    const anchorProx = distFromAnchor / maxDist;
+
+    const pointerWeight = pointerGaussian * anchorProx;
+
+    // Combine rotation with composite pointer influence; pin border vertices
     p.dispX[i] = (rotDispX + p.smoothDeltaX * p.pointerStrength * pointerWeight) * p.borderMask[i];
     p.dispY[i] = (rotDispY + p.smoothDeltaY * p.pointerStrength * pointerWeight) * p.borderMask[i];
 

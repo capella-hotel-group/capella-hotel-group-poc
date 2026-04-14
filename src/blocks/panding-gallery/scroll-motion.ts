@@ -115,6 +115,21 @@ export class ScrollMotionController {
     return this.colLogicalX;
   }
 
+  /**
+   * Last-frame raw scroll velocity X (CSS px/frame). Used by vertex deformation.
+   */
+  get currentScrollDx(): number {
+    return this.lastDx;
+  }
+
+  /**
+   * Last-frame raw scroll velocity Y (CSS px/frame, DOM convention: + = up).
+   * Used by vertex deformation.
+   */
+  get currentScrollDy(): number {
+    return this.lastDy;
+  }
+
   start(): void {
     this.measureLayout();
     this.setupInput();

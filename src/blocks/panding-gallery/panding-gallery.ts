@@ -18,8 +18,8 @@ export default async function decorate(block: HTMLElement): Promise<void> {
 
   const immersiveMode = configCells[1]?.textContent?.trim() === 'true';
 
-  const deformRadius = Number(configCells[2]?.textContent?.trim()) || 200;
-  const deformStrength = Number(configCells[3]?.textContent?.trim()) || 40;
+  const deformRadius = Number(configCells[2]?.textContent?.trim()) || 600;
+  const deformStrength = Number(configCells[3]?.textContent?.trim()) || 100;
 
   // --- Phase 1: Build static grid synchronously ---
   const imageRows = rows.slice(0, MAX_IMAGES);

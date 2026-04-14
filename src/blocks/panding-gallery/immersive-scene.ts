@@ -29,6 +29,8 @@ interface PlaneInfo {
   baseY: number;
   colIndex: number;
   itemIndex: number;
+  /** Original undisplaced vertex positions (local space, packed Float32Array x,y,z) */
+  restPositions: Float32Array;
 }
 
 export class ImmersiveScene {
@@ -158,7 +160,11 @@ export class ImmersiveScene {
         mesh.position.set(baseX, baseY, 0);
         scene.add(mesh);
 
-        const planeInfo: PlaneInfo = { mesh, baseX, baseY, colIndex: c, itemIndex: i };
+        // Snapshot vertex rest positions — used each frame to apply deformation
+        // relative to origin (prevents positional drift across frames)
+        const restPositions = new Float32Array(geometry.attributes['position'].array as Float32Array);
+
+        const planeInfo: PlaneInfo = { mesh, baseX, baseY, colIndex: c, itemIndex: i, restPositions };
         this.planes.push(planeInfo);
 
         // Fix the null placeholder now that planeInfo exists
@@ -188,6 +194,13 @@ export class ImmersiveScene {
 
     // --- Post-processing ---
     const composer = new EffectComposer(renderer);
+    // IMPORTANT: call setSize immediately after construction.
+    // The EffectComposer constructor creates render targets at CSS pixel size (W×H),
+    // but setSize() correctly multiplies by devicePixelRatio (W*dpr × H*dpr).
+    // Without this call, the CopyPass stretches CSS-pixel render targets to the
+    // full-resolution canvas, making everything appear dpr× too large on HiDPI
+    // displays (e.g. 2× on Retina).
+    composer.setSize(W, H);
     composer.addPass(new RenderPass(scene, camera));
     const rgbShiftPass = new RadialRGBShiftPass();
     composer.addPass(rgbShiftPass);
@@ -306,6 +319,8 @@ export class ImmersiveScene {
     this.animationId = requestAnimationFrame(this.animate);
 
     const energy = this.controller.scrollEnergy;
+    const scrollDx = this.controller.currentScrollDx;
+    const scrollDy = this.controller.currentScrollDy;
     const offsetY = this.controller.currentOffsetY;
     const itemOffsetY = this.controller.currentItemOffsetY;
     const globalOffsetX = this.controller.currentGlobalOffsetX;
@@ -329,16 +344,19 @@ export class ImmersiveScene {
 
       plane.mesh.position.set(worldX, worldY, 0);
 
-      // Apply vertex deformation
+      // Apply vertex deformation — XY displacement in scroll direction,
+      // vertices closer to pointer deform more (bendy-card effect)
       applyVertexDeform(
         plane.mesh.geometry as PlaneGeometry,
+        plane.restPositions,
         this.pointerWorldX,
         this.pointerWorldY,
         worldX,
         worldY,
         this.deformRadius,
         this.deformStrength,
-        energy,
+        scrollDx,
+        scrollDy,
       );
     }
 

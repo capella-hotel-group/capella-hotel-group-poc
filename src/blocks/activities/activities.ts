@@ -2,7 +2,7 @@ import { moveInstrumentation } from '@/app/scripts';
 import { resolveDAMUrl } from '@/utils/env';
 
 const SLIDE_W = 426;
-const SLIDE_GAP = 24;
+const VISUAL_GAP = 40; // desired visual gap between adjacent scaled inner edges
 const SWIPE_THRESHOLD = 60;
 const ANIM_DURATION = 500;
 const SCALE_ACTIVE = 1;
@@ -116,7 +116,11 @@ function initSlider(slider: HTMLElement, track: HTMLElement, slides: HTMLElement
 
   // ── Helpers ────────────────────────────────────────────────────────────────
   function computeTargetX(v: number): number {
-    return slider.offsetWidth / 2 - SLIDE_W / 2 - v * (SLIDE_W + SLIDE_GAP);
+    // Inactive effective layout width = W*S + V; active = W + V.
+    // Stride is always STRIDE (constant) because each slide preceding
+    // the target is inactive, so centre of target = v*STRIDE + (W+V)/2.
+    const stride = SLIDE_W * SCALE_INACTIVE + VISUAL_GAP;
+    return slider.offsetWidth / 2 - (SLIDE_W + VISUAL_GAP) / 2 - v * stride;
   }
 
   function applyTrack(): void {
@@ -127,6 +131,11 @@ function initSlider(slider: HTMLElement, track: HTMLElement, slides: HTMLElement
     const inner = node.querySelector<HTMLElement>('.activities-slide') ?? node;
     inner.style.transform = `scale(${state.scale})`;
     inner.style.opacity = String(state.opacity);
+    // Adjust wrapper margin so visual gap between inner edges stays constant (VISUAL_GAP)
+    // for any pair of adjacent slides regardless of their scales.
+    // margin = V/2 - W*(1-s)/2  →  visual_gap = 2*margin + waste_left + waste_right = V ✓
+    const margin = VISUAL_GAP / 2 - (SLIDE_W * (1 - state.scale)) / 2;
+    node.style.marginInline = `${margin}px`;
   }
 
   // Only is-active class used now — for z-index only, not CSS transform/opacity

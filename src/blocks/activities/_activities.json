@@ -60,6 +60,18 @@
           "valueType": "string",
           "name": "text",
           "label": "Text"
+        },
+        {
+          "component": "richtext",
+          "name": "description",
+          "label": "Description"
+        },
+        {
+          "component": "aem-tag",
+          "valueType": "string",
+          "name": "categories",
+          "label": "Categories",
+          "multi": true
         }
       ]
     }

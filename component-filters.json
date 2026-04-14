@@ -22,6 +22,8 @@
       "video",
       "custom-fragment",
       "hidden-stories",
+      "activities",
+      "panding-gallery",
       "hover-effect",
       "activities"
     ]
@@ -63,6 +65,12 @@
     "id": "menus",
     "components": [
       "menu-item"
+    ]
+  },
+  {
+    "id": "panding-gallery",
+    "components": [
+      "panding-gallery-item"
     ]
   }
 ]

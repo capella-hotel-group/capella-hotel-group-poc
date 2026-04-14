@@ -4,7 +4,7 @@ import {
   OrthographicCamera,
   PlaneGeometry,
   Scene,
-  TextureLoader,
+  Texture,
   Vector2,
   WebGLRenderer,
 } from 'three';
@@ -30,8 +30,6 @@ interface PlaneInfo {
   colIndex: number;
   itemIndex: number;
 }
-
-const loader = new TextureLoader();
 
 export class ImmersiveScene {
   private readonly block: HTMLElement;
@@ -95,32 +93,64 @@ export class ImmersiveScene {
     const scene = new Scene();
 
     // --- Build planes from DOM ---
-    const blockRect = this.block.getBoundingClientRect();
+    //
+    // IMPORTANT: use el.offsetLeft / el.offsetTop / el.offsetWidth / el.offsetHeight,
+    // NOT getBoundingClientRect(). getBoundingClientRect() returns the *visually*
+    // transformed position — if scroll-motion already ran a frame (async import lag),
+    // the columns have CSS transforms applied and the rect would encode scroll offset
+    // into the base positions, causing permanent drift.
+    // offsetLeft/offsetTop read from the layout tree and IGNORE CSS transforms.
+    //
+    // DOM structure:
+    //   .panding-gallery (position:relative) ← block
+    //     .panding-gallery-columns (position:absolute; inset:0)
+    //       .panding-gallery-column (flex child, will-change:transform)
+    //         <picture> elements   ← items[i]
+    //
+    // <picture>.offsetParent == .panding-gallery-columns (nearest positioned ancestor;
+    // the column itself is not positioned so it is skipped).
+    // .panding-gallery-columns has inset:0 inside block → its own offset origin is (0,0)
+    // relative to block. Therefore picture.offsetLeft/offsetTop == block-relative coords.
     this.planes = [];
-
-    const planesToLoad: Array<{ planeInfo: PlaneInfo; src: string }> = [];
+    const planesToLoad: Array<{ planeInfo: PlaneInfo; src: string; material: MeshBasicMaterial }> = [];
 
     for (let c = 0; c < this.columns.length; c++) {
       const col = this.columns[c];
       const items = col.children;
       for (let i = 0; i < items.length; i++) {
         const el = items[i] as HTMLElement;
-        const pic = el.querySelector<HTMLPictureElement>('picture');
-        const img = pic?.querySelector<HTMLImageElement>('img');
+        // el IS the <picture> element — query the <img> directly inside it
+        const img = el.querySelector<HTMLImageElement>('img');
 
-        const elRect = el.getBoundingClientRect();
-        const cellW = elRect.width;
-        const cellH = elRect.height;
+        // Layout-space dimensions/positions — transform-independent
+        const cellW = el.offsetWidth;
+        const cellH = el.offsetHeight;
+        const relX = el.offsetLeft; // relative to columns container ≡ block (no border on block)
+        const relY = el.offsetTop; // same: relative to columns container
 
-        // Convert cell top-left (relative to block) to pixel-space world coords
-        // (camera origin = block center; Y flipped)
-        const relX = elRect.left - blockRect.left;
-        const relY = elRect.top - blockRect.top;
+        // Camera origin = block center; Y axis flipped (Three.js Y up, DOM Y down)
+        // 1 world unit = 1 CSS pixel
         const baseX = relX + cellW / 2 - W / 2;
         const baseY = -(relY + cellH / 2 - H / 2);
 
         const geometry = new PlaneGeometry(cellW, cellH, 8, 8);
-        const material = new MeshBasicMaterial({ transparent: true });
+
+        // Re-use the already-decoded browser image directly — avoids CORS and a
+        // second network round-trip. needsUpdate = true flags Three.js to upload
+        // it to the GPU on the first render.
+        let material: MeshBasicMaterial;
+        if (img && img.complete && img.naturalWidth > 0) {
+          const tex = new Texture(img);
+          tex.needsUpdate = true;
+          material = new MeshBasicMaterial({ map: tex });
+        } else if (img) {
+          // Image not yet decoded — queue async load
+          material = new MeshBasicMaterial({ transparent: true });
+          planesToLoad.push({ planeInfo: null as unknown as PlaneInfo, src: img.src, material });
+        } else {
+          material = new MeshBasicMaterial({ transparent: true });
+        }
+
         const mesh = new Mesh(geometry, material);
         mesh.position.set(baseX, baseY, 0);
         scene.add(mesh);
@@ -128,25 +158,26 @@ export class ImmersiveScene {
         const planeInfo: PlaneInfo = { mesh, baseX, baseY, colIndex: c, itemIndex: i };
         this.planes.push(planeInfo);
 
-        if (img?.src) {
-          planesToLoad.push({ planeInfo, src: img.src });
+        // Fix the null placeholder now that planeInfo exists
+        const queued = planesToLoad.at(-1);
+        if (queued && queued.planeInfo === null) {
+          queued.planeInfo = planeInfo;
         }
       }
     }
 
-    // Load textures asynchronously (non-blocking for render start)
+    // Async fallback for images not yet decoded at init time
     for (const { planeInfo, src } of planesToLoad) {
-      loader.load(
-        src,
-        (tex) => {
-          (planeInfo.mesh.material as MeshBasicMaterial).map = tex;
-          (planeInfo.mesh.material as MeshBasicMaterial).needsUpdate = true;
-        },
-        undefined,
-        () => {
-          // texture load failed — keep transparent material
-        },
-      );
+      const tmpImg = new Image();
+      tmpImg.crossOrigin = 'anonymous';
+      tmpImg.onload = () => {
+        const tex = new Texture(tmpImg);
+        tex.needsUpdate = true;
+        (planeInfo.mesh.material as MeshBasicMaterial).map = tex;
+        (planeInfo.mesh.material as MeshBasicMaterial).transparent = false;
+        (planeInfo.mesh.material as MeshBasicMaterial).needsUpdate = true;
+      };
+      tmpImg.src = src;
     }
 
     // --- Post-processing ---
@@ -244,17 +275,15 @@ export class ImmersiveScene {
     this.camera.bottom = -H / 2;
     this.camera.updateProjectionMatrix();
 
-    // Recompute base positions from live DOM
-    const blockRect = this.block.getBoundingClientRect();
+    // Recompute base positions from live DOM layout (offset API ignores CSS transforms)
     for (const plane of this.planes) {
       const col = this.columns[plane.colIndex];
       const el = col.children[plane.itemIndex] as HTMLElement | undefined;
       if (!el) continue;
-      const elRect = el.getBoundingClientRect();
-      const cellW = elRect.width;
-      const cellH = elRect.height;
-      const relX = elRect.left - blockRect.left;
-      const relY = elRect.top - blockRect.top;
+      const cellW = el.offsetWidth;
+      const cellH = el.offsetHeight;
+      const relX = el.offsetLeft;
+      const relY = el.offsetTop;
       plane.baseX = relX + cellW / 2 - W / 2;
       plane.baseY = -(relY + cellH / 2 - H / 2);
     }
@@ -300,10 +329,15 @@ export class ImmersiveScene {
       );
     }
 
-    // Update RGB-shift uniforms & render only when there's motion
+    // Update RGB-shift uniforms only when there is motion
     if (energy >= 0.001) {
       this.rgbShiftPass?.update(this.pointerUV, energy);
-      this.composer?.render();
+    } else {
+      // Zero out energy so post-process pass is a no-op copy
+      this.rgbShiftPass?.update(this.pointerUV, 0);
     }
+
+    // Always render so textures appear even when the grid is stationary
+    this.composer?.render();
   };
 }

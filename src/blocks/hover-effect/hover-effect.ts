@@ -2,12 +2,33 @@ import { createOptimizedPicture } from '@/app/aem';
 import { moveInstrumentation } from '@/app/scripts';
 
 export default function decorate(block: HTMLElement): void {
+  let logoEl: HTMLElement | null = null;
   const ul = document.createElement('ul');
   ul.className = 'hover-effect-list';
 
   [...block.children].forEach((row) => {
     const cells = [...row.children] as HTMLElement[];
-    const [imageCell, imageAltCell, labelCell, linkCell] = cells;
+
+    // Logo row: hover-effect-logo model renders a single cell (just the image reference)
+    if (cells.length === 1) {
+      const div = document.createElement('div');
+      div.className = 'hover-effect-logo';
+      moveInstrumentation(row as HTMLElement, div);
+      const picture = cells[0].querySelector<HTMLPictureElement>('picture');
+      if (picture) {
+        const img = picture.querySelector<HTMLImageElement>('img');
+        if (img) {
+          const optimized = createOptimizedPicture(img.src, img.alt, false, [{ width: '200' }]);
+          moveInstrumentation(picture, optimized);
+          div.append(optimized);
+        }
+      }
+      logoEl = div;
+      return;
+    }
+
+    // Venue item row
+    const [imageCell, labelCell, linkCell] = cells;
 
     const li = document.createElement('li');
     li.className = 'hover-effect-item';
@@ -29,8 +50,7 @@ export default function decorate(block: HTMLElement): void {
     if (picture) {
       const img = picture.querySelector<HTMLImageElement>('img');
       if (img) {
-        const altText = imageAltCell?.textContent?.trim() ?? '';
-        const optimized = createOptimizedPicture(img.src, altText, false, [{ width: '750' }]);
+        const optimized = createOptimizedPicture(img.src, img.alt, false, [{ width: '750' }]);
         moveInstrumentation(picture, optimized);
         bg.append(optimized);
       }
@@ -46,5 +66,9 @@ export default function decorate(block: HTMLElement): void {
     ul.append(li);
   });
 
-  block.replaceChildren(ul);
+  const inner = document.createElement('div');
+  inner.className = 'hover-effect-inner';
+  if (logoEl) inner.append(logoEl);
+  inner.append(ul);
+  block.replaceChildren(inner);
 }

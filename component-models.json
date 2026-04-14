@@ -158,11 +158,10 @@
         "label": "Description"
       },
       {
-        "component": "aem-tag",
+        "component": "richtext",
         "valueType": "string",
         "name": "categories",
-        "label": "Categories",
-        "multi": true
+        "label": "Categories"
       }
     ]
   },

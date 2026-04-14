@@ -26,6 +26,12 @@
     ]
   },
   {
+    "id": "activities",
+    "components": [
+      "activity"
+    ]
+  },
+  {
     "id": "cards",
     "components": [
       "card"

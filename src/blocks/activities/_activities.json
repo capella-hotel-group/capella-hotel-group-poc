@@ -1,0 +1,34 @@
+{
+  "definitions": [
+    {
+      "title": "Activities",
+      "id": "activities",
+      "plugins": {
+        "xwalk": {
+          "page": {
+            "resourceType": "core/franklin/components/block/v1/block",
+            "template": {
+              "name": "Activities",
+              "model": "activities"
+            }
+          }
+        }
+      }
+    }
+  ],
+  "models": [
+    {
+      "id": "activities",
+      "fields": [
+        {
+          "component": "reference",
+          "valueType": "string",
+          "name": "backgroundVideo",
+          "label": "Background Video",
+          "multi": false
+        }
+      ]
+    }
+  ],
+  "filters": []
+}

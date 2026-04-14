@@ -32,7 +32,8 @@
     position: absolute;
     inset: 0;
     display: flex;
-    align-items: center;
+    align-items: flex-end;
+    padding-bottom: 64px;
     overflow: hidden;
 }
 
@@ -42,7 +43,7 @@
     padding: 0;
     display: flex;
     align-items: center;
-    gap: 24px;
+    gap: 0;
     flex-shrink: 0;
     will-change: transform;
     touch-action: pan-y;
@@ -53,11 +54,23 @@
     cursor: grabbing;
 }
 
-/* ── Slide (transform & opacity driven by JS RAF, not CSS) ── */
-.activities .activities-slide {
+/* ── Slide wrapper — flex layout item (fixed size, unaffected by scale) ── */
+.activities .activities-slide-wrapper {
     flex: 0 0 426px;
     aspect-ratio: 426 / 600;
     height: auto;
+    position: relative;
+    user-select: none;
+}
+
+.activities .activities-slide-wrapper.is-active {
+    z-index: 1;
+}
+
+/* ── Slide inner — scale & opacity driven by JS RAF, not CSS ── */
+.activities .activities-slide {
+    width: 100%;
+    height: 100%;
     position: relative;
     background-size: cover;
     background-position: center;
@@ -68,11 +81,6 @@
     overflow: hidden;
     border-radius: 999px;
     will-change: transform, opacity;
-    user-select: none;
-}
-
-.activities .activities-slide.is-active {
-    z-index: 1;
 }
 
 /* dark scrim inside each slide so text is readable */
@@ -88,15 +96,19 @@
 .activities .activities-slide-text {
     position: absolute;
     inset: 0;
-    display: none;
+    display: flex;
     align-items: center;
     justify-content: center;
     padding: 0 32px;
     z-index: 1;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 400ms ease;
 }
 
-.activities .activities-slide.is-active .activities-slide-text {
-    display: flex;
+.activities .activities-slide-wrapper.is-active .activities-slide-text {
+    opacity: 1;
+    pointer-events: auto;
 }
 
 .activities .activities-slide-text * {
@@ -116,14 +128,9 @@
 }
 
 @media (width < 600px) {
-    .activities .activities-slide {
+    .activities .activities-slide-wrapper {
         flex-basis: 200px;
         height: 280px;
-    }
-
-    .activities .activities-slide.is-active {
-        flex-basis: 280px;
-        height: 360px;
     }
 }
 

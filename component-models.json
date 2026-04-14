@@ -150,6 +150,18 @@
         "name": "backgroundVideo",
         "label": "Background Video",
         "multi": false
+      },
+      {
+        "component": "richtext",
+        "valueType": "string",
+        "name": "description",
+        "label": "Description"
+      },
+      {
+        "component": "richtext",
+        "valueType": "string",
+        "name": "categories",
+        "label": "Categories"
       }
     ]
   },
@@ -166,8 +178,8 @@
       {
         "component": "text",
         "valueType": "string",
-        "name": "text",
-        "label": "Text"
+        "name": "intro",
+        "label": "Intro"
       }
     ]
   },

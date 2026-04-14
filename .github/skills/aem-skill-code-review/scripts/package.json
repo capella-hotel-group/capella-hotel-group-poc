@@ -1,0 +1,7 @@
+{
+  "type": "module",
+  "description": "Screenshot capture script for AEM EDS code review. Run: npm install && node capture-screenshots.js <url>",
+  "devDependencies": {
+    "playwright": "^1.40.0"
+  }
+}

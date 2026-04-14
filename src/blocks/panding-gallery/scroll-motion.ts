@@ -51,6 +51,10 @@ export class ScrollMotionController {
   private readonly scrollDecayRate: number;
   private tracker: PointerVelocityTracker | null = null;
 
+  // Last-frame velocity for scroll energy calculation
+  private lastDx = 0;
+  private lastDy = 0;
+
   // RAF
   private animationId: number | null = null;
   private resizeObserver: ResizeObserver | null = null;
@@ -73,6 +77,42 @@ export class ScrollMotionController {
       const count = col.children.length;
       return new Array(count).fill(0) as number[];
     });
+  }
+
+  /**
+   * Normalised scroll energy in [0, 1] based on the current frame's velocity magnitude.
+   * Computed as Math.tanh(|velocity| / 15). Returns 0 when the grid is stationary.
+   */
+  get scrollEnergy(): number {
+    return Math.tanh(Math.hypot(this.lastDx, this.lastDy) / 15);
+  }
+
+  /**
+   * Last-frame global X offset (px). Used by the immersive scene to sync plane positions.
+   */
+  get currentGlobalOffsetX(): number {
+    return this.globalOffsetX;
+  }
+
+  /**
+   * Per-column Y offsets array. Used by the immersive scene to sync plane positions.
+   */
+  get currentOffsetY(): readonly number[] {
+    return this.offsetY;
+  }
+
+  /**
+   * Per-column per-item logical Y offsets (teleportation corrections).
+   */
+  get currentItemOffsetY(): readonly (readonly number[])[] {
+    return this.itemOffsetY;
+  }
+
+  /**
+   * Per-column logical X offsets (teleportation corrections).
+   */
+  get currentColLogicalX(): readonly number[] {
+    return this.colLogicalX;
   }
 
   start(): void {
@@ -160,6 +200,10 @@ export class ScrollMotionController {
       dx = this.scrollVelocityX;
       dy = this.scrollVelocityY;
     }
+
+    // Store for energy/offset getters
+    this.lastDx = dx;
+    this.lastDy = dy;
 
     // X: uniform across all columns
     this.globalOffsetX += dx;

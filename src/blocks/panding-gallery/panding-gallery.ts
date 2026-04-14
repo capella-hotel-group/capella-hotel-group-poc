@@ -10,10 +10,16 @@ const GAP = 10; // matches var(--spacing-xs, 10px)
 export default async function decorate(block: HTMLElement): Promise<void> {
   const rows = [...block.querySelectorAll<HTMLElement>(':scope > div')];
 
-  // --- Parse input mode from second row (or default "scroll") ---
+  // --- Parse config row (row after MAX_IMAGES items) ---
   const configRow = rows.length > MAX_IMAGES ? rows[MAX_IMAGES] : null;
-  const inputMode: 'scroll' | 'pointer' =
-    configRow?.querySelector<HTMLElement>(':scope > div')?.textContent?.trim() === 'pointer' ? 'pointer' : 'scroll';
+  const configCells = configRow ? [...configRow.querySelectorAll<HTMLElement>(':scope > div')] : [];
+
+  const inputMode: 'scroll' | 'pointer' = configCells[0]?.textContent?.trim() === 'pointer' ? 'pointer' : 'scroll';
+
+  const immersiveMode = configCells[1]?.textContent?.trim() === 'true';
+
+  const deformRadius = Number(configCells[2]?.textContent?.trim()) || 200;
+  const deformStrength = Number(configCells[3]?.textContent?.trim()) || 40;
 
   // --- Phase 1: Build static grid synchronously ---
   const imageRows = rows.slice(0, MAX_IMAGES);
@@ -133,19 +139,47 @@ export default async function decorate(block: HTMLElement): Promise<void> {
         inputMode,
       });
       controller.start();
-      const motionObserver = new MutationObserver(() => {
-        if (!document.contains(block)) {
-          controller.cleanup();
-          motionObserver.disconnect();
-        }
-      });
-      motionObserver.observe(document.body, { childList: true, subtree: true });
+
+      // --- Immersive mode: mount Three.js scene over the DOM grid ---
+      if (immersiveMode) {
+        const { ImmersiveScene } = await import('./immersive-scene');
+        const scene = new ImmersiveScene({
+          block,
+          columns,
+          controller,
+          deformRadius,
+          deformStrength,
+        });
+        await scene.init();
+        scene.start();
+
+        const motionObserver = new MutationObserver(() => {
+          if (!document.contains(block)) {
+            scene.cleanup();
+            controller.cleanup();
+            motionObserver.disconnect();
+          }
+        });
+        motionObserver.observe(document.body, { childList: true, subtree: true });
+      } else {
+        const motionObserver = new MutationObserver(() => {
+          if (!document.contains(block)) {
+            controller.cleanup();
+            motionObserver.disconnect();
+          }
+        });
+        motionObserver.observe(document.body, { childList: true, subtree: true });
+      }
+
       block.classList.remove('panding-gallery--loading');
       block.classList.add('panding-gallery--active');
     } catch (err) {
       console.error('panding-gallery: failed to start scroll-motion', err);
       initialized = false;
       block.classList.remove('panding-gallery--loading');
+      // Restore columns visibility in case immersive mount partially ran
+      const colsCont = block.querySelector<HTMLElement>('.panding-gallery-columns');
+      if (colsCont) colsCont.style.visibility = '';
     }
   });
 }

@@ -450,6 +450,27 @@
             "value": "pointer"
           }
         ]
+      },
+      {
+        "component": "checkbox",
+        "valueType": "boolean",
+        "name": "immersiveMode",
+        "label": "Immersive Mode (Three.js)",
+        "value": false
+      },
+      {
+        "component": "number",
+        "valueType": "number",
+        "name": "deformRadius",
+        "label": "Deform Radius (px)",
+        "value": 200
+      },
+      {
+        "component": "number",
+        "valueType": "number",
+        "name": "deformStrength",
+        "label": "Deform Strength (px)",
+        "value": 40
       }
     ]
   },

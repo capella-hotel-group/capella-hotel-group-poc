@@ -94,44 +94,47 @@ export class ImmersiveScene {
 
     // --- Build planes from DOM ---
     //
-    // IMPORTANT: use el.offsetLeft / el.offsetTop / el.offsetWidth / el.offsetHeight,
-    // NOT getBoundingClientRect(). getBoundingClientRect() returns the *visually*
-    // transformed position — if scroll-motion already ran a frame (async import lag),
-    // the columns have CSS transforms applied and the rect would encode scroll offset
-    // into the base positions, causing permanent drift.
-    // offsetLeft/offsetTop read from the layout tree and IGNORE CSS transforms.
+    // Plane base positions are computed structurally (same arithmetic as scroll-motion)
+    // rather than via offsetLeft/offsetTop to guarantee pixel-perfect alignment:
     //
-    // DOM structure:
-    //   .panding-gallery (position:relative) ← block
-    //     .panding-gallery-columns (position:absolute; inset:0)
-    //       .panding-gallery-column (flex child, will-change:transform)
-    //         <picture> elements   ← items[i]
+    //   colLeft[c] = c * (colWidth + GAP)
+    //   itemTop[c][i] = sum_{j<i} (items[j].offsetHeight + GAP)
     //
-    // <picture>.offsetParent == .panding-gallery-columns (nearest positioned ancestor;
-    // the column itself is not positioned so it is skipped).
-    // .panding-gallery-columns has inset:0 inside block → its own offset origin is (0,0)
-    // relative to block. Therefore picture.offsetLeft/offsetTop == block-relative coords.
+    // scroll-motion applies CSS transforms as DELTAS on top of these layout positions,
+    // and we apply the same deltas in the animate loop.  Using the same arithmetic
+    // avoids any discrepancy from CSS flex rounding, offsetParent chains, or
+    // intermediate element transforms.
+    //
+    // Camera convention: origin = block center, 1 world unit = 1 CSS pixel, Y axis up.
+    //   worldX = (colLeft + cellW/2) - W/2
+    //   worldY = -((itemTop + cellH/2) - H/2)  ← negate because DOM Y is down
+
+    const GAP = 10; // must match the CSS gap and scroll-motion's this.gap
+
+    // colWidth from col[0].offsetWidth (set by applyColumnWidths in panding-gallery.ts)
+    const colWidth = this.columns[0]?.offsetWidth ?? 0;
+
     this.planes = [];
     const planesToLoad: Array<{ planeInfo: PlaneInfo; src: string; material: MeshBasicMaterial }> = [];
 
     for (let c = 0; c < this.columns.length; c++) {
       const col = this.columns[c];
       const items = col.children;
+      const colLeft = c * (colWidth + GAP); // layout-space left edge of this column
+      let itemTop = 0; // accumulates as we descend through items
+
       for (let i = 0; i < items.length; i++) {
         const el = items[i] as HTMLElement;
         // el IS the <picture> element — query the <img> directly inside it
         const img = el.querySelector<HTMLImageElement>('img');
 
-        // Layout-space dimensions/positions — transform-independent
-        const cellW = el.offsetWidth;
-        const cellH = el.offsetHeight;
-        const relX = el.offsetLeft; // relative to columns container ≡ block (no border on block)
-        const relY = el.offsetTop; // same: relative to columns container
+        const cellW = colWidth; // pictures fill column width exactly
+        const cellH = el.offsetHeight; // actual rendered height (aspect-ratio driven)
 
         // Camera origin = block center; Y axis flipped (Three.js Y up, DOM Y down)
         // 1 world unit = 1 CSS pixel
-        const baseX = relX + cellW / 2 - W / 2;
-        const baseY = -(relY + cellH / 2 - H / 2);
+        const baseX = colLeft + cellW / 2 - W / 2;
+        const baseY = -(itemTop + cellH / 2 - H / 2);
 
         const geometry = new PlaneGeometry(cellW, cellH, 8, 8);
 
@@ -163,6 +166,9 @@ export class ImmersiveScene {
         if (queued && queued.planeInfo === null) {
           queued.planeInfo = planeInfo;
         }
+
+        // Advance vertical cursor (same formula as scroll-motion's totalColumnHeight)
+        itemTop += cellH + GAP;
       }
     }
 
@@ -275,17 +281,24 @@ export class ImmersiveScene {
     this.camera.bottom = -H / 2;
     this.camera.updateProjectionMatrix();
 
-    // Recompute base positions from live DOM layout (offset API ignores CSS transforms)
+    // Recompute base positions using the same structural arithmetic as init()
+    const GAP = 10;
+    const colWidth = this.columns[0]?.offsetWidth ?? 0;
     for (const plane of this.planes) {
       const col = this.columns[plane.colIndex];
       const el = col.children[plane.itemIndex] as HTMLElement | undefined;
       if (!el) continue;
-      const cellW = el.offsetWidth;
+      const cellW = colWidth;
       const cellH = el.offsetHeight;
-      const relX = el.offsetLeft;
-      const relY = el.offsetTop;
-      plane.baseX = relX + cellW / 2 - W / 2;
-      plane.baseY = -(relY + cellH / 2 - H / 2);
+      const colLeft = plane.colIndex * (colWidth + GAP);
+      // itemTop: re-accumulate for this plane's item index
+      let itemTop = 0;
+      for (let j = 0; j < plane.itemIndex; j++) {
+        const prev = col.children[j] as HTMLElement;
+        itemTop += prev.offsetHeight + GAP;
+      }
+      plane.baseX = colLeft + cellW / 2 - W / 2;
+      plane.baseY = -(itemTop + cellH / 2 - H / 2);
     }
   }
 

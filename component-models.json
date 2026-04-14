@@ -142,18 +142,6 @@
     ]
   },
   {
-    "id": "activities",
-    "fields": [
-      {
-        "component": "reference",
-        "valueType": "string",
-        "name": "backgroundVideo",
-        "label": "Background Video",
-        "multi": false
-      }
-    ]
-  },
-  {
     "id": "activity",
     "fields": [
       {

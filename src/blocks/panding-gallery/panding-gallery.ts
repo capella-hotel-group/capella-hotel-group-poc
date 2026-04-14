@@ -2,7 +2,7 @@ import { createOptimizedPicture } from '@/app/aem';
 import { moveInstrumentation } from '@/app/scripts';
 
 export default async function decorate(block: HTMLElement): Promise<void> {
-  if (document.documentElement.classList.contains('hlx-editor')) return;
+  if (document.documentElement.querySelector('#editor-app')) return;
 
   const rows = [...block.querySelectorAll<HTMLElement>(':scope > div')];
 

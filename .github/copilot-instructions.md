@@ -29,7 +29,7 @@ npm i                  # install dependencies
 npm run start          # dev: TS watch + Vite watch + aem up (localhost:3000)
 npm run build          # production: tsc type-check → vite build → editor build
 npm run build:json     # merge src/models/_*.json fragments into root AEM JSON files
-npm run lint           # ESLint (JS/TS) + Stylelint (CSS) — run before committing
+npm run lint           # ESLint (JS/TS) — run before committing
 npm run lint:fix       # auto-fix lint errors
 npm run format         # Prettier on all files
 ```

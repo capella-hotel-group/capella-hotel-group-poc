@@ -22,6 +22,7 @@
       "video",
       "custom-fragment",
       "hidden-stories",
+      "hover-effect",
       "activities"
     ]
   },
@@ -50,6 +51,12 @@
       "image",
       "button",
       "title"
+    ]
+  },
+  {
+    "id": "hover-effect",
+    "components": [
+      "hover-effect-item"
     ]
   },
   {

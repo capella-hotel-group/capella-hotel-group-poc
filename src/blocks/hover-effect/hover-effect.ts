@@ -68,7 +68,8 @@ export default function decorate(block: HTMLElement): void {
 
   const inner = document.createElement('div');
   inner.className = 'hover-effect-inner';
-  if (logoEl) inner.append(logoEl);
   inner.append(ul);
+
   block.replaceChildren(inner);
+  if (logoEl) block.append(logoEl);
 }

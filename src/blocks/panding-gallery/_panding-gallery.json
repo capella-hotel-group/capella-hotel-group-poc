@@ -35,7 +35,7 @@
     {
       "id": "panding-gallery-item",
       "fields": [
-        { "component": "reference", "valueType": "string", "name": "image", "label": "Image", "multi": false },
+        { "component": "reference", "valueType": "string", "name": "hinh", "label": "Hinh", "multi": false },
         { "component": "richtext", "name": "title", "value": "", "label": "Title", "valueType": "string" },
         { "component": "text", "valueType": "string", "name": "subtitle", "label": "Subtitle", "value": "" },
         { "component": "aem-content", "valueType": "string", "name": "link", "label": "Link" }

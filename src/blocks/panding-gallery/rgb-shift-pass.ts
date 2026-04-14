@@ -29,30 +29,44 @@ void main() {
 
   float shiftMag = uMaxShift * distFactor * uEnergy;
 
-  // Red   — unchanged
-  float r = texture2D(tDiffuse, vUv).r;
-  // Green — shifted outward (away from pointer)
-  float g = texture2D(tDiffuse, vUv + dir * shiftMag).g;
-  // Blue  — shifted inward  (toward pointer)
-  float b = texture2D(tDiffuse, vUv - dir * shiftMag).b;
+  vec4 sC = texture2D(tDiffuse, vUv);                   // center  (original)
+  vec4 sO = texture2D(tDiffuse, vUv + dir * shiftMag);  // outward sample
+  vec4 sI = texture2D(tDiffuse, vUv - dir * shiftMag);  // inward  sample
 
-  float a = texture2D(tDiffuse, vUv).a;
+  // Default tint colors.
+  vec3 cyanColor   = vec3(0.24, 0.82, 1.28) + sO.rgb;
+  vec3 violetColor = vec3(0.88, 0.12, 0.68) + sI.rgb;
 
-  gl_FragColor = vec4(r, g, b, a);
+  // Tint factor: 0 at the pointer or when energy == 0;
+  // grows toward 1 as the pixel moves outward to the influence boundary.
+  // t == shiftMag / uMaxShift, written out so GLSL avoids a division.
+  float t = distFactor * uEnergy;
+
+  // Outward sample blends toward cyan as t increases.
+  // Inward sample blends toward violet as t increases.
+  // When shiftMag == 0 → sO == sI == sC and t == 0 → collapse to original.
+  vec3 outTinted = mix(sO.rgb, cyanColor,   t * 0.16);
+  vec3 inTinted  = mix(sI.rgb, violetColor, t * 0.16);
+
+  // Chromatic split: G from cyan (outward) side, R from violet (inward) side,
+  // B is shared between both tints via a 50/50 blend.
+  float r = inTinted.r;
+  float g = outTinted.g;
+  float b = mix(inTinted.b, outTinted.b, 0.5);
+
+  gl_FragColor = vec4(r, g, b, sC.a);
 }
 `;
 
 /**
  * Radial RGB-shift post-processing pass.
  *
- * Green channel is shifted outward (away from pointer),
- * blue channel is shifted inward (toward pointer), and
- * red channel is left unchanged.
- *
- * Effect magnitude scales with scrollEnergy (0→1).
+ * Pixels moving outward from the pointer blend toward a default cyan tint;
+ * pixels moving inward blend toward a default violet tint.
+ * Both effects are zero at the pointer and scale with distFactor × scrollEnergy.
  */
 export class RadialRGBShiftPass extends ShaderPass {
-  constructor(influenceRadius = 0.4, maxShift = 0.01) {
+  constructor(influenceRadius = 0.6, maxShift = 0.008) {
     super({
       uniforms: {
         tDiffuse: { value: null },

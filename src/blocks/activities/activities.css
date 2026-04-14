@@ -1,0 +1,61 @@
+.activities .activities-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 24px;
+}
+
+.activities .activities-item {
+    display: flex;
+    flex-direction: column;
+    background-color: var(--background-color);
+    border: 1px solid #dadada;
+    overflow: hidden;
+}
+
+.activities .activities-item-image {
+    line-height: 0;
+}
+
+.activities .activities-item-image img {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+}
+
+.activities .activities-item-body {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.activities .activities-item-body h2,
+.activities .activities-item-body h3 {
+    margin: 0;
+    font-size: var(--heading-font-size-s);
+    color: var(--text-color);
+}
+
+.activities .activities-item-body p {
+    margin: 0;
+    color: var(--text-color);
+    font-size: var(--body-font-size-s);
+}
+
+.activities .activities-item-body a {
+    color: var(--link-color);
+    text-decoration: none;
+}
+
+.activities .activities-item-body a:hover {
+    text-decoration: underline;
+}
+
+@media (width >= 900px) {
+    .activities .activities-list {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}

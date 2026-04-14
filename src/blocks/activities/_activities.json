@@ -1,0 +1,75 @@
+{
+  "definitions": [
+    {
+      "title": "Activities",
+      "id": "activities",
+      "plugins": {
+        "xwalk": {
+          "page": {
+            "resourceType": "core/franklin/components/block/v1/block",
+            "template": {
+              "name": "Activities",
+              "filter": "activities"
+            }
+          }
+        }
+      }
+    },
+    {
+      "title": "Activity",
+      "id": "activity",
+      "plugins": {
+        "xwalk": {
+          "page": {
+            "resourceType": "core/franklin/components/block/v1/block/item",
+            "template": {
+              "name": "Activity",
+              "model": "activity"
+            }
+          }
+        }
+      }
+    }
+  ],
+  "models": [
+    {
+      "id": "activity",
+      "fields": [
+        {
+          "component": "reference",
+          "valueType": "string",
+          "name": "image",
+          "label": "Image",
+          "multi": false
+        },
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "title",
+          "label": "Title"
+        },
+        {
+          "component": "richtext",
+          "valueType": "string",
+          "name": "text",
+          "value": "",
+          "label": "Description"
+        },
+        {
+          "component": "aem-content",
+          "valueType": "string",
+          "name": "link",
+          "label": "Link"
+        }
+      ]
+    }
+  ],
+  "filters": [
+    {
+      "id": "activities",
+      "components": [
+        "activity"
+      ]
+    }
+  ]
+}

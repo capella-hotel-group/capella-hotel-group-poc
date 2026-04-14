@@ -83,6 +83,36 @@
       "id": "blocks",
       "components": [
         {
+          "title": "Activities",
+          "id": "activities",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/franklin/components/block/v1/block",
+                "template": {
+                  "name": "Activities",
+                  "filter": "activities"
+                }
+              }
+            }
+          }
+        },
+        {
+          "title": "Activity",
+          "id": "activity",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/franklin/components/block/v1/block/item",
+                "template": {
+                  "name": "Activity",
+                  "model": "activity"
+                }
+              }
+            }
+          }
+        },
+        {
           "title": "Cards",
           "id": "cards",
           "plugins": {

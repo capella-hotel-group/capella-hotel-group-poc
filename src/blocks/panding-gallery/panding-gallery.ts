@@ -1,5 +1,6 @@
 import { createOptimizedPicture } from '@/app/aem';
 import { moveInstrumentation } from '@/app/scripts';
+import { PointerTooltip } from './pointer-tooltip';
 
 const COLS = 5;
 const MAX_IMAGES = 20;
@@ -86,6 +87,7 @@ export default async function decorate(block: HTMLElement): Promise<void> {
     nav.append(...(navItems as HTMLElement[]));
   }
 
+  // Tooltip
   const children: Node[] = [columnsContainer, glassTop, glassBottom];
   if (nav) children.push(nav);
   block.replaceChildren(...children);
@@ -103,6 +105,9 @@ export default async function decorate(block: HTMLElement): Promise<void> {
 
   const ro = new ResizeObserver(() => applyColumnWidths());
   ro.observe(block);
+
+  // --- Tooltip: follows pointer with lerp, fades on scroll ---
+  new PointerTooltip(block, 'SCROLL OR CLICK');
 
   // --- Phase 2: interactive scroll layer on click ---
   let initialized = false;

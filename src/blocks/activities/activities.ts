@@ -1,14 +1,14 @@
 import { moveInstrumentation } from '@/app/scripts';
 import { resolveDAMUrl } from '@/utils/env';
 
-const SLIDE_W = 420;
+const SLIDE_W = 426;
 const SLIDE_GAP = 24;
 const SWIPE_THRESHOLD = 60;
 const ANIM_DURATION = 500;
 const SCALE_ACTIVE = 1;
 const SCALE_INACTIVE = 0.75;
 const OPACITY_ACTIVE = 1;
-const OPACITY_INACTIVE = 0.5;
+const OPACITY_INACTIVE = 1;
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 interface Tween {
@@ -223,21 +223,6 @@ function initSlider(slider: HTMLElement, track: HTMLElement, slides: HTMLElement
     vIdx = vNew;
     startRAF();
   }
-
-  // ── Arrow buttons ──────────────────────────────────────────────────────────
-  const btnPrev = document.createElement('button');
-  btnPrev.className = 'activities-btn activities-btn--prev';
-  btnPrev.setAttribute('aria-label', 'Previous slide');
-  btnPrev.textContent = '\u2039';
-  btnPrev.addEventListener('click', () => go(vIdx - 1));
-
-  const btnNext = document.createElement('button');
-  btnNext.className = 'activities-btn activities-btn--next';
-  btnNext.setAttribute('aria-label', 'Next slide');
-  btnNext.textContent = '\u203a';
-  btnNext.addEventListener('click', () => go(vIdx + 1));
-
-  slider.append(btnPrev, btnNext);
 
   // ── Swipe ──────────────────────────────────────────────────────────────────
   track.addEventListener('pointerdown', (e) => {

@@ -5,6 +5,7 @@ The `lighting-interaction` block renders a Three.js WebGL scene where a single b
 The new **advance mode** layers three additional transparent PNG planes (decoration-left, decoration-right, foreground) above the background. Because the background is now static in this mode, high-subdivision geometry is wasteful. The overlay planes are the only animated layers in advance mode — each with its own sin-loop animation on top of an additive pointer-velocity influence.
 
 Relevant files:
+
 - `src/blocks/lighting-interaction/lighting-interaction.ts` — block decorator, reads CMS rows
 - `src/blocks/lighting-interaction/scene.ts` — Three.js scene, `initScene()` + `SceneConfig`
 - `src/blocks/lighting-interaction/_lighting-interaction.json` — AEM component model
@@ -12,7 +13,8 @@ Relevant files:
 ## Goals / Non-Goals
 
 **Goals:**
-- Introduce an `advance` boolean flag in the CMS model that gates all new behaviour;  existing experience is completely unchanged when the flag is absent.
+
+- Introduce an `advance` boolean flag in the CMS model that gates all new behaviour; existing experience is completely unchanged when the flag is absent.
 - In advance mode, load three extra images (decor-left, decor-right, foreground) and create a corresponding Three.js `Mesh` per image, stacked above the background.
 - Background geometry is reduced to minimal segments (4×4) since it no longer deforms in advance mode.
 - Each overlay plane runs its own continuous sin-loop animation; Decoration planes rotate-like-wave around their respective anchors, foreground undulates on X only.
@@ -20,6 +22,7 @@ Relevant files:
 - Keep all tunable animation constants (amplitude, frequency, phase scale, pointer strength) as named `const` at the top of `scene.ts` so they can be promoted to authored fields later.
 
 **Non-Goals:**
+
 - Authoring the animation constants from Universal Editor (deferred).
 - Replacing the pointer-displacement logic applied to the background plane in non-advance mode.
 - Touch/mobile-specific pointer handling changes.
@@ -53,6 +56,7 @@ dispY += wave * AMPLITUDE * dist * DECOR_VELOCITY_SCALE   // decor: grows with d
 ```
 
 For foreground (X only):
+
 ```
 dispX += sin(angle + seed[i]) * FG_AMPLITUDE              // seed[i] is randomised once at init
 ```

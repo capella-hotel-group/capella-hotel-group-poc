@@ -14,6 +14,7 @@ Page load includes Three.js (~200KB+) even when the 3D scene is never viewed, hu
 ## Capabilities
 
 ### New Capabilities
+
 - `interactive-advance-block`: Full-screen AEM block with lazy-loaded Three.js WebGL scene, activated on user click
 
 ### Modified Capabilities

@@ -7,12 +7,14 @@ The project uses TypeScript + Vite with auto-discovery of blocks in `src/blocks/
 ## Goals / Non-Goals
 
 **Goals:**
+
 - Render a full-screen placeholder (image + CTA text) on page load with no Three.js code loaded
 - Defer all Three.js and WebGL code to a separate Vite chunk that loads only on user click
 - Provide an extensible `SceneConfig` interface for future GLTF / advanced scene options
 - Follow existing block conventions (BEM CSS, `block.replaceChildren()`, AEM model JSON)
 
 **Non-Goals:**
+
 - GLTF / GLB model loading (deferred to advanced phase)
 - OrbitControls or user camera interaction (deferred)
 - Post-processing effects (deferred)
@@ -26,6 +28,7 @@ The project uses TypeScript + Vite with auto-discovery of blocks in `src/blocks/
 `vite.helpers.ts` auto-discovers blocks by scanning `src/blocks/{name}/{name}.ts`. Only the file matching the block name becomes a Vite entry. `scene.ts` has a different name intentionally — Vite treats it as a lazy split chunk, not a preloaded module. This is the key mechanism that keeps Three.js out of the initial page load.
 
 **Alternatives considered:**
+
 - Putting scene code directly in `interactive-advance.ts` — rejected, would bundle Three.js into the entry
 - A separate manually-registered Vite entry — rejected, would trigger `modulePreload` warnings and complicate output paths
 

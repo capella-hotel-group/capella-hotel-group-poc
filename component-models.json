@@ -420,6 +420,28 @@
     ]
   },
   {
+    "id": "panding-gallery",
+    "fields": [
+      {
+        "component": "select",
+        "valueType": "string",
+        "name": "inputMode",
+        "label": "Input Mode",
+        "value": "scroll",
+        "options": [
+          {
+            "name": "Scroll / Wheel",
+            "value": "scroll"
+          },
+          {
+            "name": "Pointer Velocity",
+            "value": "pointer"
+          }
+        ]
+      }
+    ]
+  },
+  {
     "id": "panding-gallery-item",
     "fields": [
       {

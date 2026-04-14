@@ -14,6 +14,7 @@ import { loadTextureCoverUV, loadOverlayPlane, createHeadlinePlane } from './sce
 import type { OverlayLayer, HeadlinePlane } from './scene-loader';
 import { applySpringBack, applyStandardDisplacement, updateDecorLayer, updateForegroundLayer } from './scene-animation';
 import { createDebugOverlayCanvas, drawVelocityVector } from './scene-debug';
+import { PointerVelocityTracker } from '@/utils/pointer-velocity';
 
 // --- Standard mode config ---
 const INFLUENCE_RADIUS = 0.2; // 0.8 local-space radius of pointer influence (plane half-height = 1 unit)
@@ -45,8 +46,7 @@ export interface SceneConfig {
 
 let animationId: number | null = null;
 let resizeObserver: ResizeObserver | null = null;
-let boundPointerMove: ((e: PointerEvent) => void) | null = null;
-let boundContainer: Element | null = null;
+let velocityTracker: PointerVelocityTracker | null = null;
 let moduleDebugCanvas: HTMLCanvasElement | null = null;
 
 export function cleanupScene(): void {
@@ -56,11 +56,8 @@ export function cleanupScene(): void {
   }
   resizeObserver?.disconnect();
   resizeObserver = null;
-  if (boundPointerMove && boundContainer) {
-    boundContainer.removeEventListener('pointermove', boundPointerMove as EventListener);
-    boundPointerMove = null;
-    boundContainer = null;
-  }
+  velocityTracker?.detach();
+  velocityTracker = null;
   moduleDebugCanvas?.remove();
   moduleDebugCanvas = null;
 }
@@ -189,33 +186,20 @@ export async function initScene(canvas: HTMLCanvasElement, config: SceneConfig):
     debugCtx = debugCanvas.getContext('2d');
   }
 
-  // --- Pointer tracking ---
-  const lastNDC = new Vector2(0, 0);
-  const pendingDelta = new Vector2(0, 0);
-  const smoothDelta = new Vector2(0, 0);
+  // --- Pointer tracking (delegated to shared utility) ---
+  const decayRate = debugConfig.velocityDecayRate ?? VELOCITY_DECAY_RATE;
+  const decayThreshold = debugConfig.velocityDecayThreshold ?? VELOCITY_DECAY_THRESHOLD;
+  const tracker = new PointerVelocityTracker({ decayRate, decayThreshold });
+  tracker.attach(container);
+  velocityTracker = tracker;
+
   const currentNDC = new Vector2(0, 0);
-  let pointerScreenX = 0;
-  let pointerScreenY = 0;
 
   const raycaster = new Raycaster();
   let hitLocalX = 0;
   let hitLocalY = 0;
   let hasHit = false;
   let hasActiveDisplacement = false;
-
-  boundContainer = container;
-  boundPointerMove = (e: PointerEvent): void => {
-    const rect = container.getBoundingClientRect();
-    pointerScreenX = e.clientX - rect.left;
-    pointerScreenY = e.clientY - rect.top;
-    const nx = (pointerScreenX / rect.width) * 2 - 1;
-    const ny = -(pointerScreenY / rect.height) * 2 + 1;
-    currentNDC.set(nx, ny);
-    pendingDelta.x += nx - lastNDC.x;
-    pendingDelta.y += ny - lastNDC.y;
-    lastNDC.set(nx, ny);
-  };
-  container.addEventListener('pointermove', boundPointerMove as EventListener);
 
   // Advance mode: accumulated sin angle (incremented each frame for a smooth infinite loop)
   let advAngle = 0;
@@ -224,14 +208,10 @@ export async function initScene(canvas: HTMLCanvasElement, config: SceneConfig):
   function animate(): void {
     animationId = requestAnimationFrame(animate);
 
-    // Exponential velocity momentum decay — natural ease-out of pointer inertia
-    const decayRate = debugConfig.velocityDecayRate ?? VELOCITY_DECAY_RATE;
-    const decayThreshold = debugConfig.velocityDecayThreshold ?? VELOCITY_DECAY_THRESHOLD;
-    smoothDelta.x = (smoothDelta.x + pendingDelta.x) * (1 - decayRate);
-    smoothDelta.y = (smoothDelta.y + pendingDelta.y) * (1 - decayRate);
-    pendingDelta.set(0, 0);
-    if (Math.abs(smoothDelta.x) < decayThreshold) smoothDelta.x = 0;
-    if (Math.abs(smoothDelta.y) < decayThreshold) smoothDelta.y = 0;
+    // Advance velocity state via shared tracker
+    tracker.update();
+    currentNDC.set(tracker.currentNDC.x, tracker.currentNDC.y);
+    const smoothDelta = tracker.smoothDelta;
 
     const sMag = Math.sqrt(smoothDelta.x * smoothDelta.x + smoothDelta.y * smoothDelta.y);
 
@@ -387,7 +367,7 @@ export async function initScene(canvas: HTMLCanvasElement, config: SceneConfig):
     // Debug: draw pointer velocity vector overlay
     if (debugCtx && debugConfig.showVelocityVector) {
       const scale = debugConfig.velocityVectorScale ?? 200;
-      drawVelocityVector(debugCtx, pointerScreenX, pointerScreenY, smoothDelta.x, smoothDelta.y, scale);
+      drawVelocityVector(debugCtx, tracker.pointerScreenX, tracker.pointerScreenY, smoothDelta.x, smoothDelta.y, scale);
     }
 
     renderer.render(scene, camera);

@@ -12,12 +12,7 @@ import {
 import { debugConfig } from './debug-config';
 import { loadTextureCoverUV, loadOverlayPlane, createHeadlinePlane } from './scene-loader';
 import type { OverlayLayer, HeadlinePlane } from './scene-loader';
-import {
-  applySpringBack,
-  applyStandardDisplacement,
-  updateDecorLayer,
-  updateForegroundLayer,
-} from './scene-animation';
+import { applySpringBack, applyStandardDisplacement, updateDecorLayer, updateForegroundLayer } from './scene-animation';
 import { createDebugOverlayCanvas, drawVelocityVector } from './scene-debug';
 
 // --- Standard mode config ---
@@ -29,13 +24,13 @@ const SPRING_DAMPING = 0.8; // per-frame decay that springs vertices back to res
 const Z_FACTOR = 0.3; // 0.16 z-displacement magnitude relative to xy displacement
 
 // --- Advance mode config ---
-const ADVANCE_SIN_AMPLITUDE = 0.08; // peak Y displacement for a decor vertex at dist=1 from anchor
-const ADVANCE_SIN_FREQ = 0.015; // angle increment per frame (radians); controls wave speed
+const ADVANCE_SIN_AMPLITUDE = 0.1; // peak Y displacement for a decor vertex at dist=1 from anchor
+const ADVANCE_SIN_FREQ = 0.012; // angle increment per frame (radians); controls wave speed
 const ADVANCE_FG_AMPLITUDE = 0.03; // peak X displacement for foreground vertices
-const ADVANCE_POINTER_STRENGTH = 0.45; // uniform pointer-velocity scale for all overlay planes
+const ADVANCE_POINTER_STRENGTH = 0.32; // uniform pointer-velocity scale for all overlay planes
 const ADVANCE_FG_POINTER_STRENGTH = 0.06; // separate foreground pointer-velocity scale
 const ADVANCE_DECOR_POINTER_RADIUS = 1.2; // Gaussian influence radius around pointer for decor layers (local units)
-const DECOR_PHASE_RIGHT = Math.PI * 0.7; // phase offset applied to right decor wave
+const DECOR_PHASE_RIGHT = Math.PI * 1.3; // phase offset applied to right decor wave
 
 export interface SceneConfig {
   imageUrl: string;
@@ -129,54 +124,42 @@ export async function initScene(canvas: HTMLCanvasElement, config: SceneConfig):
 
     if (config.decorLeftUrl) {
       loadPromises.push(
-        loadOverlayPlane(
-          config.decorLeftUrl,
-          scene,
-          initAspect,
-          1,
-          debugConfig.wireframeDecorLeft ?? false,
-        ).then((layer) => {
-          layer.mesh.visible = debugConfig.showDecorLeft ?? true;
-          decorLeft = layer;
-          overlayLayers.push(layer);
-        }),
+        loadOverlayPlane(config.decorLeftUrl, scene, initAspect, 1, debugConfig.wireframeDecorLeft ?? false).then(
+          (layer) => {
+            layer.mesh.visible = debugConfig.showDecorLeft ?? true;
+            decorLeft = layer;
+            overlayLayers.push(layer);
+          },
+        ),
       );
     }
     if (config.decorRightUrl) {
       loadPromises.push(
-        loadOverlayPlane(
-          config.decorRightUrl,
-          scene,
-          initAspect,
-          2,
-          debugConfig.wireframeDecorRight ?? false,
-        ).then((layer) => {
-          layer.mesh.visible = debugConfig.showDecorRight ?? true;
-          decorRight = layer;
-          overlayLayers.push(layer);
-        }),
+        loadOverlayPlane(config.decorRightUrl, scene, initAspect, 2, debugConfig.wireframeDecorRight ?? false).then(
+          (layer) => {
+            layer.mesh.visible = debugConfig.showDecorRight ?? true;
+            decorRight = layer;
+            overlayLayers.push(layer);
+          },
+        ),
       );
     }
     if (config.foregroundUrl) {
       loadPromises.push(
-        loadOverlayPlane(
-          config.foregroundUrl,
-          scene,
-          initAspect,
-          3,
-          debugConfig.wireframeForeground ?? false,
-        ).then((layer) => {
-          layer.mesh.visible = debugConfig.showForeground ?? true;
-          foreground = layer;
-          overlayLayers.push(layer);
-          fgSeeds = new Float32Array(layer.vertCount);
-          for (let i = 0; i < layer.vertCount; i++) {
-            // Map vertex X position (-1..1) to a phase offset spanning 0..0.5*PI so
-            // the total phase difference across the entire plane is ~π/2 — a gentle
-            // horizontal wave sweep rather than chaotic per-vertex ripples.
-            fgSeeds[i] = ((layer.restX[i] + 1) / 2) * (Math.PI * 0.5);
-          }
-        }),
+        loadOverlayPlane(config.foregroundUrl, scene, initAspect, 3, debugConfig.wireframeForeground ?? false).then(
+          (layer) => {
+            layer.mesh.visible = debugConfig.showForeground ?? true;
+            foreground = layer;
+            overlayLayers.push(layer);
+            fgSeeds = new Float32Array(layer.vertCount);
+            for (let i = 0; i < layer.vertCount; i++) {
+              // Map vertex X position (-1..1) to a phase offset spanning 0..0.5*PI so
+              // the total phase difference across the entire plane is ~π/2 — a gentle
+              // horizontal wave sweep rather than chaotic per-vertex ripples.
+              fgSeeds[i] = ((layer.restX[i] + 1) / 2) * (Math.PI * 0.5);
+            }
+          },
+        ),
       );
     }
 
@@ -295,7 +278,7 @@ export async function initScene(canvas: HTMLCanvasElement, config: SceneConfig):
           sinAmplitude: ADVANCE_SIN_AMPLITUDE,
           smoothDeltaX: smoothDelta.x,
           smoothDeltaY: smoothDelta.y,
-          pointerStrength: ADVANCE_POINTER_STRENGTH,
+          pointerStrength: ADVANCE_POINTER_STRENGTH * 1.7,
           hitLocalX: currentNDC.x,
           hitLocalY: currentNDC.y,
           pointerInfluenceRadius: debugConfig.decorPointerInfluenceRadius ?? ADVANCE_DECOR_POINTER_RADIUS,

@@ -12,7 +12,7 @@
 .lighting-interaction {
     position: relative;
     overflow: hidden;
-    min-height: 100svh;
+    min-height: 100dvh;
     background: linear-gradient(180deg, var(--color-warm-mid) 0%, var(--background-color) 28%);
     cursor: pointer;
 }

@@ -11,6 +11,7 @@ The lighting-interaction block in advance mode composites up to four transparent
 4. **Headline composite plane**: Marketing copy (heading + tagline) currently lives in a DOM overlay (`lighting-interaction-content`). To allow smooth WebGL compositing effects over the text, a canvas-texture plane is needed that repaints the text content onto a `CanvasTexture`, allowing the DOM text to be hidden and the WebGL version to receive the same pointer-driven displacement as the background.
 
 Current source references:
+
 - `scene-animation.ts`: `updateDecorLayer`, `updateForegroundLayer` — need param extensions
 - `scene-loader.ts`: `loadOverlayPlane` — needs edge-clamp metadata; new `createHeadlinePlane`
 - `scene.ts`: orchestrator, wires all planes
@@ -18,6 +19,7 @@ Current source references:
 ## Goals / Non-Goals
 
 **Goals:**
+
 - Pin outer-edge vertices to zero for all overlay planes (decor and foreground) to prevent coverage gaps.
 - Add per-plane `phaseOffset` seed to `updateDecorLayer` so left and right decorations animate independently.
 - Attenuate pointer velocity influence on decor vertices by proximity to the anchor point.
@@ -25,6 +27,7 @@ Current source references:
 - Create a `createHeadlinePlane` function that renders heading + tagline DOM content onto a `CanvasTexture`, places a plane at `renderOrder = 4`, and wires pointer displacement identical to the background standard mode.
 
 **Non-Goals:**
+
 - No new CMS model fields — the headline plane reads from the existing DOM structure.
 - No runtime toggle UI for any of these features.
 - Not handling arbitrary multi-line text layout beyond what the browser font metrics provide via `measureText`.

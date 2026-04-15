@@ -53,22 +53,24 @@ function buildSlides(itemRows: HTMLElement[]): HTMLElement[] {
       slide.style.backgroundImage = `url('${img.src}')`;
     }
 
-    const textCells = [...row.children] as HTMLElement[];
-    textCells.forEach((cell) => {
-      if (!cell.querySelector('picture') && cell.textContent?.trim()) {
-        const textWrap = document.createElement('div');
-        textWrap.className = 'activities-slide-text';
-        textWrap.append(...cell.childNodes);
-        slide.append(textWrap);
-      }
-    });
+    const introCell = ([...row.children] as HTMLElement[]).find(
+      (cell) => !cell.querySelector('picture') && cell.textContent?.trim(),
+    );
+    if (introCell) {
+      // Store a snapshot of the intro cell's children on the wrapper element itself
+      const introSnapshot = document.createElement('div');
+      introSnapshot.className = 'activities-intro-snapshot';
+      introSnapshot.style.display = 'none';
+      introSnapshot.append(...[...introCell.childNodes].map((n) => n.cloneNode(true)));
+      wrapper.append(introSnapshot);
+    }
 
     wrapper.append(slide);
     return wrapper;
   });
 }
 
-function initSlider(slider: HTMLElement, track: HTMLElement, slides: HTMLElement[]): void {
+function initSlider(slider: HTMLElement, track: HTMLElement, slides: HTMLElement[], introEl: HTMLElement): void {
   if (slides.length === 0) return;
 
   const N = slides.length;
@@ -144,6 +146,21 @@ function initSlider(slider: HTMLElement, track: HTMLElement, slides: HTMLElement
     if (next === activeNode) return;
     activeNode?.classList.remove('is-active');
     next.classList.add('is-active');
+    const snapshot = next.querySelector('.activities-intro-snapshot');
+    if (activeNode === null) {
+      // First activation — no fade, just set content directly
+      introEl.replaceChildren(...[...(snapshot?.childNodes ?? [])].map((n) => n.cloneNode(true)));
+    } else {
+      introEl.style.opacity = '0';
+      introEl.addEventListener(
+        'transitionend',
+        () => {
+          introEl.replaceChildren(...[...(snapshot?.childNodes ?? [])].map((n) => n.cloneNode(true)));
+          introEl.style.opacity = '1';
+        },
+        { once: true },
+      );
+    }
     activeNode = next;
   }
 
@@ -297,7 +314,11 @@ function initSlider(slider: HTMLElement, track: HTMLElement, slides: HTMLElement
 export default async function decorate(block: HTMLElement): Promise<void> {
   const rows = [...block.children] as HTMLElement[];
   const videoSrc = rows[0]?.querySelector<HTMLAnchorElement>('a')?.href ?? '';
-  const itemRows = rows.slice(1);
+  // Activity items: rows with class "activity" (set by xwalk template) in the editor,
+  // or containing a picture element in production (where classes are rendered onto the row).
+  const itemRows = rows
+    .slice(1)
+    .filter((row) => row.classList.contains('activity') || row.querySelector('picture') !== null);
 
   const container = document.createElement('div');
   container.className = 'activities-container';
@@ -323,6 +344,10 @@ export default async function decorate(block: HTMLElement): Promise<void> {
 
   // Slider
   if (itemRows.length > 0) {
+    const introEl = document.createElement('div');
+    introEl.className = 'activities-intro';
+    container.append(introEl);
+
     const slider = document.createElement('div');
     slider.className = 'activities-slider';
 
@@ -334,7 +359,7 @@ export default async function decorate(block: HTMLElement): Promise<void> {
     slider.append(track);
     container.append(slider);
 
-    initSlider(slider, track, slides);
+    initSlider(slider, track, slides, introEl);
   }
 
   block.replaceChildren(container);

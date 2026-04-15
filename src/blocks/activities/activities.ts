@@ -53,16 +53,19 @@ function buildSlides(itemRows: HTMLElement[]): HTMLElement[] {
       slide.style.backgroundImage = `url('${img.src}')`;
     }
 
-    const introSnapshot = document.createElement('div');
-    introSnapshot.className = 'activities-intro-snapshot';
-    introSnapshot.style.display = 'none';
+    // Slide text overlay (visible on active)
     const textCells = [...row.children] as HTMLElement[];
+    const slideText = document.createElement('div');
+    slideText.className = 'activities-slide-text';
     textCells.forEach((cell) => {
       if (!cell.querySelector('picture') && cell.textContent?.trim()) {
-        introSnapshot.append(...[...cell.childNodes].map((n) => n.cloneNode(true)));
+        slideText.append(...[...cell.childNodes].map((n) => n.cloneNode(true)));
       }
     });
-    wrapper.append(introSnapshot);
+    if (slideText.childNodes.length > 0) {
+      slide.append(slideText);
+    }
+
     wrapper.append(slide);
     return wrapper;
   });

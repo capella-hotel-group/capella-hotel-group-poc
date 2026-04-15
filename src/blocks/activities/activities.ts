@@ -325,6 +325,7 @@ export default async function decorate(block: HTMLElement): Promise<void> {
 
   const overlay = document.createElement('div');
   overlay.className = 'activities-overlay';
+  container.append(overlay);
 
   // Block-level intro
   if (introRow?.textContent?.trim()) {
@@ -332,7 +333,7 @@ export default async function decorate(block: HTMLElement): Promise<void> {
     intro.className = 'activities-intro';
     moveInstrumentation(introRow, intro);
     intro.append(...[...introRow.children].map((c) => c.cloneNode(true)));
-    overlay.append(intro);
+    container.append(intro);
   }
 
   // Block-level categories
@@ -340,11 +341,18 @@ export default async function decorate(block: HTMLElement): Promise<void> {
     const categories = document.createElement('div');
     categories.className = 'activities-categories';
     moveInstrumentation(categoriesRow, categories);
-    categories.append(...[...categoriesRow.children].map((c) => c.cloneNode(true)));
-    overlay.append(categories);
+    const paragraphs = categoriesRow.querySelectorAll('p');
+    paragraphs.forEach((p, i) => {
+      const clone = p.cloneNode(true) as HTMLElement;
+      if (i === 0) clone.classList.add('is-active');
+      clone.addEventListener('click', () => {
+        categories.querySelector('.is-active')?.classList.remove('is-active');
+        clone.classList.add('is-active');
+      });
+      categories.append(clone);
+    });
+    container.append(categories);
   }
-
-  container.append(overlay);
 
   // Slider
   if (itemRows.length > 0) {

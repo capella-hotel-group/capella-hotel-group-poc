@@ -296,8 +296,14 @@ function initSlider(slider: HTMLElement, track: HTMLElement, slides: HTMLElement
 
 export default async function decorate(block: HTMLElement): Promise<void> {
   const rows = [...block.children] as HTMLElement[];
+
+  // Block-level fields (activities model: backgroundVideo, intro, categories)
   const videoSrc = rows[0]?.querySelector<HTMLAnchorElement>('a')?.href ?? '';
-  const itemRows = rows.slice(1);
+  const introRow = rows[1];
+  const categoriesRow = rows[2];
+
+  // Activity items start after the 3 block-level fields
+  const itemRows = rows.slice(3);
 
   const container = document.createElement('div');
   container.className = 'activities-container';
@@ -319,6 +325,25 @@ export default async function decorate(block: HTMLElement): Promise<void> {
 
   const overlay = document.createElement('div');
   overlay.className = 'activities-overlay';
+
+  // Block-level intro
+  if (introRow?.textContent?.trim()) {
+    const intro = document.createElement('div');
+    intro.className = 'activities-intro';
+    moveInstrumentation(introRow, intro);
+    intro.append(...[...introRow.children].map((c) => c.cloneNode(true)));
+    overlay.append(intro);
+  }
+
+  // Block-level categories
+  if (categoriesRow?.textContent?.trim()) {
+    const categories = document.createElement('div');
+    categories.className = 'activities-categories';
+    moveInstrumentation(categoriesRow, categories);
+    categories.append(...[...categoriesRow.children].map((c) => c.cloneNode(true)));
+    overlay.append(categories);
+  }
+
   container.append(overlay);
 
   // Slider

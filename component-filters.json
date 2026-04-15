@@ -30,6 +30,7 @@
   {
     "id": "activities",
     "components": [
+      "activities-config",
       "activity"
     ]
   },

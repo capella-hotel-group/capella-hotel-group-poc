@@ -85,7 +85,6 @@
         {
           "title": "Activities",
           "id": "activities",
-          "model": "activities",
           "plugins": {
             "xwalk": {
               "page": {
@@ -93,6 +92,21 @@
                 "template": {
                   "name": "Activities",
                   "filter": "activities"
+                }
+              }
+            }
+          }
+        },
+        {
+          "title": "Activities Config",
+          "id": "activities-config",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/franklin/components/block/v1/block/item",
+                "template": {
+                  "name": "Activities Config",
+                  "model": "activities-config"
                 }
               }
             }

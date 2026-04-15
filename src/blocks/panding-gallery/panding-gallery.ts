@@ -141,7 +141,7 @@ export default async function decorate(block: HTMLElement): Promise<void> {
       controller.start();
 
       // --- Immersive mode: mount Three.js scene over the DOM grid ---
-      if (immersiveMode || 1 === 1) {
+      if (immersiveMode) {
         const { ImmersiveScene } = await import('./immersive-scene');
         const scene = new ImmersiveScene({
           block,

@@ -53,16 +53,16 @@ function buildSlides(itemRows: HTMLElement[]): HTMLElement[] {
       slide.style.backgroundImage = `url('${img.src}')`;
     }
 
+    const introSnapshot = document.createElement('div');
+    introSnapshot.className = 'activities-intro-snapshot';
+    introSnapshot.style.display = 'none';
     const textCells = [...row.children] as HTMLElement[];
     textCells.forEach((cell) => {
       if (!cell.querySelector('picture') && cell.textContent?.trim()) {
-        const textWrap = document.createElement('div');
-        textWrap.className = 'activities-slide-text';
-        textWrap.append(...cell.childNodes);
-        slide.append(textWrap);
+        introSnapshot.append(...[...cell.childNodes].map((n) => n.cloneNode(true)));
       }
     });
-
+    wrapper.append(introSnapshot);
     wrapper.append(slide);
     return wrapper;
   });

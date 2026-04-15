@@ -85,6 +85,7 @@
         {
           "title": "Activities",
           "id": "activities",
+          "model": "activities",
           "plugins": {
             "xwalk": {
               "page": {

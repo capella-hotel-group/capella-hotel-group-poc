@@ -334,6 +334,10 @@ export default async function decorate(block: HTMLElement): Promise<void> {
   const container = document.createElement('div');
   container.className = 'activities-container';
 
+  // Set model via instrumentation so UE properties panel shows activities fields
+  // without putting model+filter both in the template (which breaks the Add button).
+  block.dataset.aueModel = 'activities';
+
   // Background video
   if (videoSrc) {
     const video = document.createElement('video');

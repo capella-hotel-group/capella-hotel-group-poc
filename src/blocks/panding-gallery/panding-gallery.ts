@@ -14,19 +14,23 @@ export default async function decorate(block: HTMLElement): Promise<void> {
   if (isUniversalEditor()) return;
   const rows = [...block.querySelectorAll<HTMLElement>(':scope > div')];
 
-  // --- Parse config row (row after MAX_IMAGES items) ---
-  const configRow = rows.length > MAX_IMAGES ? rows[MAX_IMAGES] : null;
-  const configCells = configRow ? [...configRow.querySelectorAll<HTMLElement>(':scope > div')] : [];
+  // xwalk container blocks: block-level properties are each in their own single-cell
+  // row BEFORE child item rows (per AEM EDS content-modeling docs on container blocks).
+  // Model field order: inputMode [0], immersiveMode [1], deformRadius [2], deformStrength [3]
+  const NUM_CONFIG_ROWS = 4;
+  const [inputModeRow, immersiveModeRow, deformRadiusRow, deformStrengthRow] = rows;
 
-  const inputMode: 'scroll' | 'pointer' = configCells[0]?.textContent?.trim() === 'pointer' ? 'pointer' : 'scroll';
+  const inputMode: 'scroll' | 'pointer' =
+    inputModeRow?.querySelector<HTMLElement>(':scope > div')?.textContent?.trim() === 'pointer' ? 'pointer' : 'scroll';
 
-  const immersiveMode = configCells[1]?.textContent?.trim() === 'true';
+  const immersiveMode = immersiveModeRow?.querySelector<HTMLElement>(':scope > div')?.textContent?.trim() === 'true';
 
-  const deformRadius = Number(configCells[2]?.textContent?.trim()) || 600;
-  const deformStrength = Number(configCells[3]?.textContent?.trim()) || 80;
+  const deformRadius = Number(deformRadiusRow?.querySelector<HTMLElement>(':scope > div')?.textContent?.trim()) || 600;
+  const deformStrength =
+    Number(deformStrengthRow?.querySelector<HTMLElement>(':scope > div')?.textContent?.trim()) || 80;
 
   // --- Phase 1: Build static grid synchronously ---
-  const imageRows = rows.slice(0, MAX_IMAGES);
+  const imageRows = rows.slice(NUM_CONFIG_ROWS, NUM_CONFIG_ROWS + MAX_IMAGES);
   const columns: HTMLElement[] = [];
   for (let c = 0; c < COLS; c++) {
     const col = document.createElement('div');
@@ -58,8 +62,7 @@ export default async function decorate(block: HTMLElement): Promise<void> {
   glassBottom.className = 'panding-gallery-glass panding-gallery-glass--bottom';
 
   // Navigation overlay (keep original nav items if present)
-  const navItems = rows
-    .slice(0, MAX_IMAGES)
+  const navItems = imageRows
     .map((row) => {
       const cells = [...row.querySelectorAll<HTMLElement>(':scope > div')];
       const titleCell = cells[1]; // second cell: title

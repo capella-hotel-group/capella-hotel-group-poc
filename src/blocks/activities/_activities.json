@@ -46,8 +46,8 @@
         {
           "component": "richtext",
           "valueType": "string",
-          "name": "description",
-          "label": "Description"
+          "name": "intro",
+          "label": "Intro"
         },
         {
           "component": "richtext",
@@ -70,8 +70,8 @@
         {
           "component": "text",
           "valueType": "string",
-          "name": "intro",
-          "label": "Intro"
+          "name": "text",
+          "label": "Text"
         }
       ]
     }

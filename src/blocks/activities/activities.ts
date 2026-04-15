@@ -53,16 +53,19 @@ function buildSlides(itemRows: HTMLElement[]): HTMLElement[] {
       slide.style.backgroundImage = `url('${img.src}')`;
     }
 
-    const introSnapshot = document.createElement('div');
-    introSnapshot.className = 'activities-intro-snapshot';
-    introSnapshot.style.display = 'none';
+    // Slide text overlay (visible on active)
     const textCells = [...row.children] as HTMLElement[];
+    const slideText = document.createElement('div');
+    slideText.className = 'activities-slide-text';
     textCells.forEach((cell) => {
       if (!cell.querySelector('picture') && cell.textContent?.trim()) {
-        introSnapshot.append(...[...cell.childNodes].map((n) => n.cloneNode(true)));
+        slideText.append(...[...cell.childNodes].map((n) => n.cloneNode(true)));
       }
     });
-    wrapper.append(introSnapshot);
+    if (slideText.childNodes.length > 0) {
+      slide.append(slideText);
+    }
+
     wrapper.append(slide);
     return wrapper;
   });
@@ -296,8 +299,14 @@ function initSlider(slider: HTMLElement, track: HTMLElement, slides: HTMLElement
 
 export default async function decorate(block: HTMLElement): Promise<void> {
   const rows = [...block.children] as HTMLElement[];
+
+  // Block-level fields (activities model: backgroundVideo, intro, categories)
   const videoSrc = rows[0]?.querySelector<HTMLAnchorElement>('a')?.href ?? '';
-  const itemRows = rows.slice(1);
+  const introRow = rows[1];
+  const categoriesRow = rows[2];
+
+  // Activity items start after the 3 block-level fields
+  const itemRows = rows.slice(3);
 
   const container = document.createElement('div');
   container.className = 'activities-container';
@@ -320,6 +329,33 @@ export default async function decorate(block: HTMLElement): Promise<void> {
   const overlay = document.createElement('div');
   overlay.className = 'activities-overlay';
   container.append(overlay);
+
+  // Block-level intro
+  if (introRow?.textContent?.trim()) {
+    const intro = document.createElement('div');
+    intro.className = 'activities-intro';
+    moveInstrumentation(introRow, intro);
+    intro.append(...[...introRow.children].map((c) => c.cloneNode(true)));
+    container.append(intro);
+  }
+
+  // Block-level categories
+  if (categoriesRow?.textContent?.trim()) {
+    const categories = document.createElement('div');
+    categories.className = 'activities-categories';
+    moveInstrumentation(categoriesRow, categories);
+    const paragraphs = categoriesRow.querySelectorAll('p');
+    paragraphs.forEach((p, i) => {
+      const clone = p.cloneNode(true) as HTMLElement;
+      if (i === 0) clone.classList.add('is-active');
+      clone.addEventListener('click', () => {
+        categories.querySelector('.is-active')?.classList.remove('is-active');
+        clone.classList.add('is-active');
+      });
+      categories.append(clone);
+    });
+    container.append(categories);
+  }
 
   // Slider
   if (itemRows.length > 0) {

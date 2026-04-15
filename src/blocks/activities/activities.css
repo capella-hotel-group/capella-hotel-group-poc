@@ -27,6 +27,58 @@
     pointer-events: none;
 }
 
+.activities .activities-intro {
+    position: absolute;
+    width: 50%;
+    max-width: 577px;
+    top: 120px;
+    left: 64px;
+    color: #fff;
+    font-family: GoudyWtcT;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    z-index: 3;
+}
+
+.activities .activities-intro h2 {
+    font-size: 16px;
+    margin: 0 0 16px;
+}
+.activities .activities-intro p {
+    font-size: 36px;
+    margin: 16px 0;
+}
+
+.activities .activities-categories {
+    position: absolute;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 20px 40px;
+    top: 200px;
+    right: 64px;
+    width: 50%;
+    max-width: 470px;
+    z-index: 3;
+    color: #c6c6c6;
+    font-family: GoudyWtcT;
+    font-size: 24px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+
+.activities .activities-categories p {
+    margin: 0;
+}
+
+.activities .activities-categories p.is-active {
+    color: #fff;
+    font-size: 28px;
+}
+
 /* ── Slider ── */
 .activities .activities-slider {
     position: absolute;

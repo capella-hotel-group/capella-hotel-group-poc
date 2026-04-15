@@ -1,5 +1,13 @@
 import { moveInstrumentation } from '@/app/scripts';
 import { resolveDAMUrl } from '@/utils/env';
+import blockConfig from './_activities.json';
+
+// Derive field order for the block-level model from the JSON — single source of truth.
+const activitiesFields = blockConfig.models.find((m) => m.id === 'activities')?.fields ?? [];
+const FIELD = Object.fromEntries(activitiesFields.map((f, i) => [f.name, i])) as Record<string, number>;
+// FIELD.backgroundVideo === 0, FIELD.intro === 1, FIELD.categories === 2, …
+// Activity items start at row index = activitiesFields.length
+const ITEMS_START = activitiesFields.length;
 
 const SLIDE_W = 426;
 const VISUAL_GAP = 40; // desired visual gap between adjacent scaled inner edges
@@ -313,12 +321,15 @@ function initSlider(slider: HTMLElement, track: HTMLElement, slides: HTMLElement
 
 export default async function decorate(block: HTMLElement): Promise<void> {
   const rows = [...block.children] as HTMLElement[];
-  const videoSrc = rows[0]?.querySelector<HTMLAnchorElement>('a')?.href ?? '';
-  // Activity items: rows with class "activity" (set by xwalk template) in the editor,
-  // or containing a picture element in production (where classes are rendered onto the row).
+
+  // Block-level fields — index driven by JSON field order (FIELD map above)
+  const videoSrc = rows[FIELD.backgroundVideo]?.querySelector<HTMLAnchorElement>('a')?.href ?? '';
+
+  // Activity items start after the block-level fields
   const itemRows = rows
-    .slice(1)
-    .filter((row) => row.classList.contains('activity') || row.querySelector('picture') !== null);
+    .slice(ITEMS_START)
+    .filter((row) => row.dataset.aueModel === 'activity' || row.querySelector('picture') !== null);
+  itemRows.forEach((row) => row.setAttribute('data-activity', ''));
 
   const container = document.createElement('div');
   container.className = 'activities-container';

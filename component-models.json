@@ -154,8 +154,8 @@
       {
         "component": "richtext",
         "valueType": "string",
-        "name": "description",
-        "label": "Description"
+        "name": "intro",
+        "label": "Intro"
       },
       {
         "component": "richtext",

@@ -142,7 +142,7 @@
     ]
   },
   {
-    "id": "activities-config",
+    "id": "activities",
     "fields": [
       {
         "component": "reference",
@@ -154,8 +154,8 @@
       {
         "component": "richtext",
         "valueType": "string",
-        "name": "intro",
-        "label": "Intro"
+        "name": "description",
+        "label": "Description"
       },
       {
         "component": "richtext",
@@ -178,8 +178,8 @@
       {
         "component": "text",
         "valueType": "string",
-        "name": "text",
-        "label": "Text"
+        "name": "intro",
+        "label": "Intro"
       }
     ]
   },

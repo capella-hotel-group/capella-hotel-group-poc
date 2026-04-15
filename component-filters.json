@@ -24,13 +24,13 @@
       "hidden-stories",
       "activities",
       "panding-gallery",
-      "hover-effect"
+      "hover-effect",
+      "activities"
     ]
   },
   {
     "id": "activities",
     "components": [
-      "activities-config",
       "activity"
     ]
   },

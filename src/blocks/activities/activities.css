@@ -27,44 +27,6 @@
     pointer-events: none;
 }
 
-/* ── Intro overlay ── */
-.activities .activities-intro {
-    position: absolute;
-    top: 120px;
-    left: 64px;
-    width: 577px;
-    max-width: 50%;
-    color: #fff;
-    font-family: GoudyWtcT, serif;
-    font-size: 36px;
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
-    z-index: 2;
-    pointer-events: none;
-    transition: opacity 300ms ease;
-}
-
-.activities .activities-intro * {
-    margin: 0;
-}
-
-.activities .activities-intro h1 {
-    color: #fff;
-    font-size: 16px;
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
-}
-.activities .activities-intro p {
-    color: #fff;
-    font-size: 36px;
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
-    margin-top: 28px;
-}
-
 /* ── Slider ── */
 .activities .activities-slider {
     position: absolute;

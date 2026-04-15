@@ -86,14 +86,14 @@ export function resolveDAMUrl(src: string): string {
 
 /**
  * Detects if the page is being viewed in the AEM Universal Editor.
- * @returns {boolean} True if in Universal Editor, false otherwise.
+ *
+ * Canonical AEM EDS signal: the Universal Editor always loads the content page
+ * inside an iframe (the outer shell is experience.adobe.com). EDS pages are
+ * never embedded in iframes during normal production browsing, so a frame check
+ * is both necessary and sufficient.
+ *
+ * @returns {boolean} True if currently running inside the Universal Editor, false otherwise.
  */
-export function isUniversalEditor() {
-  return (
-    window.location.search.includes('universal-editor=true') ||
-    window.location.pathname.startsWith('/editor.html') ||
-    window.location.hash.includes('universal-editor') ||
-    window.location.hostname.includes('adobeaemcloud') ||
-    !!document.querySelector('[data-universal-editor]')
-  );
+export function isUniversalEditor(): boolean {
+  return window.self !== window.top;
 }

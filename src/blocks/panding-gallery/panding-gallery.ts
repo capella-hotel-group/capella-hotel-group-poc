@@ -1,5 +1,6 @@
 import { createOptimizedPicture } from '@/app/aem';
 import { moveInstrumentation } from '@/app/scripts';
+import { isUniversalEditor } from '@/utils/env';
 import { PointerTooltip } from './pointer-tooltip';
 
 const COLS = 5;
@@ -8,6 +9,9 @@ const VISIBLE_COLS = 3.2;
 const GAP = 10; // matches var(--spacing-xs, 10px)
 
 export default async function decorate(block: HTMLElement): Promise<void> {
+  // In the Universal Editor the raw DOM is sufficient for authoring;
+  // skip the heavy WebGL / scroll-interaction setup to avoid rendering errors.
+  if (isUniversalEditor()) return;
   const rows = [...block.querySelectorAll<HTMLElement>(':scope > div')];
 
   // --- Parse config row (row after MAX_IMAGES items) ---

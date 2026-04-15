@@ -24,7 +24,8 @@
 
 /* Individual column */
 .panding-gallery-column {
-    flex: 1 1 0;
+    flex: 0 0 var(--pg-col-width, 35vw);
+    width: var(--pg-col-width, 35vw);
     display: flex;
     flex-direction: column;
     gap: var(--spacing-xs, 10px);
@@ -40,7 +41,7 @@
 .panding-gallery-column picture img {
     width: 100%;
     height: auto;
-    aspect-ratio: 9 / 16;
+    aspect-ratio: 3 / 4;
     object-fit: cover;
     display: block;
 }
@@ -56,7 +57,7 @@
 
 .panding-gallery-glass--top {
     top: 0;
-    height: 35vh;
+    height: 25vh;
     background: linear-gradient(to bottom, rgb(0 0 0 / 0.9) 0%, rgb(0 0 0 / 0) 100%);
     backdrop-filter: blur(15px);
     backdrop-filter: blur(15px);
@@ -66,7 +67,7 @@
 
 .panding-gallery-glass--bottom {
     bottom: 0;
-    height: 40vh;
+    height: 25vh;
     background: linear-gradient(to top, rgb(0 0 0 / 0.8) 0%, rgb(0 0 0 / 0) 100%);
     backdrop-filter: blur(5px);
     backdrop-filter: blur(5px);
@@ -137,10 +138,51 @@
     }
 
     .panding-gallery-column picture img {
-        aspect-ratio: 9 / 16;
+        aspect-ratio: 3 / 4;
     }
 
     .panding-gallery-nav {
         gap: var(--spacing-xl, 64px);
     }
+}
+
+/* Phase 2: loading + active states */
+.panding-gallery--loading {
+    cursor: wait;
+}
+
+.panding-gallery--active {
+    cursor: grab;
+}
+
+.panding-gallery--active .panding-gallery-columns {
+    overflow: visible;
+}
+
+.panding-gallery--active .panding-gallery-column picture {
+    will-change: transform;
+}
+
+/* Pointer tooltip */
+.panding-gallery-tooltip {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 10;
+    pointer-events: none;
+    padding: 10px 18px;
+    background: rgb(255 255 255 / 0.08);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgb(255 255 255 / 0.18);
+    border-radius: 2px;
+    color: var(--color-white, #fff);
+    font-family: var(--font-sans, sans-serif);
+    font-size: var(--type-size-xs, 13px);
+    font-weight: 400;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.35s ease;
+    will-change: transform;
 }

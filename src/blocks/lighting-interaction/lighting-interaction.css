@@ -5,8 +5,8 @@
 }
 
 /* Authoring-only fix */
-.adobe-ue-edit .lighting-interaction-wrapper {
-    max-height: 1080px;
+.adobe-ue-edit .lighting-interaction {
+    max-height: 100vw;
 }
 
 .lighting-interaction {

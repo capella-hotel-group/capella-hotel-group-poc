@@ -6,6 +6,11 @@
     background-color: #f0eae8;
 }
 
+/* Authoring-only fix */
+.adobe-ue-edit .hover-effect {
+    min-height: 600px;
+}
+
 .hover-effect-inner {
     position: absolute;
     top: 50%;

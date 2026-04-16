@@ -5,6 +5,11 @@
     overflow: hidden;
 }
 
+/* Authoring-only fix */
+.adobe-ue-edit .activities {
+    height: 600px;
+}
+
 .activities .activities-container {
     position: relative;
     width: 100%;

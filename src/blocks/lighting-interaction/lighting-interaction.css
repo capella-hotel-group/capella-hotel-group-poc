@@ -9,6 +9,10 @@
     max-height: 768px;
 }
 
+.adobe-ue-edit .lighting-interaction {
+    min-height: auto;
+}
+
 .lighting-interaction {
     position: relative;
     overflow: hidden;

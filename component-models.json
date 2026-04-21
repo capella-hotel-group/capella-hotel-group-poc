@@ -432,6 +432,17 @@
     ]
   },
   {
+    "id": "masthead-sticky",
+    "fields": [
+      {
+        "component": "aem-content",
+        "valueType": "string",
+        "name": "video",
+        "label": "Video"
+      }
+    ]
+  },
+  {
     "id": "menu-item",
     "fields": [
       {

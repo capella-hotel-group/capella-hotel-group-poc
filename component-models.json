@@ -257,6 +257,30 @@
     ]
   },
   {
+    "id": "header",
+    "fields": [
+      {
+        "component": "richtext",
+        "valueType": "string",
+        "name": "language",
+        "label": "Language Selector",
+        "description": "List of language options shown in the dropdown"
+      },
+      {
+        "component": "richtext",
+        "valueType": "string",
+        "name": "nav",
+        "label": "Navigation Links",
+        "description": "Nav links displayed around the emblem (e.g. Destinations, Experiences)"
+      },
+      {
+        "component": "aem-content",
+        "name": "cta",
+        "label": "CTA Button Link"
+      }
+    ]
+  },
+  {
     "id": "hero",
     "fields": [
       {

@@ -92,3 +92,7 @@ main .masthead-sticky .masthead-cta {
         bottom: 24px;
     }
 }
+/* Authoring: cap height to prevent layout issues in the Universal Editor */
+.adobe-ue-edit .masthead-sticky {
+    max-height: 1080px;
+}

@@ -1,28 +1,49 @@
+import { getMetadata } from '@/app/aem';
+import { loadFragment } from '@/blocks/fragment/fragment';
+import { moveInstrumentation } from '@/app/scripts';
+
 function closeLangDropdown(trigger: HTMLButtonElement, dropdown: HTMLUListElement): void {
   trigger.setAttribute('aria-expanded', 'false');
   dropdown.classList.remove('is-open');
 }
 
-function buildLangZone(): [HTMLDivElement, HTMLUListElement] {
+/**
+ * Builds the language selector from the authored richtext.
+ * Each <li> in the source list becomes a dropdown option.
+ * The first item is auto-selected and shown as the trigger label.
+ */
+function buildLangZone(sourceList: Element): [HTMLDivElement, HTMLUListElement] {
+  const sourceItems = [...sourceList.querySelectorAll<HTMLLIElement>('li')];
+  const firstLabel = sourceItems[0]?.textContent?.trim() ?? 'ENGLISH';
+
   const trigger = document.createElement('button');
   trigger.className = 'header-lang-trigger';
   trigger.setAttribute('aria-expanded', 'false');
   trigger.setAttribute('aria-haspopup', 'listbox');
-  trigger.textContent = 'ENGLISH ▾';
+  trigger.textContent = `${firstLabel} ▾`;
 
-  // Dropdown is intentionally NOT appended inside the header element.
-  // It is appended to document.body in decorate() so it lives in the root
-  // stacking context (z-index: 99) beneath the sticky header (z-index: 100),
-  // which allows the header's box-shadow to paint on top of the dropdown.
+  // Dropdown lives in document.body (appended in decorate) so the header's
+  // box-shadow (z-index: 100) paints on top of it (z-index: 99).
   const dropdown = document.createElement('ul');
   dropdown.className = 'header-lang-dropdown';
   dropdown.setAttribute('role', 'listbox');
+  moveInstrumentation(sourceList, dropdown);
 
-  ['ENGLISH', '简体中文', '日本語'].forEach((lang) => {
+  sourceItems.forEach((srcItem, i) => {
     const item = document.createElement('li');
     item.setAttribute('role', 'option');
     item.setAttribute('tabindex', '0');
-    item.textContent = lang;
+    item.textContent = srcItem.textContent?.trim() ?? '';
+    if (i === 0) item.setAttribute('aria-selected', 'true');
+    moveInstrumentation(srcItem, item);
+
+    item.addEventListener('click', () => {
+      trigger.textContent = `${item.textContent ?? ''} ▾`;
+      dropdown.querySelectorAll('li').forEach((li) => li.removeAttribute('aria-selected'));
+      item.setAttribute('aria-selected', 'true');
+      closeLangDropdown(trigger, dropdown);
+    });
+
     dropdown.append(item);
   });
 
@@ -67,35 +88,43 @@ function buildLangZone(): [HTMLDivElement, HTMLUListElement] {
   return [zone, dropdown];
 }
 
-function buildNavZone(): HTMLElement {
-  const destLink = document.createElement('a');
-  destLink.className = 'header-nav-link';
-  destLink.href = '/destinations';
-  destLink.textContent = 'DESTINATIONS';
-
-  // emblem: static brand asset, not authored content
-  const emblem = document.createElement('img');
-  emblem.className = 'header-emblem';
-  emblem.src = '/icons/capella-emblem.svg';
-  emblem.alt = '';
-
-  const expLink = document.createElement('a');
-  expLink.className = 'header-nav-link';
-  expLink.href = '/experiences';
-  expLink.textContent = 'EXPERIENCES';
+/**
+ * Builds the center nav from the authored richtext.
+ * Expects <a> tags inside <li> elements. Links are split around the emblem:
+ * first half left, remaining right.
+ */
+function buildNavZone(sourceList: Element): HTMLElement {
+  const items = [...sourceList.querySelectorAll<HTMLLIElement>('li')];
 
   const nav = document.createElement('nav');
   nav.className = 'header-nav';
   nav.setAttribute('aria-label', 'Primary navigation');
-  nav.append(destLink, emblem, expLink);
+  moveInstrumentation(sourceList, nav);
+
+  function makeNavLink(srcItem: HTMLLIElement): HTMLAnchorElement {
+    const srcA = srcItem.querySelector<HTMLAnchorElement>('a');
+    const a = document.createElement('a');
+    a.className = 'header-nav-link';
+    a.href = srcA?.href ?? '#';
+    a.textContent = (srcA?.textContent ?? srcItem.textContent)?.trim() ?? '';
+    moveInstrumentation(srcA ?? srcItem, a);
+    return a;
+  }
+
+  items.forEach((item) => nav.append(makeNavLink(item)));
+
   return nav;
 }
 
-function buildCtaZone(): HTMLAnchorElement {
+/**
+ * Builds the CTA anchor from the authored aem-content field.
+ */
+function buildCtaZone(sourceAnchor: HTMLAnchorElement | null): HTMLAnchorElement {
   const cta = document.createElement('a');
   cta.className = 'header-cta';
-  cta.href = '/book';
-  cta.textContent = 'BOOK YOUR STAY';
+  cta.href = sourceAnchor?.href ?? '/book';
+  cta.textContent = sourceAnchor?.textContent?.trim() ?? 'BOOK YOUR STAY';
+  if (sourceAnchor) moveInstrumentation(sourceAnchor, cta);
   return cta;
 }
 
@@ -109,11 +138,36 @@ export default async function decorate(block: HTMLElement): Promise<void> {
     return;
   }
 
-  const [langZone, langDropdown] = buildLangZone();
+  const navMeta = getMetadata('nav');
+  const navPath = navMeta ? new URL(navMeta, window.location.href).pathname : '/nav';
+  const fragment = await loadFragment(navPath);
+  if (!fragment) return;
+
+  const sections = [...fragment.children] as HTMLElement[];
+
+  // Section 0: language richtext — find <ul>
+  const langList = sections[0]?.querySelector('ul, ol');
+
+  // Section 1: nav richtext — find <ul>
+  const navList = sections[1]?.querySelector('ul, ol');
+
+  // Section 2: CTA — find <a>
+  const ctaAnchor = sections[2]?.querySelector<HTMLAnchorElement>('a') ?? null;
+
+  if (!langList || !navList) return;
+
+  const [langZone, langDropdown] = buildLangZone(langList);
+
+  // Emblem is a direct child of header-inner, absolutely centered at 50%,
+  // so it stays at the true horizontal center regardless of link count.
+  const emblem = document.createElement('img');
+  emblem.className = 'header-emblem';
+  emblem.src = '/icons/capella-emblem.svg';
+  emblem.alt = '';
 
   const inner = document.createElement('div');
   inner.className = 'header-inner';
-  inner.append(langZone, buildNavZone(), buildCtaZone());
+  inner.append(langZone, buildNavZone(navList), emblem, buildCtaZone(ctaAnchor));
 
   block.replaceChildren(inner);
 

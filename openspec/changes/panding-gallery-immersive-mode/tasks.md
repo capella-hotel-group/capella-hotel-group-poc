@@ -56,10 +56,10 @@
 
 ## 7. Verification
 
-- [ ] 7.1 Start dev server (`npm run start`) and verify `immersiveMode = false` (default) — grid works as before with no regressions
-- [ ] 7.2 Set `immersiveMode = true` in UE or locally; click the block; verify Three.js canvas appears and planes pixel-match the original grid layout
-- [ ] 7.3 Scroll the block and verify vertex deformation: vertices near pointer push up less, vertices at `deformRadius` push up more
-- [ ] 7.4 Observe RGB-shift effect during scroll — green channel shifted outward, blue inward, red unchanged; effect fades when scroll stops
-- [ ] 7.5 Resize the viewport and verify planes, camera, and composer all update without drift
-- [ ] 7.6 Navigate away (block removed from DOM) and verify `cleanup()` is called: canvas removed, columns visibility restored, no memory leaks from dangling RAF
+- [x] 7.1 Start dev server (`npm run start`) and verify `immersiveMode = false` (default) — grid works as before with no regressions
+- [x] 7.2 Set `immersiveMode = true` in UE or locally; click the block; verify Three.js canvas appears and planes pixel-match the original grid layout
+- [x] 7.3 Scroll the block and verify vertex deformation: vertices near pointer push up less, vertices at `deformRadius` push up more
+- [x] 7.4 Observe RGB-shift effect during scroll — green channel shifted outward, blue inward, red unchanged; effect fades when scroll stops
+- [x] 7.5 Resize the viewport and verify planes, camera, and composer all update without drift
+- [x] 7.6 Navigate away (block removed from DOM) and verify `cleanup()` is called: canvas removed, columns visibility restored, no memory leaks from dangling RAF
 - [x] 7.7 Run `npm run lint` and verify zero lint errors

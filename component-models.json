@@ -257,6 +257,55 @@
     ]
   },
   {
+    "id": "header",
+    "fields": [
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "languageLabel",
+        "label": "Language Selector Label",
+        "value": "ENGLISH ▾",
+        "description": "Trigger text shown in the language selector button"
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "destinationsLabel",
+        "label": "Destinations Link Label",
+        "value": "DESTINATIONS"
+      },
+      {
+        "component": "aem-content",
+        "name": "destinationsLink",
+        "label": "Destinations Link"
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "experiencesLabel",
+        "label": "Experiences Link Label",
+        "value": "EXPERIENCES"
+      },
+      {
+        "component": "aem-content",
+        "name": "experiencesLink",
+        "label": "Experiences Link"
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "ctaLabel",
+        "label": "CTA Button Label",
+        "value": "BOOK YOUR STAY"
+      },
+      {
+        "component": "aem-content",
+        "name": "ctaLink",
+        "label": "CTA Button Link"
+      }
+    ]
+  },
+  {
     "id": "hero",
     "fields": [
       {

@@ -22,6 +22,7 @@
     font-weight: 300;
     font-display: swap;
     src: url('../fonts/calibre-Light.ttf') format('truetype');
+    src: url('../fonts/calibre-light.woff2') format('woff2');
 }
 
 @font-face {
@@ -37,7 +38,7 @@
     font-style: normal;
     font-weight: 400;
     font-display: swap;
-    src: url('../fonts/Calibre-Regular.woff2') format('woff2');
+    src: url('../fonts/calibre-regular-2.woff2') format('woff2');
 }
 
 @font-face {

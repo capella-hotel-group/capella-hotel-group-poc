@@ -1,157 +1,123 @@
-import { getMetadata } from '@/app/aem';
-import { loadFragment } from '@/blocks/fragment/fragment';
-
-const isDesktop = window.matchMedia('(min-width: 900px)');
-
-function closeOnEscape(e: KeyboardEvent): void {
-  if (e.code === 'Escape') {
-    const nav = document.getElementById('nav');
-    if (!nav) return;
-    const navSections = nav.querySelector<HTMLElement>('.nav-sections');
-    if (!navSections) return;
-    const navSectionExpanded = navSections.querySelector<HTMLElement>('[aria-expanded="true"]');
-    if (navSectionExpanded && isDesktop.matches) {
-      toggleAllNavSections(navSections);
-      navSectionExpanded.focus();
-    } else if (!isDesktop.matches) {
-      toggleMenu(nav, navSections);
-      nav.querySelector('button')?.focus();
-    }
-  }
+function closeLangDropdown(trigger: HTMLButtonElement, dropdown: HTMLUListElement): void {
+  trigger.setAttribute('aria-expanded', 'false');
+  dropdown.classList.remove('is-open');
 }
 
-function closeOnFocusLost(e: FocusEvent): void {
-  const nav = e.currentTarget as HTMLElement;
-  if (!nav.contains(e.relatedTarget as Node)) {
-    const navSections = nav.querySelector<HTMLElement>('.nav-sections');
-    if (!navSections) return;
-    const navSectionExpanded = navSections.querySelector<HTMLElement>('[aria-expanded="true"]');
-    if (navSectionExpanded && isDesktop.matches) {
-      toggleAllNavSections(navSections, false);
-    } else if (!isDesktop.matches) {
-      toggleMenu(nav, navSections, false);
-    }
-  }
-}
+function buildLangZone(): [HTMLDivElement, HTMLUListElement] {
+  const trigger = document.createElement('button');
+  trigger.className = 'header-lang-trigger';
+  trigger.setAttribute('aria-expanded', 'false');
+  trigger.setAttribute('aria-haspopup', 'listbox');
+  trigger.textContent = 'ENGLISH ▾';
 
-function openOnKeydown(e: KeyboardEvent): void {
-  const focused = document.activeElement as HTMLElement;
-  const isNavDrop = focused.className === 'nav-drop';
-  if (isNavDrop && (e.code === 'Enter' || e.code === 'Space')) {
-    const dropExpanded = focused.getAttribute('aria-expanded') === 'true';
-    toggleAllNavSections(focused.closest('.nav-sections') as HTMLElement);
-    focused.setAttribute('aria-expanded', dropExpanded ? 'false' : 'true');
-  }
-}
+  // Dropdown is intentionally NOT appended inside the header element.
+  // It is appended to document.body in decorate() so it lives in the root
+  // stacking context (z-index: 99) beneath the sticky header (z-index: 100),
+  // which allows the header's box-shadow to paint on top of the dropdown.
+  const dropdown = document.createElement('ul');
+  dropdown.className = 'header-lang-dropdown';
+  dropdown.setAttribute('role', 'listbox');
 
-function focusNavSection(this: HTMLElement): void {
-  this.addEventListener('keydown', openOnKeydown);
-}
-
-function toggleAllNavSections(sections: HTMLElement, expanded: boolean | string = false): void {
-  sections.querySelectorAll('.nav-sections .default-content-wrapper > ul > li').forEach((section) => {
-    section.setAttribute('aria-expanded', String(expanded));
+  ['ENGLISH', '简体中文', '日本語'].forEach((lang) => {
+    const item = document.createElement('li');
+    item.setAttribute('role', 'option');
+    item.setAttribute('tabindex', '0');
+    item.textContent = lang;
+    dropdown.append(item);
   });
+
+  const zone = document.createElement('div');
+  zone.className = 'header-lang';
+  zone.append(trigger);
+
+  function alignDropdown(): void {
+    dropdown.style.left = `${trigger.getBoundingClientRect().left}px`;
+  }
+
+  function openDropdown(): void {
+    alignDropdown();
+    dropdown.classList.add('is-open');
+    trigger.setAttribute('aria-expanded', 'true');
+  }
+
+  window.addEventListener('resize', () => {
+    if (trigger.getAttribute('aria-expanded') === 'true') alignDropdown();
+  });
+
+  trigger.addEventListener('click', (e: MouseEvent) => {
+    e.stopPropagation();
+    if (trigger.getAttribute('aria-expanded') === 'true') {
+      closeLangDropdown(trigger, dropdown);
+    } else {
+      openDropdown();
+    }
+  });
+
+  document.addEventListener('keydown', (e: KeyboardEvent) => {
+    if (e.key === 'Escape') closeLangDropdown(trigger, dropdown);
+  });
+
+  document.addEventListener('click', (e: MouseEvent) => {
+    const target = e.target as Node;
+    if (!zone.contains(target) && !dropdown.contains(target)) {
+      closeLangDropdown(trigger, dropdown);
+    }
+  });
+
+  return [zone, dropdown];
 }
 
-function toggleMenu(nav: HTMLElement, navSections: HTMLElement, forceExpanded: boolean | null = null): void {
-  const expanded = forceExpanded !== null ? !forceExpanded : nav.getAttribute('aria-expanded') === 'true';
-  const button = nav.querySelector('button');
-  document.body.style.overflowY = expanded || isDesktop.matches ? '' : 'hidden';
-  nav.setAttribute('aria-expanded', expanded ? 'false' : 'true');
-  toggleAllNavSections(navSections, expanded || isDesktop.matches ? 'false' : 'true');
-  if (button) {
-    button.setAttribute('aria-label', expanded ? 'Open navigation' : 'Close navigation');
-  }
+function buildNavZone(): HTMLElement {
+  const destLink = document.createElement('a');
+  destLink.className = 'header-nav-link';
+  destLink.href = '/destinations';
+  destLink.textContent = 'DESTINATIONS';
 
-  const navDrops = navSections.querySelectorAll<HTMLElement>('.nav-drop');
-  if (isDesktop.matches) {
-    navDrops.forEach((drop) => {
-      if (!drop.hasAttribute('tabindex')) {
-        drop.setAttribute('tabindex', '0');
-        drop.addEventListener('focus', focusNavSection);
-      }
-    });
-  } else {
-    navDrops.forEach((drop) => {
-      drop.removeAttribute('tabindex');
-      drop.removeEventListener('focus', focusNavSection);
-    });
-  }
+  // emblem: static brand asset, not authored content
+  const emblem = document.createElement('img');
+  emblem.className = 'header-emblem';
+  emblem.src = '/icons/capella-emblem.svg';
+  emblem.alt = '';
 
-  if (!expanded || isDesktop.matches) {
-    window.addEventListener('keydown', closeOnEscape);
-    nav.addEventListener('focusout', closeOnFocusLost);
-  } else {
-    window.removeEventListener('keydown', closeOnEscape);
-    nav.removeEventListener('focusout', closeOnFocusLost);
-  }
+  const expLink = document.createElement('a');
+  expLink.className = 'header-nav-link';
+  expLink.href = '/experiences';
+  expLink.textContent = 'EXPERIENCES';
+
+  const nav = document.createElement('nav');
+  nav.className = 'header-nav';
+  nav.setAttribute('aria-label', 'Primary navigation');
+  nav.append(destLink, emblem, expLink);
+  return nav;
+}
+
+function buildCtaZone(): HTMLAnchorElement {
+  const cta = document.createElement('a');
+  cta.className = 'header-cta';
+  cta.href = '/book';
+  cta.textContent = 'BOOK YOUR STAY';
+  return cta;
 }
 
 /**
- * Loads and decorates the header nav.
+ * Decorates the luxury three-zone sticky header:
+ * [language selector] [brand nav + emblem] [BOOK YOUR STAY]
  */
-export default async function decorate(block) {
+export default async function decorate(block: HTMLElement): Promise<void> {
   if (window.location.pathname.includes('/en/exploration')) {
     block.closest('header')?.remove();
     return;
   }
 
-  // load nav as fragment
-  const navMeta = getMetadata('nav');
-  const navPath = navMeta ? new URL(navMeta, window.location.href).pathname : '/nav';
-  const fragment = await loadFragment(navPath);
-  if (!fragment) return;
+  const [langZone, langDropdown] = buildLangZone();
 
-  block.textContent = '';
-  const nav = document.createElement('nav');
-  nav.id = 'nav';
-  while (fragment.firstElementChild) nav.append(fragment.firstElementChild);
+  const inner = document.createElement('div');
+  inner.className = 'header-inner';
+  inner.append(langZone, buildNavZone(), buildCtaZone());
 
-  const classes = ['brand', 'sections', 'tools'];
-  classes.forEach((c, i) => {
-    const section = nav.children[i] as HTMLElement | undefined;
-    if (section) section.classList.add(`nav-${c}`);
-  });
+  block.replaceChildren(inner);
 
-  const navBrand = nav.querySelector('.nav-brand');
-  const brandLink = navBrand?.querySelector('.button');
-  if (brandLink) {
-    brandLink.className = '';
-    brandLink.closest('.button-container')?.removeAttribute('class');
-  }
-
-  const navSections = nav.querySelector<HTMLElement>('.nav-sections');
-  if (navSections) {
-    navSections.querySelectorAll<HTMLElement>(':scope .default-content-wrapper > ul > li').forEach((navSection) => {
-      if (navSection.querySelector('ul')) navSection.classList.add('nav-drop');
-      navSection.addEventListener('click', () => {
-        if (isDesktop.matches) {
-          const expanded = navSection.getAttribute('aria-expanded') === 'true';
-          toggleAllNavSections(navSections);
-          navSection.setAttribute('aria-expanded', expanded ? 'false' : 'true');
-        }
-      });
-    });
-  }
-
-  const hamburger = document.createElement('div');
-  hamburger.classList.add('nav-hamburger');
-  hamburger.innerHTML = `<button type="button" aria-controls="nav" aria-label="Open navigation">
-      <span class="nav-hamburger-icon"></span>
-    </button>`;
-  hamburger.addEventListener('click', () => {
-    if (navSections) toggleMenu(nav, navSections);
-  });
-  nav.prepend(hamburger);
-  nav.setAttribute('aria-expanded', 'false');
-  if (navSections) {
-    toggleMenu(nav, navSections, isDesktop.matches);
-    isDesktop.addEventListener('change', () => toggleMenu(nav, navSections, isDesktop.matches));
-  }
-
-  const navWrapper = document.createElement('div');
-  navWrapper.className = 'nav-wrapper';
-  navWrapper.append(nav);
-  block.append(navWrapper);
+  // Append dropdown to body so it's outside the header's stacking context.
+  // This ensures the header (z-index: 100) and its box-shadow paint on top.
+  document.body.append(langDropdown);
 }

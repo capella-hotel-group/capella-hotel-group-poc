@@ -1,2 +1,2 @@
-/*! v1.0.0 | h71993a28*/
-footer{background-color:var(--light-color);font-size:var(--body-font-size-xs)}footer .footer>div{margin:auto;max-width:1200px;padding:40px 24px 24px}footer .footer p{margin:0}@media(width>=900px){footer .footer>div{padding:40px 32px 24px}}
+/*! v1.0.0 | h5da3c664*/
+footer{background-color:#999ea3;font-size:1rem}.footer-inner{max-width:1000px;margin:0 auto;padding:40px var(--header-padding-x, 40px) 24px;display:flex;flex-wrap:wrap}.footer-item{margin:0 0 12px;width:calc(1 / 3 * 100%)}.footer-item a{font-family:var(--body-font-family);font-size:var(--body-font-size-xs);font-weight:300;letter-spacing:var(--header-letter-spacing, .12em);color:var(--text-color);text-decoration:none;transition:.3s cubic-bezier(.25,.46,.45,.94);color:#fff}.footer-item a:hover{color:#242f3a}@media(width<900px){.footer-inner{padding:32px 24px 24px}}

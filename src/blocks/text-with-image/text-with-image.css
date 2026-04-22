@@ -64,11 +64,10 @@
     display: inline-block;
     font-family: var(--body-font-family);
     font-size: 0.875rem;
-    text-transform: uppercase !important;
+    text-transform: uppercase;
     color: #232323;
     letter-spacing: 1px;
-    border-bottom: 1px solid #232323;
-    text-decoration: none;
+    text-decoration: underline !important;
 }
 
 .text-with-image-cta-link:hover {

@@ -1,17 +1,33 @@
 import { resolveDAMUrl } from '@/utils/env';
 
 export default async function decorate(block: HTMLElement): Promise<void> {
-  // Read authored fields from DOM rows: row 0 = video, row 1 = image, row 2 = content
+  // Read authored fields from DOM rows:
+  // row 0 = video, row 1 = videoMobile, row 2 = image, row 3 = imageMobile, row 4 = content
   const rows = [...block.querySelectorAll<HTMLDivElement>(':scope > div')];
   const videoRow = rows[0];
-  const imageRow = rows[1];
-  const contentRow = rows[2];
+  const videoMobileRow = rows[1];
+  const imageRow = rows[2];
+  const imageMobileRow = rows[3];
+  const contentRow = rows[4];
 
-  // Row 0: video URL from reference field (<a> tag)
-  const sourceAnchor = videoRow?.querySelector<HTMLAnchorElement>('a');
-  const videoSrc = resolveDAMUrl(sourceAnchor?.href ?? '');
+  // Resolve video URLs (mobile falls back to desktop)
+  const desktopVideoSrc = resolveDAMUrl(videoRow?.querySelector<HTMLAnchorElement>('a')?.href ?? '');
+  const mobileVideoSrc =
+    resolveDAMUrl(videoMobileRow?.querySelector<HTMLAnchorElement>('a')?.href ?? '') || desktopVideoSrc;
 
-  if (!videoSrc) return;
+  if (!desktopVideoSrc) return;
+
+  // Resolve placeholder images (mobile falls back to desktop)
+  const desktopPlaceholder =
+    imageRow?.querySelector<HTMLPictureElement>('picture') ?? imageRow?.querySelector<HTMLImageElement>('img') ?? null;
+  const mobilePlaceholder =
+    imageMobileRow?.querySelector<HTMLPictureElement>('picture') ??
+    imageMobileRow?.querySelector<HTMLImageElement>('img') ??
+    null;
+
+  // Responsive breakpoint: matches current CSS convention
+  const mobileQuery = window.matchMedia('(max-width: 599px)');
+  const isMobile = (): boolean => mobileQuery.matches;
 
   // Background video: autoplay, muted, loop, playsinline (muted required for autoplay policy)
   const bgVideo = document.createElement('video');
@@ -22,21 +38,36 @@ export default async function decorate(block: HTMLElement): Promise<void> {
   bgVideo.playsInline = true;
 
   const bgSource = document.createElement('source');
-  bgSource.src = videoSrc;
+  bgSource.src = isMobile() ? mobileVideoSrc : desktopVideoSrc;
   bgVideo.append(bgSource);
 
-  // Row 1: placeholder image — use authored <picture> or <img> as-is, fade out on video load
-  const placeholder =
-    imageRow?.querySelector<HTMLPictureElement>('picture') ?? imageRow?.querySelector<HTMLImageElement>('img') ?? null;
-  if (placeholder) {
-    placeholder.className = 'masthead-placeholder';
+  // Swap video source on viewport change
+  mobileQuery.addEventListener('change', () => {
+    bgSource.src = isMobile() ? mobileVideoSrc : desktopVideoSrc;
+    bgVideo.load();
+  });
 
-    bgVideo.addEventListener('loadeddata', () => {
-      placeholder.classList.add('masthead-placeholder--hidden');
-      placeholder.addEventListener('transitionend', () => {
-        placeholder.remove();
+  // Select active placeholder based on viewport (mobile fallback to desktop)
+  const activePlaceholder = isMobile() && mobilePlaceholder ? mobilePlaceholder : desktopPlaceholder;
+  // Hide the unused placeholder
+  if (mobilePlaceholder && mobilePlaceholder !== activePlaceholder) mobilePlaceholder.remove();
+  if (desktopPlaceholder && desktopPlaceholder !== activePlaceholder) desktopPlaceholder.remove();
+
+  if (activePlaceholder) {
+    activePlaceholder.className = 'masthead-placeholder';
+
+    const fadePlaceholder = (): void => {
+      activePlaceholder.classList.add('masthead-placeholder--hidden');
+      activePlaceholder.addEventListener('transitionend', () => {
+        activePlaceholder.remove();
       });
-    });
+    };
+
+    if (bgVideo.readyState >= 2) {
+      fadePlaceholder();
+    } else {
+      bgVideo.addEventListener('loadeddata', fadePlaceholder, { once: true });
+    }
   }
 
   // Row 2: richtext content overlay
@@ -78,7 +109,7 @@ export default async function decorate(block: HTMLElement): Promise<void> {
   modalVideo.controls = true;
 
   const modalSource = document.createElement('source');
-  modalSource.src = videoSrc;
+  modalSource.src = desktopVideoSrc;
   modalVideo.append(modalSource);
 
   const closeBtn = document.createElement('button');
@@ -107,7 +138,7 @@ export default async function decorate(block: HTMLElement): Promise<void> {
 
   // Replace block contents — video + placeholder + content + scroll icon + CTA; modal is in document.body
   const children: Element[] = [bgVideo];
-  if (placeholder) children.push(placeholder);
+  if (activePlaceholder) children.push(activePlaceholder);
   if (contentOverlay) children.push(contentOverlay);
   if (scrollIcon) children.push(scrollIcon);
   children.push(cta);

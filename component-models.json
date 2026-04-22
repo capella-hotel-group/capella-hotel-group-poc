@@ -444,8 +444,22 @@
       {
         "component": "reference",
         "valueType": "string",
+        "name": "videoMobile",
+        "label": "Video (Mobile)",
+        "multi": false
+      },
+      {
+        "component": "reference",
+        "valueType": "string",
         "name": "image",
         "label": "Placeholder Image",
+        "multi": false
+      },
+      {
+        "component": "reference",
+        "valueType": "string",
+        "name": "imageMobile",
+        "label": "Placeholder Image (Mobile)",
         "multi": false
       },
       {

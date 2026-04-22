@@ -25,9 +25,9 @@ export default async function decorate(block: HTMLElement): Promise<void> {
 
   const immersiveMode = immersiveModeRow?.querySelector<HTMLElement>(':scope > div')?.textContent?.trim() === 'true';
 
-  const deformRadius = Number(deformRadiusRow?.querySelector<HTMLElement>(':scope > div')?.textContent?.trim()) || 600;
+  const deformRadius = Number(deformRadiusRow?.querySelector<HTMLElement>(':scope > div')?.textContent?.trim()) || 200;
   const deformStrength =
-    Number(deformStrengthRow?.querySelector<HTMLElement>(':scope > div')?.textContent?.trim()) || 80;
+    Number(deformStrengthRow?.querySelector<HTMLElement>(':scope > div')?.textContent?.trim()) || 40;
 
   // --- Phase 1: Build static grid synchronously ---
   const imageRows = rows.slice(NUM_CONFIG_ROWS, NUM_CONFIG_ROWS + MAX_IMAGES);

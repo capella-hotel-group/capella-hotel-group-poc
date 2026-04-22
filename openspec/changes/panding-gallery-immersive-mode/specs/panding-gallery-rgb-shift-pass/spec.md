@@ -17,8 +17,8 @@ Uniforms:
 
 - `tDiffuse` (sampler2D) — the upstream render target texture (managed by `EffectComposer`).
 - `uPointerUV` (vec2) — pointer position in UV space `[0, 1]²`, derived from the block-relative pointer NDC.
-- `uInfluenceRadius` (float) — radius of effect in UV space (author-configurable, default `0.4`).
-- `uMaxShift` (float) — maximum channel shift in UV space (author-configurable, default `0.006`).
+- `uInfluenceRadius` (float) — radius of effect in UV space (author-configurable, default `0.6`).
+- `uMaxShift` (float) — maximum channel shift in UV space (author-configurable, default `0.008`).
 - `uEnergy` (float) — current `scrollEnergy` value `[0, 1]`; updated every frame.
 
 #### Scenario: Pixel exactly at pointer position has no color shift
@@ -45,6 +45,13 @@ Uniforms:
 - **WHEN** a pixel is to the right of the pointer (`dir ≈ (1, 0)`) and `shiftMag > 0`
 - **THEN** the green channel SHALL be sampled from a UV position to the **right** of the pixel's UV
 - **AND** the blue channel SHALL be sampled from a UV position to the **left** of the pixel's UV
+
+#### Scenario: Outward pixels blend toward cyan, inward pixels blend toward violet
+
+- **WHEN** `shiftMag > 0` and a pixel is outside the pointer position
+- **THEN** the outward (green) sample SHALL blend 16% toward a cyan tint `(0.24, 0.82, 1.28)`
+- **AND** the inward (blue) sample SHALL blend 16% toward a violet tint `(0.88, 0.12, 0.68)`
+- **AND** the tint factor `t = distFactor × uEnergy` so tinting is zero at the pointer and zero when stationary
 
 #### Scenario: Effect fades with energy as scroll decelerates
 
@@ -73,21 +80,22 @@ Every frame, the scene SHALL call `composer.render()` instead of `renderer.rende
 
 ---
 
-### Requirement: Render loop suspends when scrollEnergy is negligible
+### Requirement: Render loop renders every frame; RGB-shift effect is a no-op when energy is negligible
 
-When `scrollEnergy < 0.001` for the current frame, the immersive scene frame callback SHALL:
+The immersive scene frame callback SHALL call `composer.render()` every frame to ensure textures remain visible (e.g. on first load and when stationary). The RAF loop SHALL NOT be cancelled.
 
-1. Skip calling `composer.render()`.
-2. NOT cancel the `requestAnimationFrame` loop (the loop continues checking energy).
+When `scrollEnergy < 0.001`, the `RadialRGBShiftPass` uniform `uEnergy` SHALL be set to `0`, making the pass a transparent copy with no visual chromatic effect.
 
-When `scrollEnergy >= 0.001` again, rendering SHALL resume automatically in the same RAF loop.
+When `scrollEnergy >= 0.001`, `uEnergy` is updated to the live value and the full RGB-shift effect is applied.
 
-#### Scenario: No GPU work when grid is stationary
+#### Scenario: composer.render() called every frame
 
 - **WHEN** the grid has been stationary for several frames (`scrollEnergy = 0`)
-- **THEN** `composer.render()` SHALL NOT be called in those frames
+- **THEN** `composer.render()` SHALL still be called each frame so the canvas remains up to date
+- **AND** `uEnergy` SHALL be `0`, so the RGB-shift pass outputs the unmodified render
 
 #### Scenario: Rendering resumes immediately on new scroll input
 
 - **WHEN** `scrollEnergy` rises above `0.001` after a stationary period
 - **THEN** `composer.render()` SHALL be called in that frame without any extra initialisation
+- **AND** the full chromatic aberration effect SHALL be visible

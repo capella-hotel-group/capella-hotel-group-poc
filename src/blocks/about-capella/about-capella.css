@@ -1,55 +1,65 @@
 /* about-capella block
- * Layout: two-column heading row / full-width image / indented body + CTA
+ * 12-column grid layout (each col = 8.33%)
+ * Subgrid lets .about-capella-header children align to the parent grid.
  *
- * --about-capella-text-indent aligns body text with the subtitle column start
- * (~8.3% of container = one notional grid column at 1200 px)
+ * col 1       = 8.33% left gap
+ * cols 2–4   = heading  (25%)
+ * col 5       = 8.33% gap between heading and subtitle
+ * cols 6–9   = subtitle (33.33%)
+ * image       = full 12 cols
+ * cols 2–5   = synopsis (33.33%)
  */
 
 main .about-capella-container {
-    background-color: var(--background-color, #f5f5f0);
+    background-color: #f5f5f6;
     padding-top: 90px;
 }
 
 main .about-capella {
-    /* scroll-reveal hooks (deferred) */
-    /* opacity: 0; transform: translateY(20px); transition: opacity 0.6s, transform 0.6s; */
+    max-width: 1440px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
 }
 
-/* ── Header row ──────────────────────────────────────────────────── */
+/* ── Header row (subgrid) ────────────────────────────────────────── */
 
 main .about-capella .about-capella-header {
+    grid-column: 1 / -1;
     display: grid;
-    grid-template-columns: 25% 1fr;
+    grid-template-columns: subgrid;
     align-items: start;
     margin-bottom: 65px;
-    padding: 0 35px;
 }
 
 main .about-capella .about-capella-heading {
+    grid-column: 2 / span 3;
     font-family: var(--heading-font-family);
-    font-size: 1.5rem;
+    font-size: 44px;
     font-weight: 300;
     text-transform: uppercase;
-    letter-spacing: 0.12em;
-    line-height: 1.1;
-    color: var(--text-color, #272727);
+    letter-spacing: 2.5px;
+    line-height: 1;
+    color: var(--text-color, #212322);
     margin: 0;
 }
 
 main .about-capella .about-capella-subtitle {
+    grid-column: 6 / span 4;
     font-family: var(--heading-font-family);
-    font-size: 1.1rem;
-    font-weight: 300;
-    font-style: italic;
-    line-height: 1.4;
-    color: var(--text-color, #272727);
+    font-size: 30px;
+    font-weight: 400;
+    font-style: normal;
+    line-height: 1.2;
+    letter-spacing: 0.16px;
+    color: var(--text-color, #212322);
     margin: 0;
 }
 
-/* ── Full-width image ────────────────────────────────────────────── */
+/* ── Image (full wrapper width) ──────────────────────────────────── */
 
 main .about-capella .about-capella-image {
-    width: 100%;
+    grid-column: 1 / -1;
     margin-bottom: 40px;
     overflow: hidden;
 }
@@ -61,22 +71,20 @@ main .about-capella .about-capella-image img {
     height: auto;
 }
 
-/* ── Synopsis (body + CTA) ───────────────────────────────────────── */
+/* ── Synopsis (body text) ────────────────────────────────────────── */
 
 main .about-capella .about-capella-synopsis {
-    --about-capella-text-indent: calc(25% + 35px);
-
-    margin-left: var(--about-capella-text-indent);
-    max-width: 55%;
-    padding-bottom: 60px;
+    grid-column: 2 / span 4;
+    padding-bottom: 20px;
 }
 
 main .about-capella .about-capella-body p {
     font-family: var(--body-font-family);
-    font-size: 1rem;
+    font-size: 16px;
     font-weight: 400;
     color: #919191;
-    line-height: 1.6;
+    line-height: 1.2;
+    letter-spacing: 0.16px;
     margin: 0 0 20px;
 }
 
@@ -91,11 +99,26 @@ main .about-capella .about-capella-body p:last-child {
         padding-top: 50px;
     }
 
+    main .about-capella {
+        display: block;
+    }
+
     main .about-capella .about-capella-header {
-        grid-template-columns: 1fr;
-        padding: 0 20px;
+        display: flex;
+        flex-direction: column;
         margin-bottom: 30px;
+        padding: 0 20px;
         gap: 12px;
+    }
+
+    main .about-capella .about-capella-subtitle {
+        margin-left: 8.33%;
+        font-size: 20px;
+    }
+
+    main .about-capella .about-capella-heading {
+        font-size: 30px;
+        width: 50%;
     }
 
     main .about-capella .about-capella-image {
@@ -109,8 +132,8 @@ main .about-capella .about-capella-body p:last-child {
     }
 
     main .about-capella .about-capella-synopsis {
-        margin-left: 0;
-        max-width: 100%;
+        width: calc(10 / 12 * 100%);
+        margin: 0 auto;
         padding: 0 20px 40px;
     }
 }

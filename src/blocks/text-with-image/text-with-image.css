@@ -77,10 +77,10 @@
     font-weight: 400;
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    text-decoration: underline;
+    text-decoration: underline !important;
     text-decoration-thickness: 1px;
     text-underline-offset: 4px;
-    color: #232323;
+    color: #232323 !important;
     padding-left: 50px;
 }
 
@@ -137,7 +137,7 @@
             'image'
             'text';
         gap: 24px;
-        padding: 0 6px;
+        padding: 0 30px;
         margin-bottom: 40px;
     }
 

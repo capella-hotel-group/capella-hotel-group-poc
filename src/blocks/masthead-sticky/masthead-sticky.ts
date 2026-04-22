@@ -66,7 +66,7 @@ export default async function decorate(block: HTMLElement): Promise<void> {
   block.replaceChildren(bgVideo, cta);
 
   // Mark the parent section so sibling content sections can stack above masthead
-  const section = block.closest('main > div');
+  const section = block.closest<HTMLDivElement>('main > div');
   if (section) {
     section.classList.add('masthead-section');
 
@@ -75,5 +75,32 @@ export default async function decorate(block: HTMLElement): Promise<void> {
     // Header keeps position:sticky + z-index:100 and sticks when it hits viewport top.
     const header = document.querySelector('header');
     if (header) section.after(header);
+  }
+
+  // Scroll-snap: auto-correct partial masthead visibility after 300ms idle.
+  // Snaps to fully visible (scrollY=0) or fully hidden (scrollY=mastheadHeight).
+  if (section) {
+    let snapTimer = 0;
+    let isSnapping = false;
+
+    const onScroll = (): void => {
+      if (isSnapping) return;
+      window.clearTimeout(snapTimer);
+      snapTimer = window.setTimeout(() => {
+        const y = window.scrollY;
+        const h = section.offsetHeight;
+        if (y <= 0 || y >= h) return;
+        const target = y / h < 0.5 ? 0 : h;
+        isSnapping = true;
+        window.scrollTo({ top: target, behavior: 'smooth' });
+      }, 300);
+    };
+
+    const onScrollEnd = (): void => {
+      isSnapping = false;
+    };
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('scrollend', onScrollEnd);
   }
 }

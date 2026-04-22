@@ -1,0 +1,28 @@
+import { p as d } from '../../chunks/dompurify.js';
+/*! v1.0.0 | h900679da*/ function u(a) {
+  const e = [...a.children],
+    i = e[0]?.firstElementChild?.textContent?.trim() ?? '',
+    o = e[1]?.firstElementChild,
+    r = e[2]?.querySelector('picture'),
+    l = e[3]?.querySelector('a'),
+    s = l?.getAttribute('href') ?? '',
+    m = e[4]?.firstElementChild?.textContent?.trim() || l?.textContent?.trim() || 'Read More',
+    n = document.createElement('div');
+  if (((n.className = 'text-col'), i)) {
+    const t = document.createElement('h3');
+    ((t.textContent = i), n.append(t));
+  }
+  if (o) {
+    const t = document.createElement('div');
+    ((t.className = 'description'),
+      (t.innerHTML = d.sanitize(o.innerHTML, { USE_PROFILES: { html: !0 } })),
+      n.append(t));
+  }
+  if (s) {
+    const t = document.createElement('a');
+    ((t.className = 'cta-link'), (t.href = s), (t.textContent = m), n.append(t));
+  }
+  const c = document.createElement('div');
+  ((c.className = 'image-col'), r && c.append(r), a.replaceChildren(n, c));
+}
+export { u as default };

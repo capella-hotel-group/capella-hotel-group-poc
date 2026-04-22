@@ -58,3 +58,27 @@ Any imports from project-shared utilities (e.g., `dompurify`) SHALL use the stan
 
 - **WHEN** `text-with-image.ts` imports DOMPurify
 - **THEN** the import statement is `import DOMPurify from 'dompurify';`
+
+### Requirement: CTA label is author-configurable
+
+Authors SHALL be able to override the button text of the CTA link via a dedicated `ctaLabel` text field in the Universal Editor model, independent of the link's own text content. The priority order SHALL be: `ctaLabel` field → link text content → `'Read More'` fallback.
+
+#### Scenario: ctaLabel field overrides link text
+
+- **WHEN** `decorate` is called and row 4 contains non-empty text
+- **THEN** the CTA anchor's `textContent` is set to that text, ignoring the link's own text
+
+#### Scenario: Fallback to link text when ctaLabel is empty
+
+- **WHEN** row 4 is absent or empty and the CTA link has non-empty text content
+- **THEN** the CTA anchor's `textContent` is set to the link's text content
+
+#### Scenario: Final fallback to Read More
+
+- **WHEN** both row 4 and the link text are absent or empty
+- **THEN** the CTA anchor's `textContent` is `'Read More'`
+
+#### Scenario: ctaLabel field present in model
+
+- **WHEN** `_text-with-image.json` is reviewed
+- **THEN** a field with `"name": "ctaLabel"`, `"component": "text"`, and `"label": "CTA Label"` exists in the model

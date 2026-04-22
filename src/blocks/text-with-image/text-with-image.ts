@@ -3,13 +3,14 @@ import DOMPurify from 'dompurify';
 export default function decorate(block: HTMLElement): void {
   const rows = [...block.children];
 
-  // row 0: title, row 1: description, row 2: image, row 3: cta
+  // row 0: title, row 1: description, row 2: image, row 3: cta, row 4: ctaLabel
   const titleText = rows[0]?.firstElementChild?.textContent?.trim() ?? '';
   const descriptionEl = rows[1]?.firstElementChild;
   const pictureEl = rows[2]?.querySelector('picture');
   const ctaLinkEl = rows[3]?.querySelector('a');
   const ctaHref = ctaLinkEl?.getAttribute('href') ?? '';
-  const ctaText = ctaLinkEl?.textContent?.trim() ?? 'Read More';
+  const ctaLabelText = rows[4]?.firstElementChild?.textContent?.trim();
+  const ctaText = ctaLabelText || ctaLinkEl?.textContent?.trim() || 'Read More';
 
   const textCol = document.createElement('div');
   textCol.className = 'text-col';

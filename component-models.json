@@ -584,6 +584,13 @@
         "name": "cta",
         "label": "CTA Link",
         "valueType": "string"
+      },
+      {
+        "component": "text",
+        "name": "ctaLabel",
+        "label": "CTA Label",
+        "valueType": "string",
+        "placeholder": "Read More"
       }
     ]
   },

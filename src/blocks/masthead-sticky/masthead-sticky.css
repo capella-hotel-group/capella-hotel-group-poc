@@ -99,6 +99,7 @@ main .masthead-sticky .masthead-cta {
 
 /* Placeholder image — covers block while video loads, fades out */
 main .masthead-sticky .masthead-placeholder {
+    display: block;
     position: absolute;
     inset: 0;
     width: 100%;

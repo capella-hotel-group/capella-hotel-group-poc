@@ -1,13 +1,15 @@
-export default function decorate(block) {
+import DOMPurify from 'dompurify';
+
+export default function decorate(block: HTMLElement): void {
   const rows = [...block.children];
 
   // row 0: title, row 1: description, row 2: image, row 3: cta
-  const titleText = rows[0]?.firstElementChild?.textContent?.trim() || '';
+  const titleText = rows[0]?.firstElementChild?.textContent?.trim() ?? '';
   const descriptionEl = rows[1]?.firstElementChild;
   const pictureEl = rows[2]?.querySelector('picture');
   const ctaLinkEl = rows[3]?.querySelector('a');
-  const ctaHref = ctaLinkEl?.getAttribute('href') || '';
-  const ctaText = ctaLinkEl?.textContent?.trim() || 'Read More';
+  const ctaHref = ctaLinkEl?.getAttribute('href') ?? '';
+  const ctaText = ctaLinkEl?.textContent?.trim() ?? 'Read More';
 
   const textCol = document.createElement('div');
   textCol.className = 'text-col';
@@ -21,7 +23,7 @@ export default function decorate(block) {
   if (descriptionEl) {
     const desc = document.createElement('div');
     desc.className = 'description';
-    desc.innerHTML = descriptionEl.innerHTML;
+    desc.innerHTML = DOMPurify.sanitize(descriptionEl.innerHTML, { USE_PROFILES: { html: true } });
     textCol.append(desc);
   }
 
@@ -37,6 +39,5 @@ export default function decorate(block) {
   imageCol.className = 'image-col';
   if (pictureEl) imageCol.append(pictureEl);
 
-  block.innerHTML = '';
-  block.append(textCol, imageCol);
+  block.replaceChildren(textCol, imageCol);
 }

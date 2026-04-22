@@ -5,14 +5,19 @@ export default async function decorate(block: HTMLElement): Promise<void> {
   const sourceAnchor = block.querySelector<HTMLAnchorElement>('a');
   const videoSrc = resolveDAMUrl(sourceAnchor?.href ?? '');
 
+  if (!videoSrc) return;
+
   // Background video: autoplay, muted, loop, playsinline (muted required for autoplay policy)
   const bgVideo = document.createElement('video');
   bgVideo.className = 'masthead-bg-video';
-  bgVideo.src = videoSrc;
   bgVideo.autoplay = true;
   bgVideo.muted = true;
   bgVideo.loop = true;
   bgVideo.playsInline = true;
+
+  const bgSource = document.createElement('source');
+  bgSource.src = videoSrc;
+  bgVideo.append(bgSource);
 
   // "WATCH VIDEO" CTA — bottom-right corner
   const cta = document.createElement('a');
@@ -27,8 +32,11 @@ export default async function decorate(block: HTMLElement): Promise<void> {
 
   const modalVideo = document.createElement('video');
   modalVideo.className = 'masthead-modal-video';
-  modalVideo.src = videoSrc;
   modalVideo.controls = true;
+
+  const modalSource = document.createElement('source');
+  modalSource.src = videoSrc;
+  modalVideo.append(modalSource);
 
   const closeBtn = document.createElement('button');
   closeBtn.className = 'masthead-modal-close';

@@ -133,11 +133,6 @@ function buildCtaZone(sourceAnchor: HTMLAnchorElement | null): HTMLAnchorElement
  * [language selector] [brand nav + emblem] [BOOK YOUR STAY]
  */
 export default async function decorate(block: HTMLElement): Promise<void> {
-  if (window.location.pathname.includes('/en/exploration')) {
-    block.closest('header')?.remove();
-    return;
-  }
-
   const navMeta = getMetadata('nav');
   const navPath = navMeta ? new URL(navMeta, window.location.href).pathname : '/nav';
   const fragment = await loadFragment(navPath);

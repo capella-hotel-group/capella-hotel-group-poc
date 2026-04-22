@@ -1,0 +1,116 @@
+/* about-capella block
+ * Layout: two-column heading row / full-width image / indented body + CTA
+ *
+ * --about-capella-text-indent aligns body text with the subtitle column start
+ * (~8.3% of container = one notional grid column at 1200 px)
+ */
+
+main .about-capella-container {
+    background-color: var(--background-color, #f5f5f0);
+    padding-top: 90px;
+}
+
+main .about-capella {
+    /* scroll-reveal hooks (deferred) */
+    /* opacity: 0; transform: translateY(20px); transition: opacity 0.6s, transform 0.6s; */
+}
+
+/* ── Header row ──────────────────────────────────────────────────── */
+
+main .about-capella .about-capella-header {
+    display: grid;
+    grid-template-columns: 25% 1fr;
+    align-items: start;
+    margin-bottom: 65px;
+    padding: 0 35px;
+}
+
+main .about-capella .about-capella-heading {
+    font-family: var(--heading-font-family);
+    font-size: 1.5rem;
+    font-weight: 300;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    line-height: 1.1;
+    color: var(--text-color, #272727);
+    margin: 0;
+}
+
+main .about-capella .about-capella-subtitle {
+    font-family: var(--heading-font-family);
+    font-size: 1.1rem;
+    font-weight: 300;
+    font-style: italic;
+    line-height: 1.4;
+    color: var(--text-color, #272727);
+    margin: 0;
+}
+
+/* ── Full-width image ────────────────────────────────────────────── */
+
+main .about-capella .about-capella-image {
+    width: 100%;
+    margin-bottom: 40px;
+    overflow: hidden;
+}
+
+main .about-capella .about-capella-image picture,
+main .about-capella .about-capella-image img {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+/* ── Synopsis (body + CTA) ───────────────────────────────────────── */
+
+main .about-capella .about-capella-synopsis {
+    --about-capella-text-indent: calc(25% + 35px);
+
+    margin-left: var(--about-capella-text-indent);
+    max-width: 55%;
+    padding-bottom: 60px;
+}
+
+main .about-capella .about-capella-body p {
+    font-family: var(--body-font-family);
+    font-size: 1rem;
+    font-weight: 400;
+    color: #919191;
+    line-height: 1.6;
+    margin: 0 0 20px;
+}
+
+main .about-capella .about-capella-body p:last-child {
+    margin-bottom: 0;
+}
+
+/* ── Mobile ≤ 767px ──────────────────────────────────────────────── */
+
+@media (width <= 767px) {
+    main .about-capella-container {
+        padding-top: 50px;
+    }
+
+    main .about-capella .about-capella-header {
+        grid-template-columns: 1fr;
+        padding: 0 20px;
+        margin-bottom: 30px;
+        gap: 12px;
+    }
+
+    main .about-capella .about-capella-image {
+        min-height: 220px;
+    }
+
+    main .about-capella .about-capella-image img {
+        min-height: 220px;
+        object-fit: cover;
+        object-position: center;
+    }
+
+    main .about-capella .about-capella-synopsis {
+        margin-left: 0;
+        max-width: 100%;
+        padding: 0 20px 40px;
+    }
+}

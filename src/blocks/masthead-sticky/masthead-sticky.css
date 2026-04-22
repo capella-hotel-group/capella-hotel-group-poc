@@ -90,12 +90,91 @@ main .masthead-sticky .masthead-cta {
     opacity: 0.7;
 }
 
+/* Placeholder image — covers block while video loads, fades out */
+main .masthead-sticky .masthead-placeholder {
+    display: block;
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    transition: opacity 0.6s ease;
+    object-fit: cover;
+}
+
+main .masthead-sticky .masthead-placeholder img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+main .masthead-sticky .masthead-placeholder--hidden {
+    opacity: 0;
+}
+
+/* Content overlay — richtext positioned above video and image */
+main .masthead-sticky .masthead-content {
+    position: absolute;
+    bottom: 110px;
+    width: 100%;
+    padding-left: 20px;
+    padding-right: 20px;
+    text-align: center;
+    z-index: 2;
+    color: #fff;
+    font-size: 1.625rem;
+    font-family: 'Goudy Regular', Times, 'Times New Roman', serif;
+    line-height: 1.2em;
+}
+
+/* Scroll indicator icon — animated hint to scroll down */
+main .masthead-sticky .masthead-scroll-icon {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 3;
+    width: 60px;
+    animation: masthead-scroll-hint 2s ease-in-out infinite;
+}
+
+main .masthead-sticky .masthead-scroll-icon .icon,
+main .masthead-sticky .masthead-scroll-icon img {
+    width: 60px;
+    height: 40px;
+}
+
 @media (width < 600px) {
     main .masthead-sticky .masthead-cta {
         right: 24px;
         bottom: 24px;
+        font-size: 0.875rem;
+    }
+
+    main .masthead-sticky .masthead-content {
+        display: none;
+    }
+
+    main .masthead-sticky .masthead-scroll-icon {
+        bottom: 110px;
     }
 }
+
+@keyframes masthead-scroll-hint {
+    0% {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+    60% {
+        opacity: 0;
+        transform: translateX(-50%) translateY(14px);
+    }
+    100% {
+        opacity: 0;
+        transform: translateX(-50%) translateY(14px);
+    }
+}
+
 /* Authoring: cap height to prevent layout issues in the Universal Editor */
 .adobe-ue-edit .masthead-sticky {
     max-height: 1080px;

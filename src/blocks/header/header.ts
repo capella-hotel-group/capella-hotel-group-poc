@@ -128,6 +128,87 @@ function buildCtaZone(sourceAnchor: HTMLAnchorElement | null): HTMLAnchorElement
   return cta;
 }
 
+/** Mobile MENU toggle button. */
+function buildMobileToggle(): HTMLButtonElement {
+  const btn = document.createElement('button');
+  btn.className = 'header-menu-toggle';
+  btn.textContent = 'MENU';
+  btn.setAttribute('aria-label', 'Open navigation menu');
+  return btn;
+}
+
+/** Mobile CTA — shortened text. */
+function buildMobileCta(sourceAnchor: HTMLAnchorElement | null): HTMLAnchorElement {
+  const cta = document.createElement('a');
+  cta.className = 'header-mobile-cta';
+  cta.href = sourceAnchor?.href ?? '/book';
+  cta.textContent = 'BOOK';
+  if (sourceAnchor) moveInstrumentation(sourceAnchor, cta);
+  return cta;
+}
+
+/**
+ * Builds the slide-down mobile panel containing:
+ * - nav links (cloned from authored list)
+ * - lang accordion
+ * - close button
+ */
+function buildMobilePanel(navList: Element, langList: Element): HTMLDivElement {
+  const panel = document.createElement('div');
+  panel.className = 'header-mobile-panel';
+
+  // — Menu card (nav links + lang trigger) —
+  const menuCard = document.createElement('div');
+  menuCard.className = 'header-mobile-menu';
+
+  const navItems = [...navList.querySelectorAll<HTMLLIElement>('li')].filter((li) => li.textContent?.trim());
+  navItems.forEach((srcItem) => {
+    const srcA = srcItem.querySelector<HTMLAnchorElement>('a');
+    const a = document.createElement('a');
+    a.className = 'header-mobile-nav-link';
+    a.href = srcA?.href ?? '#';
+    a.textContent = (srcA?.textContent ?? srcItem.textContent)?.trim() ?? '';
+    menuCard.append(a);
+  });
+
+  const langToggle = document.createElement('button');
+  langToggle.className = 'header-mobile-lang-toggle';
+  langToggle.textContent = 'LANGUAGES';
+  menuCard.append(langToggle);
+
+  // — Lang list (direct child of panel, expands below card) —
+  const langItems = [...langList.querySelectorAll<HTMLLIElement>('li')];
+  const langUl = document.createElement('ul');
+  langUl.className = 'header-mobile-lang-list';
+  langItems.forEach((srcItem) => {
+    const li = document.createElement('li');
+    li.textContent = srcItem.textContent?.trim() ?? '';
+    li.addEventListener('click', () => {
+      panel.classList.remove('is-lang-expanded');
+    });
+    langUl.append(li);
+  });
+
+  langToggle.addEventListener('click', () => {
+    panel.classList.toggle('is-lang-expanded');
+  });
+
+  // — Close button —
+  const closeBtn = document.createElement('button');
+  closeBtn.className = 'header-mobile-close';
+  closeBtn.innerHTML =
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 14"><polyline points="38.7,12.7 20,1.5 1.3,12.7" fill="none" stroke="#242F3A" stroke-width="1.75"/></svg>';
+  closeBtn.setAttribute('aria-label', 'Close navigation menu');
+
+  closeBtn.addEventListener('click', () => {
+    panel.classList.remove('is-open');
+    panel.classList.remove('is-lang-expanded');
+  });
+
+  panel.append(menuCard, langUl, closeBtn);
+  return panel;
+}
+
 /**
  * Decorates the luxury three-zone sticky header:
  * [language selector] [brand nav + emblem] [BOOK YOUR STAY]
@@ -160,11 +241,20 @@ export default async function decorate(block: HTMLElement): Promise<void> {
   emblem.src = '/icons/capella-emblem.svg';
   emblem.alt = '';
 
+  // Mobile elements
+  const mobileToggle = buildMobileToggle();
+  const mobileCta = buildMobileCta(ctaAnchor);
+  const mobilePanel = buildMobilePanel(navList, langList);
+
+  mobileToggle.addEventListener('click', () => {
+    mobilePanel.classList.toggle('is-open');
+  });
+
   const inner = document.createElement('div');
   inner.className = 'header-inner';
-  inner.append(langZone, buildNavZone(navList), emblem, buildCtaZone(ctaAnchor));
+  inner.append(langZone, buildNavZone(navList), emblem, buildCtaZone(ctaAnchor), mobileToggle, mobileCta);
 
-  block.replaceChildren(inner);
+  block.replaceChildren(inner, mobilePanel);
 
   // Append dropdown to body so it's outside the header's stacking context.
   // This ensures the header (z-index: 100) and its box-shadow paint on top.

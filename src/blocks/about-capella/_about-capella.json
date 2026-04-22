@@ -1,15 +1,15 @@
 {
   "definitions": [
     {
-      "title": "Masthead Sticky",
-      "id": "masthead-sticky",
+      "title": "About Capella",
+      "id": "about-capella",
       "plugins": {
         "xwalk": {
           "page": {
             "resourceType": "core/franklin/components/block/v1/block",
             "template": {
-              "name": "Masthead Sticky",
-              "model": "masthead-sticky"
+              "name": "About Capella",
+              "model": "about-capella"
             }
           }
         }
@@ -18,41 +18,38 @@
   ],
   "models": [
     {
-      "id": "masthead-sticky",
+      "id": "about-capella",
       "fields": [
         {
-          "component": "reference",
+          "component": "text",
           "valueType": "string",
-          "name": "video",
-          "label": "Video",
-          "multi": false
+          "name": "heading",
+          "label": "Heading"
         },
         {
-          "component": "reference",
+          "component": "text",
           "valueType": "string",
-          "name": "videoMobile",
-          "label": "Video (Mobile)",
-          "multi": false
+          "name": "subtitle",
+          "label": "Subtitle"
         },
         {
           "component": "reference",
           "valueType": "string",
           "name": "image",
-          "label": "Placeholder Image",
+          "label": "Image",
           "multi": false
         },
         {
-          "component": "reference",
+          "component": "text",
           "valueType": "string",
-          "name": "imageMobile",
-          "label": "Placeholder Image (Mobile)",
-          "multi": false
+          "name": "imageAlt",
+          "label": "Image Alt Text"
         },
         {
           "component": "richtext",
           "valueType": "string",
-          "name": "content",
-          "label": "Content"
+          "name": "body",
+          "label": "Body Text"
         }
       ]
     }

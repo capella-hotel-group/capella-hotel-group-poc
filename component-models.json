@@ -174,18 +174,6 @@
         "valueType": "string",
         "name": "body",
         "label": "Body Text"
-      },
-      {
-        "component": "aem-content",
-        "valueType": "string",
-        "name": "link",
-        "label": "CTA Link"
-      },
-      {
-        "component": "text",
-        "valueType": "string",
-        "name": "linkText",
-        "label": "CTA Label"
       }
     ]
   },

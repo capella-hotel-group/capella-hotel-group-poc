@@ -84,23 +84,6 @@ main .about-capella .about-capella-body p:last-child {
     margin-bottom: 0;
 }
 
-main .about-capella .about-capella-cta {
-    display: inline-block;
-    margin-top: 24px;
-    font-family: var(--body-font-family);
-    font-size: 0.8125rem;
-    font-weight: 400;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    text-decoration: underline;
-    color: var(--text-color, #272727);
-    transition: opacity 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-}
-
-main .about-capella .about-capella-cta:hover {
-    opacity: 0.6;
-}
-
 /* ── Mobile ≤ 767px ──────────────────────────────────────────────── */
 
 @media (width <= 767px) {

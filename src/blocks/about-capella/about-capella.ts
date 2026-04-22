@@ -15,11 +15,6 @@ export default function decorate(block: HTMLElement): void {
   // Row 3: body rich-text
   const bodyEl = rows[3]?.firstElementChild ?? null;
 
-  // Row 4: optional CTA link
-  const ctaLinkEl = rows[4]?.querySelector('a') ?? null;
-  const ctaHref = ctaLinkEl?.getAttribute('href') ?? '';
-  const ctaText = ctaLinkEl?.textContent?.trim() ?? '';
-
   // --- Header row (heading + subtitle) ---
   const header = document.createElement('div');
   header.className = 'about-capella-header';
@@ -52,14 +47,6 @@ export default function decorate(block: HTMLElement): void {
     body.className = 'about-capella-body';
     body.innerHTML = DOMPurify.sanitize(bodyEl.innerHTML, { USE_PROFILES: { html: true } });
     synopsis.append(body);
-  }
-
-  if (ctaHref) {
-    const cta = document.createElement('a');
-    cta.className = 'about-capella-cta';
-    cta.href = ctaHref;
-    cta.textContent = ctaText;
-    synopsis.append(cta);
   }
 
   block.replaceChildren(header, imageWrapper, synopsis);

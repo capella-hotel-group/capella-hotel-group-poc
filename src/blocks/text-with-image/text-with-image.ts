@@ -13,7 +13,7 @@ export default function decorate(block: HTMLElement): void {
   const ctaText = ctaLabelText || ctaLinkEl?.textContent?.trim() || 'Read More';
 
   const textCol = document.createElement('div');
-  textCol.className = 'text-col';
+  textCol.className = 'text-with-image-text-col';
 
   if (titleText) {
     const h3 = document.createElement('h3');
@@ -23,21 +23,21 @@ export default function decorate(block: HTMLElement): void {
 
   if (descriptionEl) {
     const desc = document.createElement('div');
-    desc.className = 'description';
+    desc.className = 'text-with-image-description';
     desc.innerHTML = DOMPurify.sanitize(descriptionEl.innerHTML, { USE_PROFILES: { html: true } });
     textCol.append(desc);
   }
 
   if (ctaHref) {
     const cta = document.createElement('a');
-    cta.className = 'cta-link';
+    cta.className = 'text-with-image-cta-link';
     cta.href = ctaHref;
     cta.textContent = ctaText;
     textCol.append(cta);
   }
 
   const imageCol = document.createElement('div');
-  imageCol.className = 'image-col';
+  imageCol.className = 'text-with-image-image-col';
   if (pictureEl) imageCol.append(pictureEl);
 
   block.replaceChildren(textCol, imageCol);

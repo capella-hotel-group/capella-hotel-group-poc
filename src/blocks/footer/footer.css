@@ -35,4 +35,8 @@ footer {
     .footer-inner {
         padding: 32px 24px 24px;
     }
+
+    .footer-item {
+        width: calc(1 / 2 * 100%);
+    }
 }

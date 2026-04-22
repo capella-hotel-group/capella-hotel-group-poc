@@ -25,8 +25,9 @@ export default async function decorate(block: HTMLElement): Promise<void> {
   bgSource.src = videoSrc;
   bgVideo.append(bgSource);
 
-  // Row 1: placeholder image — use authored <picture> as-is, fade out on video load
-  const placeholder = imageRow?.querySelector<HTMLPictureElement>('picture') ?? null;
+  // Row 1: placeholder image — use authored <picture> or <img> as-is, fade out on video load
+  const placeholder =
+    imageRow?.querySelector<HTMLPictureElement>('picture') ?? imageRow?.querySelector<HTMLImageElement>('img') ?? null;
   if (placeholder) {
     placeholder.className = 'masthead-placeholder';
 

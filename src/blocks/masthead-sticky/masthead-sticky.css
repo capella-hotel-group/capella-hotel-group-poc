@@ -106,6 +106,7 @@ main .masthead-sticky .masthead-placeholder {
     height: 100%;
     z-index: 1;
     transition: opacity 0.6s ease;
+    object-fit: cover;
 }
 
 main .masthead-sticky .masthead-placeholder img {

@@ -29,36 +29,42 @@ export default async function decorate(block: HTMLElement): Promise<void> {
   heading.textContent = headingText;
   titleZone.append(heading);
 
-  // — Content zone —
+  // — Content zone — two columns: left (subtitle + small img), right (large img + body + cta)
   const contentZone = document.createElement('div');
   contentZone.className = 'layout-2-image-content';
+
+  const colLeft = document.createElement('div');
+  colLeft.className = 'layout-2-image-col-left';
+
+  const colRight = document.createElement('div');
+  colRight.className = 'layout-2-image-col-right';
 
   if (subtitleP) {
     const subtitle = document.createElement('div');
     subtitle.className = 'layout-2-image-subtitle';
     subtitle.textContent = subtitleP.textContent?.trim() ?? '';
-    contentZone.append(subtitle);
-  }
-
-  if (imageLargePic) {
-    const large = document.createElement('div');
-    large.className = 'layout-2-image-image-large';
-    large.append(imageLargePic);
-    contentZone.append(large);
+    colLeft.append(subtitle);
   }
 
   if (imageSmallPic) {
     const small = document.createElement('div');
     small.className = 'layout-2-image-image-small';
     small.append(imageSmallPic);
-    contentZone.append(small);
+    colLeft.append(small);
+  }
+
+  if (imageLargePic) {
+    const large = document.createElement('div');
+    large.className = 'layout-2-image-image-large';
+    large.append(imageLargePic);
+    colRight.append(large);
   }
 
   if (bodyRichtext) {
     const body = document.createElement('div');
     body.className = 'layout-2-image-body';
     body.append(...bodyRichtext.childNodes);
-    contentZone.append(body);
+    colRight.append(body);
   }
 
   if (ctaAnchor) {
@@ -67,8 +73,10 @@ export default async function decorate(block: HTMLElement): Promise<void> {
     ctaAnchor.className = 'layout-2-image-cta';
     ctaAnchor.textContent = ctaText || ctaAnchor.textContent?.trim() || 'DISCOVER MORE';
     linkWrap.append(ctaAnchor);
-    contentZone.append(linkWrap);
+    colRight.append(linkWrap);
   }
+
+  contentZone.append(colLeft, colRight);
 
   // — Inner wrapper —
   const inner = document.createElement('div');

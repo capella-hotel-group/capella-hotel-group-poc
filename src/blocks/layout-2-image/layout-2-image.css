@@ -1,19 +1,19 @@
-/* Layout 2-Image block — matches capellahotels.com section-2image-layout2 */
+/* Layout 2-Image block */
 .layout-2-image {
     margin-top: 60px;
     padding-bottom: 90px;
 }
 
-/* Inner wrapper — right-aligned, 91.667% width */
+/* Inner wrapper */
 .layout-2-image-inner {
-    width: 91.667%;
-    margin-left: auto;
+    padding: 0 40px;
+    max-width: 1440px;
+    margin: 0 auto;
 }
 
 /* Title zone */
 .layout-2-image-title {
     margin-bottom: 60px;
-    padding-left: 20px;
 }
 
 /* Heading */
@@ -25,34 +25,40 @@
     line-height: 1;
     letter-spacing: 2.5px;
     color: rgb(36 47 58);
-    margin: 0 0 20px;
+    margin: 0;
 }
 
-/* Content zone — two-column layout via padding-left */
+/* Content zone — two-column flex */
 .layout-2-image-content {
-    position: relative;
-    padding-left: 36.3636%;
-    width: 100%;
+    display: flex;
 }
 
-/* Subtitle — absolutely positioned in left column */
+/* Left column — 1/3 */
+.layout-2-image-col-left {
+    flex: 0 0 33.333%;
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+}
+
+/* Right column — 2/3 */
+.layout-2-image-col-right {
+    flex: 0 0 66.667%;
+    padding-left: 80px;
+}
+
+/* Subtitle */
 .layout-2-image-subtitle {
-    position: absolute;
-    left: 0;
-    top: 0;
-    max-width: 27.2727%;
     font-family: var(--heading-font-family);
     font-size: 1.875rem;
     font-weight: 400;
     line-height: 1.2;
     color: var(--text-color);
-    margin: 0 0 35px;
-    padding-left: 70px;
+    margin: 0;
 }
 
-/* Large image — right column, full width */
+/* Large image */
 .layout-2-image-image-large {
-    width: 100%;
     margin-bottom: 40px;
 }
 
@@ -65,14 +71,7 @@
     display: block;
 }
 
-/* Small image — absolutely positioned in left column, bottom-aligned */
-.layout-2-image-image-small {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    max-width: 36.3636%;
-}
-
+/* Small image */
 .layout-2-image-image-small img {
     max-width: 100%;
     display: block;
@@ -82,15 +81,15 @@
     display: block;
 }
 
-/* Body / synopsis */
+/* Body */
 .layout-2-image-body {
-    max-width: 57.1429%;
     font-family: var(--body-font-family);
-    font-size: var(--body-font-size-xs);
-    line-height: 1.2;
+    font-size: 17px;
+    line-height: 20px;
+    letter-spacing: 0.16px;
     color: rgb(145 145 145);
-    padding: 0 20px 0 70px;
     margin-bottom: 20px;
+    max-width: 456px;
 }
 
 .layout-2-image-body p {
@@ -98,10 +97,6 @@
 }
 
 /* CTA link */
-.layout-2-image-link {
-    padding-left: 70px;
-}
-
 .layout-2-image-cta {
     display: inline-block;
     font-family: var(--body-font-family);
@@ -119,34 +114,15 @@
     opacity: 0.7;
 }
 
-/* Tablet */
-@media (width < 1366px) {
-    .layout-2-image-inner {
-        width: 100%;
-        padding-left: 35px;
-        padding-right: 35px;
-    }
-
-    .layout-2-image-heading {
-        font-size: 2.75rem;
-    }
-
-    .layout-2-image-image-small img {
-        max-width: 70%;
-    }
-}
-
 /* Mobile */
-@media (width < 600px) {
+@media (width < 768px) {
     .layout-2-image {
         margin-top: 40px;
         padding-bottom: 60px;
     }
 
     .layout-2-image-inner {
-        width: 100%;
-        padding-left: 0;
-        padding-right: 0;
+        padding: 0;
     }
 
     .layout-2-image-title {
@@ -159,19 +135,23 @@
     }
 
     .layout-2-image-content {
+        flex-direction: column;
+    }
+
+    .layout-2-image-col-left {
+        flex: auto;
+        gap: 20px;
+    }
+
+    .layout-2-image-col-right {
+        flex: auto;
         padding-left: 0;
     }
 
     .layout-2-image-subtitle {
-        position: relative;
-        float: none;
-        top: auto;
-        left: auto;
-        width: 100%;
-        max-width: none;
-        margin-bottom: 20px;
         font-size: 1.375rem;
         padding: 0 20px 0 70px;
+        margin-bottom: 0;
     }
 
     .layout-2-image-image-large {
@@ -180,17 +160,13 @@
     }
 
     .layout-2-image-image-small {
-        position: relative;
-        bottom: auto;
-        left: auto;
         max-width: 70%;
         margin-bottom: 20px;
     }
 
     .layout-2-image-body {
-        width: 100%;
-        max-width: none;
         padding: 0 20px 0 70px;
+        max-width: none;
     }
 
     .layout-2-image-link {

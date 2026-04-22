@@ -1,7 +1,9 @@
+import { resolveDAMUrl } from '@/utils/env';
+
 export default async function decorate(block: HTMLElement): Promise<void> {
   // Read authored video URL from the single authored link field
   const sourceAnchor = block.querySelector<HTMLAnchorElement>('a');
-  const videoSrc = sourceAnchor?.href ?? '';
+  const videoSrc = resolveDAMUrl(sourceAnchor?.href ?? '');
 
   // Background video: autoplay, muted, loop, playsinline (muted required for autoplay policy)
   const bgVideo = document.createElement('video');

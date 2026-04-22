@@ -26,12 +26,12 @@ Import path: `@/utils/event-bus`
 
 ## API
 
-| Function | Description |
-|---|---|
-| `on(eventName, handler)` | Subscribe a handler to an event |
-| `off(eventName, handler)` | Remove a previously registered handler |
-| `emit(eventName, payload?)` | Fire an event; safe when no listeners exist |
-| `getRegisteredEvents()` | Return `{ eventName: listenerCount }` snapshot |
+| Function                    | Description                                    |
+| --------------------------- | ---------------------------------------------- |
+| `on(eventName, handler)`    | Subscribe a handler to an event                |
+| `off(eventName, handler)`   | Remove a previously registered handler         |
+| `emit(eventName, payload?)` | Fire an event; safe when no listeners exist    |
+| `getRegisteredEvents()`     | Return `{ eventName: listenerCount }` snapshot |
 
 ---
 
@@ -59,7 +59,7 @@ Declare your block's events via **declaration merging** to get autocomplete on e
 // In your block file (e.g. menus.ts)
 declare module '@/utils/event-bus' {
   interface EventMap {
-    'menus:ready':   { block: HTMLElement };
+    'menus:ready': { block: HTMLElement };
     'slider:change': { index: number };
     'section:enter': { index: number };
     'section:leave': { index: number };
@@ -68,6 +68,7 @@ declare module '@/utils/event-bus' {
 ```
 
 Once declared, TypeScript will:
+
 - Autocomplete known event names in `on()` and `emit()`
 - Type-check the payload against the declared shape
 - Infer `payload` type inside the handler without an explicit annotation
@@ -92,8 +93,8 @@ Examples: `section:enter`, `section:leave`, `slider:change`, `menus:ready`.
 Enable event logging in the browser console (persists across reloads):
 
 ```js
-localStorage.setItem('debug:events', 'true');   // enable
-localStorage.removeItem('debug:events');          // disable
+localStorage.setItem('debug:events', 'true'); // enable
+localStorage.removeItem('debug:events'); // disable
 ```
 
 Each `emit` will log: `[EventBus] section:enter { index: 2 }`

@@ -1,0 +1,116 @@
+{
+  "definitions": [
+    {
+      "title": "Home Culture",
+      "id": "home-culture",
+      "plugins": {
+        "xwalk": {
+          "page": {
+            "resourceType": "core/franklin/components/block/v1/block",
+            "template": {
+              "name": "Home Culture",
+              "model": "home-culture"
+            }
+          }
+        }
+      }
+    }
+  ],
+  "models": [
+    {
+      "id": "home-culture",
+      "fields": [
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "heading",
+          "label": "Section Heading"
+        },
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "subtitle",
+          "label": "Section Subtitle"
+        },
+        {
+          "component": "richtext",
+          "valueType": "string",
+          "name": "intro",
+          "label": "Intro Body"
+        },
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "item1Heading",
+          "label": "Item 1 Heading (Craftsmanship)"
+        },
+        {
+          "component": "reference",
+          "valueType": "string",
+          "name": "item1Image1",
+          "label": "Item 1 Image (tall left)",
+          "multi": false
+        },
+        {
+          "component": "reference",
+          "valueType": "string",
+          "name": "item1Image2",
+          "label": "Item 1 Image 2 (small right)",
+          "multi": false
+        },
+        {
+          "component": "richtext",
+          "valueType": "string",
+          "name": "item1Body",
+          "label": "Item 1 Body (blockquote + paragraphs)"
+        },
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "item2Heading",
+          "label": "Item 2 Heading (Capella Curates)"
+        },
+        {
+          "component": "reference",
+          "valueType": "string",
+          "name": "item2Image1",
+          "label": "Item 2 Image (large right)",
+          "multi": false
+        },
+        {
+          "component": "richtext",
+          "valueType": "string",
+          "name": "item2Body",
+          "label": "Item 2 Body (blockquote + paragraphs + CTA)"
+        },
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "item3Heading",
+          "label": "Item 3 Heading (Capella Youth)"
+        },
+        {
+          "component": "reference",
+          "valueType": "string",
+          "name": "item3Image1",
+          "label": "Item 3 Image 1 (large left)",
+          "multi": false
+        },
+        {
+          "component": "reference",
+          "valueType": "string",
+          "name": "item3Image2",
+          "label": "Item 3 Image 2 (small right)",
+          "multi": false
+        },
+        {
+          "component": "richtext",
+          "valueType": "string",
+          "name": "item3Body",
+          "label": "Item 3 Body (blockquote + paragraphs)"
+        }
+      ]
+    }
+  ],
+  "filters": []
+}

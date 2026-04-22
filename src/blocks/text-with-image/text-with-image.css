@@ -18,7 +18,7 @@
 }
 
 /* Text column */
-.text-with-image-text-col {
+.text-with-image .text-with-image-text-col {
     grid-area: text;
     display: flex;
     flex-direction: column;
@@ -26,7 +26,7 @@
     max-width: 450px;
 }
 
-.text-with-image-text-col h3 {
+.text-with-image .text-with-image-text-col h3 {
     font-size: 2.5rem;
     font-family: var(--heading-font-family);
     font-weight: 300;
@@ -37,15 +37,15 @@
     margin: 0 0 20px;
 }
 
-.text-with-image-description {
+.text-with-image .text-with-image-description {
     display: flex;
     flex-direction: column;
     padding-left: 50px;
     max-width: 400px;
 }
 
-.text-with-image-description h4,
-.text-with-image-description blockquote {
+.text-with-image .text-with-image-description h4,
+.text-with-image .text-with-image-description blockquote {
     font-family: var(--heading-font-family);
     font-weight: 400;
     color: #000;
@@ -57,7 +57,7 @@
     font-style: normal;
 }
 
-.text-with-image-description p {
+.text-with-image .text-with-image-description p {
     font-family: var(--body-font-family);
     font-weight: 400;
     color: #919191;
@@ -66,41 +66,41 @@
     margin: 0 0 20px;
 }
 
-.text-with-image-description p:empty {
+.text-with-image .text-with-image-description p:empty {
     display: none;
 }
 
-.text-with-image-cta-link {
+.text-with-image .text-with-image-cta-link {
     display: inline-block;
     font-size: 0.875rem;
     font-family: var(--body-font-family);
     font-weight: 400;
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    text-decoration: underline !important;
+    text-decoration: underline;
     text-decoration-thickness: 1px;
     text-underline-offset: 4px;
-    color: #232323 !important;
+    color: #232323;
     padding-left: 50px;
 }
 
-.text-with-image-cta-link:hover {
+.text-with-image .text-with-image-cta-link:hover {
     opacity: 0.6;
 }
 
 /* Image column */
-.text-with-image-image-col {
+.text-with-image .text-with-image-image-col {
     grid-area: image;
     overflow: hidden;
 }
 
-.text-with-image-image-col picture {
+.text-with-image .text-with-image-image-col picture {
     display: block;
     width: 100%;
     height: 100%;
 }
 
-.text-with-image-image-col img {
+.text-with-image .text-with-image-image-col img {
     display: block;
     width: 100%;
     height: 100%;
@@ -120,14 +120,14 @@
         grid-template-columns: calc(70% - 100px) 40px calc(30% + 60px);
     }
 
-    .text-with-image-text-col h3 {
+    .text-with-image .text-with-image-text-col h3 {
         font-size: 2.125rem;
     }
 }
 
 /* Mobile */
 @media (width <= 767px) {
-    .text-with-image-text-col h3 {
+    .text-with-image .text-with-image-text-col h3 {
         font-size: 1.875rem;
     }
 

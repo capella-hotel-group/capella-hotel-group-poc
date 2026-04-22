@@ -95,6 +95,14 @@ main .masthead-sticky .masthead-cta {
         right: 24px;
         bottom: 24px;
     }
+
+    main .masthead-sticky .masthead-content {
+        display: none;
+    }
+
+    main .masthead-sticky .masthead-scroll-icon {
+        bottom: 110px;
+    }
 }
 
 /* Placeholder image — covers block while video loads, fades out */

@@ -56,4 +56,11 @@ export default async function decorate(block: HTMLElement): Promise<void> {
 
   // Replace block contents — background video + CTA only; modal is in document.body
   block.replaceChildren(bgVideo, cta);
+
+  // Flex-reorder body so masthead renders above header in visual order
+  document.body.classList.add('has-masthead');
+
+  // Mark the parent section so sibling content sections can stack above masthead
+  const section = block.closest('main > div');
+  if (section) section.classList.add('masthead-section');
 }

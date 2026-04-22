@@ -7,13 +7,35 @@
  *   masthead-modal   : 200  (above everything)
  */
 
+/* Reorder body so main (with masthead) renders before header visually */
+body.has-masthead {
+    display: flex;
+    flex-direction: column;
+}
+
+body.has-masthead main {
+    order: 1;
+}
+
+body.has-masthead header {
+    order: 2;
+}
+
+body.has-masthead footer {
+    order: 3;
+}
+
+/* Content sections above masthead so they overlap it on scroll */
+.masthead-section ~ div {
+    position: relative;
+    z-index: 51;
+}
+
 /* Block wrapper — sticky, full-viewport */
 main .masthead-sticky {
     position: sticky;
     top: 0;
     height: 100vh;
-    /* 100dvh: stable on mobile (address bar resize); 100vh as fallback */
-    height: 100dvh;
     overflow: hidden;
     z-index: 50;
 }

@@ -9,17 +9,20 @@ provides a **single source of truth** for page state that multiple blocks need t
 such as the currently active section, scroll progress, or viewport dimensions.
 
 It complements the [event-bus](../event-bus/README.md):
-- **global-state** = *what is the current value right now?*
-- **event-bus** = *something just happened*
+
+- **global-state** = _what is the current value right now?_
+- **event-bus** = _something just happened_
 
 ## When to use
 
 ✅ Use global-state when:
+
 - A block needs to **read** shared state at any point in time (e.g. "is the hero section active?")
 - Multiple blocks need to react to the **same piece of page state**
 - You want to avoid duplicating scroll/resize listeners across blocks
 
 ❌ Do not use global-state for:
+
 - Block-internal state (slider index, open/closed toggles, animation phase) — keep that local
 - One-off events / side effects — use the event-bus instead
 - Storing boolean flags that mean "this event fired" (e.g. `heroDone: true`)
@@ -52,6 +55,7 @@ setState({ viewport: { width: window.innerWidth, height: window.innerHeight } })
 ```
 
 ### `subscribe(listener): UnsubscribeFn`
+
 ### `subscribe(selector, listener): UnsubscribeFn`
 
 Two overloads — use whichever fits your case.
@@ -119,8 +123,9 @@ afterEach(() => reset());
 ```ts
 type GlobalState = {
   currentSection: string | null; // ID/name of the active page section
-  scrollProgress: number;        // 0 → 1, percentage scrolled through the page
-  viewport?: {                   // Set once on load and on resize
+  scrollProgress: number; // 0 → 1, percentage scrolled through the page
+  viewport?: {
+    // Set once on load and on resize
     width: number;
     height: number;
   };

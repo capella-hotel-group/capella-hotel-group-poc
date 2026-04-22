@@ -1,42 +1,191 @@
-# Your Project's Title...
-Your project's description...
+# Capella Hotel Group — AEM Edge Delivery Services PoC
 
-## Environments
+This repository is a team-evolved derivative of the Adobe [`aem-boilerplate-xwalk`](https://github.com/adobe-rnd/aem-boilerplate-xwalk) template, purpose-built to maximize final-output quality and developer experience. On top of the standard WYSIWYG-authoring stack it layers a Vite + Rollup build pipeline, a TypeScript-strict `src/`-first development model, and a Spec-Driven Development (SDD) workflow — enabling modern frontend patterns without compromising any AEM Edge Delivery Services runtime contract.
+
+---
+
+## Architecture Highlights
+
+### Build & Bundle Pipeline
+
+The project replaces the stock plain-file workflow with a **Vite + Rollup** build pipeline (`vite.config.ts` / `vite.helpers.ts`):
+
+- **Auto-discovered block entries** — every `src/blocks/<name>/<name>.ts` is automatically registered as a Rollup entry; adding a new block requires no manual config.
+- **Per-block output** — each block compiles to its own `blocks/<name>/<name>.js` + `blocks/<name>/<name>.css`, matching the AEM EDS block-loading convention.
+- **Stable infrastructure chunks** — shared heavy dependencies are extracted into fixed-path chunks (`chunks/aem-core.js`, `chunks/dompurify.js`, `chunks/three.js`, `chunks/env.js`) that can be `modulepreload`-ed from `head.html`.
+- **Dual app entries** — `scripts/scripts.js` (eager, phase-1) and `scripts/aem.js` (lazy, phase-2) are emitted as first-class Rollup entries.
+- **Version-banner plugin** — every compiled JS chunk and CSS asset is prefixed with a `/*! v{version} | h{hash} */` comment for cache-busting traceability.
+- **Watch-mode root sync** — in `--watch` mode, Vite writes output to a `dist/` directory and then syncs it back to the repository root so `aem up` always serves the latest build without full rebuilds.
+- **JSON model merge** — `npm run build:json` merges `src/models/_*.json` fragments into the three Universal Editor config files at the repo root (`component-definition.json`, `component-models.json`, `component-filters.json`), keeping per-block model authoring colocated with its source code.
+
+### `src/`-First Development Model
+
+All source code lives under `src/`. The root-level `blocks/`, `scripts/`, `styles/`, and `chunks/` folders are **generated build outputs — do not edit them by hand**. Changes must always be made in `src/`.
+
+| Folder         | Purpose                                                                                                   |
+| -------------- | --------------------------------------------------------------------------------------------------------- |
+| `src/app/`     | AEM EDS runtime — `scripts.ts`, `aem.ts`, `delayed.ts`, and Universal Editor editor-support helpers       |
+| `src/blocks/`  | One subfolder per block: `<name>.ts` + `<name>.css` + `_<name>.json` model fragment                       |
+| `src/configs/` | Environment and runtime configuration (`environments.ts`)                                                 |
+| `src/models/`  | Shared AEM component model JSON fragments merged by `build:json`                                          |
+| `src/styles/`  | Global CSS: `styles.css` (eager), `lazy-styles.css`, `fonts.css`, shared design tokens                    |
+| `src/types/`   | Global TypeScript declarations                                                                            |
+| `src/utils/`   | Shared utilities — `env.ts`, `helper.ts`, `math.ts`, `global-state/`, `event-bus/`, `pointer-velocity.ts` |
+
+**Key conventions:**
+
+- **`@/*` alias** — all cross-module imports use the `@/*` path alias (maps to `src/*`). Relative paths across modules are not permitted.
+- **`decorate(block)` contract** — every block exports `async function decorate(block: HTMLElement): Promise<void>` as its default export. The block element must not be reassigned; build with `block.replaceChildren()`.
+- **TypeScript strict mode** — `strictNullChecks`, `noUnusedLocals`, `noUnusedParameters`, `noImplicitReturns` are all enabled. Guard every `querySelector` result.
+- **Security** — all external or user-supplied HTML must be sanitized with `DOMPurify` before assigning to `innerHTML`.
+
+---
+
+## EDS Compatibility Guarantee
+
+Despite the modernized development stack, the production output fully preserves the core AEM Edge Delivery Services contracts:
+
+- **Two-phase loading** — the eager bundle (`scripts/scripts.js`) handles above-the-fold rendering; the lazy bundle (`scripts/aem.js`) handles deferred block loading. This split is enforced by the Rollup entry configuration and must not be collapsed.
+- **Per-block colocation** — each block's compiled `.js` and `.css` land at `blocks/<name>/<name>.js` and `blocks/<name>/<name>.css`, exactly where the AEM EDS runtime expects them.
+- **Universal Editor component contracts** — `component-definition.json`, `component-models.json`, and `component-filters.json` remain at the repository root, generated by `build:json` from `src/models/` fragments, and are consumed directly by the Universal Editor.
+
+---
+
+## Developer Workflow
+
+| Script                 | Purpose                                                                                 |
+| ---------------------- | --------------------------------------------------------------------------------------- |
+| `npm run start`        | TypeScript watch + Vite watch + `aem up` in parallel — full DX loop at `localhost:3000` |
+| `npm run build`        | Production build: `tsc` type-check → Vite build (main) → Vite build (editor support)    |
+| `npm run build:watch`  | Watch-mode build only (no `aem up`) — TS watch + Vite watch + editor Vite watch         |
+| `npm run build:json`   | Merge `src/models/_*.json` fragments into root UE component JSON files                  |
+| `npm run lint`         | ESLint — run before every commit                                                        |
+| `npm run lint:fix`     | Auto-fix ESLint errors                                                                  |
+| `npm run format`       | Prettier — format all files in place                                                    |
+| `npm run format:check` | Prettier check without writing (useful in CI)                                           |
+
+> **Watch-mode note:** `build:watch` outputs to `dist/` and syncs back to the repository root after each build, so `aem up` always serves up-to-date compiled output without full cleans.
+
+---
+
+## Spec-Driven Development (SDD)
+
+This project adopts an AI-assisted Spec-Driven Development workflow powered by [OpenSpec](https://openspec.dev) and GitHub Copilot. Reusable skills (`.github/skills/`) and prompts (`.github/prompts/`) encode the team's conventions and domain knowledge, enabling a repeatable, high-throughput delivery model where a single engineer can own a block end-to-end.
+
+### AEM EDS Skills
+
+Skills that encode project-specific conventions for every phase of AEM EDS block development:
+
+| Skill                                  | Purpose                                                                                                     |
+| -------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| `aem-skill-content-driven-development` | Master workflow skill — orchestrates the full Content-Driven Development loop (model → build → test)        |
+| `aem-skill-content-modeling`           | Design author-friendly AEM content models for new or modified blocks                                        |
+| `aem-skill-building-blocks`            | Implement TypeScript + CSS block code following project conventions (`@/*`, `replaceChildren`, `DOMPurify`) |
+| `aem-skill-testing-blocks`             | Validate block behavior through lint checks, browser testing, and regression review                         |
+| `aem-skill-code-review`                | Self-review or PR-review checklist aligned to coding standards and EDS performance requirements             |
+| `aem-skill-ue-component-model`         | Create or modify Universal Editor component configuration (definition, models, filters JSON)                |
+| `aem-skill-docs-search`                | Search the `aem.live` documentation when platform guidance is unclear                                       |
+| `aem-skill-create-block-from-figma`    | Scaffold a complete xwalk block directly from a Figma design node                                           |
+
+### OpenSpec Workflow Prompts
+
+Prompts that drive the artifact-based change management lifecycle:
+
+| Prompt               | Workflow step                                                                       |
+| -------------------- | ----------------------------------------------------------------------------------- |
+| `/opsx:new`          | Scaffold a new, empty change with the `.openspec.yaml` manifest                     |
+| `/opsx:propose`      | Create all change artifacts (proposal → design → specs → tasks) in one step         |
+| `/opsx:ff`           | Fast-forward through artifact creation without pausing between steps                |
+| `/opsx:explore`      | Enter a thinking-partner mode to clarify requirements before committing to a spec   |
+| `/opsx:continue`     | Create the next missing artifact in the current change                              |
+| `/opsx:apply`        | Implement pending tasks from a change's `tasks.md`, marking them complete as you go |
+| `/opsx:verify`       | Validate that implementation matches all requirements in the change's specs         |
+| `/opsx:sync`         | Sync delta specs from a change back to the canonical `openspec/specs/` directory    |
+| `/opsx:archive`      | Archive a completed change (moves it to `openspec/changes/archive/`)                |
+| `/opsx:bulk-archive` | Archive multiple completed changes at once                                          |
+| `/opsx:onboard`      | Guided onboarding walk-through of the full OpenSpec workflow cycle                  |
+
+### Figma → Block Workflow
+
+The repository integrates the **Figma MCP server** (`mcp_com_figma_*` tools) with the `aem-skill-create-block-from-figma` skill and the `/aem-create-block-from-figma` prompt to provide a direct, automated path from design to a deployable xwalk block:
+
+1. Provide a Figma node URL.
+2. The skill fetches the design context via MCP, extracts component structure and design tokens, and generates a standards-compliant `decorate(block)` implementation with matching CSS and UE model JSON.
+3. The output is immediately lint-clean, type-safe, and aligned to the project's conventions.
+
+This workflow substantially reduces the per-block effort, making a **one-engineer-per-block** delivery model viable — reducing the time, cost, and communication overhead of conventional handoff-based front-end development.
+
+---
+
+## Roadmap & Open Problems
+
+The following areas have been identified and are actively being explored or planned. They are not yet covered by accepted specs:
+
+- [ ] **Figma-to-block fidelity constraints** — define which design affordances translate cleanly to EDS blocks and which require manual negotiation (auto-layout, interactive states, responsive overrides, web font parity, etc.).
+- [ ] **Component classification framework** — formalize how to classify a design component as a new block, a block variant, a style override, or a composition of existing blocks, based on design analysis and feature intent.
+- [ ] **Component performance evaluation tooling** — establish per-block LCP, CLS, and TBT budgets and add automated measurement (Lighthouse CI, Web Vitals attribution) to the review gate.
+- [ ] **Two-phase loading contract formalization** — move beyond the current paper plan and establish enforceable rules (lint, test, or build-time checks) that guarantee the phase-1 / phase-2 boundary is never violated by a block.
+- [ ] **Build/bundle further optimizations** — evaluate deferred chunk loading strategies, shared vendor splitting policy, CSS bundle budgeting, and module-preload coverage in `head.html`.
+- [ ] **Automated UE authoring smoke tests** — validate that block model changes do not silently break Universal Editor interaction or content round-trips.
+- [ ] **Structured block performance regression testing** — track per-block bundle size and runtime cost over time to catch regressions before they reach production.
+- [ ] _(Placeholder for team-added items — open a PR to add new entries here)_
+
+---
+
+## Further Reading
+
+Project-specific contributor guidelines in `.github/instructions/`:
+
+- [Commit Conventions](.github/instructions/commit-conventions.instructions.md) — Conventional Commits format, allowed types, scopes, and examples for this repository.
+- [Block Authoring](.github/instructions/block-authoring.instructions.md) — block structure, `decorate()` contract, AEM model JSON, loading phases, and image handling.
+- [Coding Style](.github/instructions/coding-style.instructions.md) — TypeScript strictness rules, `@/*` import conventions, DOM patterns, Prettier/ESLint configuration.
+- [UE Layout Conflicts](.github/instructions/ue-layout-conflicts.instructions.md) — checklist for avoiding conflicts between the Universal Editor content tree and JS-driven layout (sliders, carousels, tabs, accordions).
+
+---
+
+## Upstream aem-boilerplate Reference
+
+The sections below preserve the standard setup guidance from the upstream [`aem-boilerplate-xwalk`](https://github.com/adobe-rnd/aem-boilerplate-xwalk) template.
+
+### Environments
+
 - Preview: https://main--{repo}--{owner}.aem.page/
 - Live: https://main--{repo}--{owner}.aem.live/
 
-## Documentation
+### Documentation
 
-Before using the aem-boilerplate, we recommand you to go through the documentation on [www.aem.live](https://www.aem.live/docs/) and [experienceleague.adobe.com](https://experienceleague.adobe.com/en/docs/experience-manager-cloud-service/content/edge-delivery/wysiwyg-authoring/authoring), more specifically:
+Before using the aem-boilerplate, we recommend going through the documentation on [www.aem.live](https://www.aem.live/docs/) and [experienceleague.adobe.com](https://experienceleague.adobe.com/en/docs/experience-manager-cloud-service/content/edge-delivery/wysiwyg-authoring/authoring), more specifically:
+
 1. [Getting Started](https://experienceleague.adobe.com/en/docs/experience-manager-cloud-service/content/edge-delivery/wysiwyg-authoring/edge-dev-getting-started), [Creating Blocks](https://experienceleague.adobe.com/en/docs/experience-manager-cloud-service/content/edge-delivery/wysiwyg-authoring/create-block), [Content Modelling](https://experienceleague.adobe.com/en/docs/experience-manager-cloud-service/content/edge-delivery/wysiwyg-authoring/content-modeling)
 2. [The Anatomy of a Project](https://www.aem.live/developer/anatomy-of-a-project)
 3. [Web Performance](https://www.aem.live/developer/keeping-it-100)
 4. [Markup, Sections, Blocks, and Auto Blocking](https://www.aem.live/developer/markup-sections-blocks)
 
-Furthremore, we encourage you to watch the recordings of any of our previous presentations or sessions:
+We also encourage watching the recordings of previous sessions:
+
 - [Getting started with AEM Authoring and Edge Delivery Services](https://experienceleague.adobe.com/en/docs/events/experience-manager-gems-recordings/gems2024/aem-authoring-and-edge-delivery)
 
-## Prerequisites
+### Prerequisites
 
 - nodejs 18.3.x or newer
 - AEM Cloud Service release 2024.8 or newer (>= `17465`)
 
-## Installation
+### Installation
 
 ```sh
 npm i
 ```
 
-## Linting
+### Linting
 
 ```sh
 npm run lint
 ```
 
-## Local development
+### Local Development
 
-1. Create a new repository based on the `aem-boilerplate` template
-1. Add the [AEM Code Sync GitHub App](https://github.com/apps/aem-code-sync) to the repository
-1. Install the [AEM CLI](https://github.com/adobe/helix-cli): `npm install -g @adobe/aem-cli`
-1. Start AEM Proxy: `aem up` (opens your browser at `http://localhost:3000`)
-1. Open the `{repo}` directory in your favorite IDE and start coding :)
+1. Create a new repository based on the `aem-boilerplate` template.
+2. Add the [AEM Code Sync GitHub App](https://github.com/apps/aem-code-sync) to the repository.
+3. Install the [AEM CLI](https://github.com/adobe/helix-cli): `npm install -g @adobe/aem-cli`
+4. Start AEM Proxy: `aem up` (opens your browser at `http://localhost:3000`)
+5. Open the `{repo}` directory in your favorite IDE and start coding.

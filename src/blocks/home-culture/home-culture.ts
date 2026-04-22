@@ -43,24 +43,32 @@ export default function decorate(block: HTMLElement): void {
     sectionHeader.append(intro);
   }
 
-  // ── Culture items (rows 3-5) ────────────────────────────────────────
-  const itemTypes = ['type1', 'type2', 'type3'] as const;
-  const items: HTMLElement[] = [];
+  // ── Culture items ─────────────────────────────────────────────────
+  // AEM delivers each model field as its own single-cell row:
+  //   rows[3]  = item1Heading   rows[7]  = item2Heading   rows[10] = item3Heading
+  //   rows[4]  = item1Image1    rows[8]  = item2Image1    rows[11] = item3Image1
+  //   rows[5]  = item1Image2                              rows[12] = item3Image2
+  //   rows[6]  = item1Body      rows[9]  = item2Body      rows[13] = item3Body
 
-  itemTypes.forEach((type, idx) => {
-    const row = rows[3 + idx];
-    if (!row) return;
+  interface ItemDef {
+    type: 'type1' | 'type2' | 'type3';
+    titleRow: number;
+    img1Row: number;
+    img2Row: number | null;
+    bodyRow: number;
+  }
 
-    const cells = [...row.children] as HTMLElement[];
-    const titleText = cells[0]?.textContent?.trim() ?? '';
-    const picture1 = cells[1]?.querySelector('picture') ?? null;
+  const itemDefs: ItemDef[] = [
+    { type: 'type1', titleRow: 3, img1Row: 4, img2Row: 5, bodyRow: 6 },
+    { type: 'type2', titleRow: 7, img1Row: 8, img2Row: null, bodyRow: 9 },
+    { type: 'type3', titleRow: 10, img1Row: 11, img2Row: 12, bodyRow: 13 },
+  ];
 
-    // img2 is cells[2] only when it contains a <picture>; type2 has no second image
-    const picture2 = cells[2]?.querySelector('picture') ?? null;
-
-    // richtext is always the last cell that has no <picture> inside
-    const richtextCell = [...cells].reverse().find((c) => !c.querySelector('picture')) ?? null;
-    const richtextEl = richtextCell?.firstElementChild ?? richtextCell ?? null;
+  const items: HTMLElement[] = itemDefs.map(({ type, titleRow, img1Row, img2Row, bodyRow }) => {
+    const titleText = rows[titleRow]?.firstElementChild?.textContent?.trim() ?? '';
+    const picture1 = rows[img1Row]?.querySelector('picture') ?? null;
+    const picture2 = img2Row !== null ? (rows[img2Row]?.querySelector('picture') ?? null) : null;
+    const bodyEl = rows[bodyRow]?.firstElementChild ?? null;
 
     const item = document.createElement('div');
     item.className = `home-culture-item home-culture-item--${type}`;
@@ -71,7 +79,7 @@ export default function decorate(block: HTMLElement): void {
     if (picture1) img1Wrap.append(picture1);
     item.append(img1Wrap);
 
-    // image2 (only for type1 and type3)
+    // image2 (type1 and type3 only)
     if (picture2) {
       const img2Wrap = document.createElement('div');
       img2Wrap.className = 'home-culture-img2';
@@ -90,15 +98,15 @@ export default function decorate(block: HTMLElement): void {
       contentPanel.append(h3);
     }
 
-    if (richtextEl) {
+    if (bodyEl) {
       const body = document.createElement('div');
       body.className = 'home-culture-richtext';
-      body.innerHTML = DOMPurify.sanitize(richtextEl.innerHTML, { USE_PROFILES: { html: true } });
+      body.innerHTML = DOMPurify.sanitize(bodyEl.innerHTML, { USE_PROFILES: { html: true } });
       contentPanel.append(body);
     }
 
     item.append(contentPanel);
-    items.push(item);
+    return item;
   });
 
   block.replaceChildren(sectionHeader, ...items);

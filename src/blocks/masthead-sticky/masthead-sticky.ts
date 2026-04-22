@@ -1,8 +1,14 @@
 import { resolveDAMUrl } from '@/utils/env';
 
 export default async function decorate(block: HTMLElement): Promise<void> {
-  // Read authored video URL from the single authored link field
-  const sourceAnchor = block.querySelector<HTMLAnchorElement>('a');
+  // Read authored fields from DOM rows: row 0 = video, row 1 = image, row 2 = content
+  const rows = [...block.querySelectorAll<HTMLDivElement>(':scope > div')];
+  const videoRow = rows[0];
+  const imageRow = rows[1];
+  const contentRow = rows[2];
+
+  // Row 0: video URL from reference field (<a> tag)
+  const sourceAnchor = videoRow?.querySelector<HTMLAnchorElement>('a');
   const videoSrc = resolveDAMUrl(sourceAnchor?.href ?? '');
 
   if (!videoSrc) return;
@@ -18,6 +24,32 @@ export default async function decorate(block: HTMLElement): Promise<void> {
   const bgSource = document.createElement('source');
   bgSource.src = videoSrc;
   bgVideo.append(bgSource);
+
+  // Row 1: placeholder image — shown while video loads, fades out on loadeddata
+  const authoredImg = imageRow?.querySelector<HTMLImageElement>('img');
+  let placeholder: HTMLImageElement | null = null;
+  if (authoredImg) {
+    placeholder = document.createElement('img');
+    placeholder.className = 'masthead-placeholder';
+    placeholder.src = authoredImg.src;
+    placeholder.alt = authoredImg.alt;
+
+    bgVideo.addEventListener('loadeddata', () => {
+      placeholder?.classList.add('masthead-placeholder--hidden');
+      placeholder?.addEventListener('transitionend', () => {
+        placeholder?.remove();
+      });
+    });
+  }
+
+  // Row 2: richtext content overlay
+  let contentOverlay: HTMLDivElement | null = null;
+  const contentChildren = contentRow?.querySelectorAll<HTMLElement>(':scope > div > *');
+  if (contentChildren && contentChildren.length > 0) {
+    contentOverlay = document.createElement('div');
+    contentOverlay.className = 'masthead-content';
+    contentOverlay.append(...contentChildren);
+  }
 
   // "WATCH VIDEO" CTA — bottom-right corner
   const cta = document.createElement('a');
@@ -62,8 +94,12 @@ export default async function decorate(block: HTMLElement): Promise<void> {
     modalVideo.currentTime = 0;
   });
 
-  // Replace block contents — background video + CTA only; modal is in document.body
-  block.replaceChildren(bgVideo, cta);
+  // Replace block contents — video + placeholder + content + CTA; modal is in document.body
+  const children: Element[] = [bgVideo];
+  if (placeholder) children.push(placeholder);
+  if (contentOverlay) children.push(contentOverlay);
+  children.push(cta);
+  block.replaceChildren(...children);
 
   // Mark the parent section so sibling content sections can stack above masthead
   const section = block.closest<HTMLDivElement>('main > div');

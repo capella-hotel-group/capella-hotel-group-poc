@@ -21,10 +21,24 @@
       "id": "masthead-sticky",
       "fields": [
         {
-          "component": "aem-content",
+          "component": "reference",
           "valueType": "string",
           "name": "video",
-          "label": "Video"
+          "label": "Video",
+          "multi": false
+        },
+        {
+          "component": "reference",
+          "valueType": "string",
+          "name": "image",
+          "label": "Placeholder Image",
+          "multi": false
+        },
+        {
+          "component": "richtext",
+          "valueType": "string",
+          "name": "content",
+          "label": "Content"
         }
       ]
     }

@@ -1,0 +1,102 @@
+/*
+ * masthead-sticky block
+ *
+ * z-index convention:
+ *   masthead-sticky  : 50   (below header's 100 — content scrolls over masthead first)
+ *   header           : 100
+ *   masthead-modal   : 200  (above everything)
+ */
+
+/* Content sections above masthead so they overlap it on scroll */
+.masthead-section ~ div {
+    position: relative;
+    z-index: 51;
+}
+
+/* Block wrapper — sticky, full-viewport */
+main .masthead-sticky {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow: hidden;
+    z-index: 50;
+}
+
+/* Background video — covers the full block area */
+main .masthead-sticky .masthead-bg-video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Watch Video CTA — bottom-right corner */
+main .masthead-sticky .masthead-cta {
+    position: absolute;
+    bottom: 32px;
+    right: var(--header-padding-x, 40px);
+    color: #fff;
+    text-transform: uppercase;
+    text-decoration: underline;
+    letter-spacing: var(--header-letter-spacing, 0.12em);
+    font-size: var(--body-font-size-xs);
+    text-underline-offset: 3px;
+}
+
+/* Modal overlay — appended to document.body */
+.masthead-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    background: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    visibility: hidden;
+    opacity: 0;
+    transition:
+        opacity 0.25s ease,
+        visibility 0.25s ease;
+}
+
+.masthead-modal.is-open {
+    visibility: visible;
+    opacity: 1;
+}
+
+/* Modal video */
+.masthead-modal .masthead-modal-video {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+/* Close button — top-right corner of modal */
+.masthead-modal .masthead-modal-close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    color: #fff;
+    background: transparent;
+    border: none;
+    font-size: 1.5rem;
+    line-height: 1;
+    cursor: pointer;
+    padding: 4px 8px;
+}
+
+.masthead-modal .masthead-modal-close:hover {
+    opacity: 0.7;
+}
+
+@media (width < 600px) {
+    main .masthead-sticky .masthead-cta {
+        right: 24px;
+        bottom: 24px;
+    }
+}
+/* Authoring: cap height to prevent layout issues in the Universal Editor */
+.adobe-ue-edit .masthead-sticky {
+    max-height: 1080px;
+}

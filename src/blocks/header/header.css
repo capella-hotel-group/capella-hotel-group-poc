@@ -10,6 +10,7 @@ header {
 
 /* Three-zone flex layout */
 .header-inner {
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -104,11 +105,15 @@ header {
     opacity: 0.7;
 }
 
-/* Emblem — 16px wide, proportional height, vertically centered via parent flex */
+/* Emblem — absolutely centered in header-inner, independent of nav link count */
 .header-emblem {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
     width: 16px;
     height: auto;
     display: block;
+    pointer-events: none;
 }
 
 /* ── Right: CTA button ───────────────────────────────────── */

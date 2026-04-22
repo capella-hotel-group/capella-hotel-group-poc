@@ -65,10 +65,15 @@ export default async function decorate(block: HTMLElement): Promise<void> {
   // Replace block contents — background video + CTA only; modal is in document.body
   block.replaceChildren(bgVideo, cta);
 
-  // Flex-reorder body so masthead renders above header in visual order
-  document.body.classList.add('has-masthead');
-
   // Mark the parent section so sibling content sections can stack above masthead
   const section = block.closest('main > div');
-  if (section) section.classList.add('masthead-section');
+  if (section) {
+    section.classList.add('masthead-section');
+
+    // Move <header> into <main> right after the masthead section.
+    // This gives the visual order: masthead → header → content → footer.
+    // Header keeps position:sticky + z-index:100 and sticks when it hits viewport top.
+    const header = document.querySelector('header');
+    if (header) section.after(header);
+  }
 }

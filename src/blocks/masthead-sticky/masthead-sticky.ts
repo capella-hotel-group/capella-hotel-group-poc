@@ -25,19 +25,15 @@ export default async function decorate(block: HTMLElement): Promise<void> {
   bgSource.src = videoSrc;
   bgVideo.append(bgSource);
 
-  // Row 1: placeholder image — shown while video loads, fades out on loadeddata
-  const authoredImg = imageRow?.querySelector<HTMLImageElement>('img');
-  let placeholder: HTMLImageElement | null = null;
-  if (authoredImg) {
-    placeholder = document.createElement('img');
+  // Row 1: placeholder image — use authored <picture> as-is, fade out on video load
+  const placeholder = imageRow?.querySelector<HTMLPictureElement>('picture') ?? null;
+  if (placeholder) {
     placeholder.className = 'masthead-placeholder';
-    placeholder.src = authoredImg.src;
-    placeholder.alt = authoredImg.alt;
 
     bgVideo.addEventListener('loadeddata', () => {
-      placeholder?.classList.add('masthead-placeholder--hidden');
-      placeholder?.addEventListener('transitionend', () => {
-        placeholder?.remove();
+      placeholder.classList.add('masthead-placeholder--hidden');
+      placeholder.addEventListener('transitionend', () => {
+        placeholder.remove();
       });
     });
   }

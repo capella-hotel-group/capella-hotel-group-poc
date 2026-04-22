@@ -1,72 +1,79 @@
 export default async function decorate(block: HTMLElement): Promise<void> {
   const rows = [...block.children] as HTMLElement[];
 
-  // Row 0: heading
-  // Row 1: headingType (h1/h2/h3)
-  // Row 2: subtitle
-  // Row 3: imageLarge (picture or img)
-  // Row 4: imageSmall (picture or img)
-  // Row 5: body (richtext)
-  // Row 6: cta link
-  // Row 7: ctaText
+  // Row 0: [heading, headingType] — 2 cells
+  // Row 1: subtitle
+  // Row 2: imageLarge (picture)
+  // Row 3: imageSmall (picture)
+  // Row 4: body (richtext)
+  // Row 5: [cta, ctaText] — 2 cells
 
-  const headingText = rows[0]?.textContent?.trim() ?? '';
-  const headingType = (rows[1]?.textContent?.trim() ?? 'h2') as 'h1' | 'h2' | 'h3';
-  const subtitleText = rows[2]?.textContent?.trim() ?? '';
-  const imageLargeEl = rows[3]?.querySelector<HTMLElement>('picture, img');
-  const imageSmallEl = rows[4]?.querySelector<HTMLElement>('picture, img');
-  const bodyEl = rows[5];
-  const ctaAnchor = rows[6]?.querySelector<HTMLAnchorElement>('a');
-  const ctaText = rows[7]?.textContent?.trim() ?? '';
+  const headingCells = [...rows[0].children] as HTMLElement[];
+  const headingText = headingCells[0]?.textContent?.trim() ?? '';
+  const headingType = (headingCells[1]?.textContent?.trim() ?? 'h2') as 'h1' | 'h2' | 'h3';
 
-  // — Heading —
+  const subtitleP = rows[1]?.querySelector<HTMLParagraphElement>('p');
+  const imageLargePic = rows[2]?.querySelector<HTMLElement>('picture');
+  const imageSmallPic = rows[3]?.querySelector<HTMLElement>('picture');
+  const bodyRichtext = rows[4]?.querySelector<HTMLElement>('div');
+
+  const ctaCells = [...(rows[5]?.children ?? [])] as HTMLElement[];
+  const ctaAnchor = ctaCells[0]?.querySelector<HTMLAnchorElement>('a');
+  const ctaText = ctaCells[1]?.textContent?.trim() ?? '';
+
+  // — Title zone —
+  const titleZone = document.createElement('div');
+  titleZone.className = 'layout-2-image-title';
   const heading = document.createElement(headingType);
   heading.className = 'layout-2-image-heading';
   heading.textContent = headingText;
+  titleZone.append(heading);
 
-  // — Subtitle —
-  const subtitle = document.createElement('p');
-  subtitle.className = 'layout-2-image-subtitle';
-  subtitle.textContent = subtitleText;
+  // — Content zone —
+  const contentZone = document.createElement('div');
+  contentZone.className = 'layout-2-image-content';
 
-  // — Images —
-  const imageContainer = document.createElement('div');
-  imageContainer.className = 'layout-2-image-images';
+  if (subtitleP) {
+    const subtitle = document.createElement('div');
+    subtitle.className = 'layout-2-image-subtitle';
+    subtitle.textContent = subtitleP.textContent?.trim() ?? '';
+    contentZone.append(subtitle);
+  }
 
-  if (imageLargeEl) {
+  if (imageLargePic) {
     const large = document.createElement('div');
     large.className = 'layout-2-image-image-large';
-    large.append(imageLargeEl);
-    imageContainer.append(large);
+    large.append(imageLargePic);
+    contentZone.append(large);
   }
 
-  if (imageSmallEl) {
+  if (imageSmallPic) {
     const small = document.createElement('div');
     small.className = 'layout-2-image-image-small';
-    small.append(imageSmallEl);
-    imageContainer.append(small);
+    small.append(imageSmallPic);
+    contentZone.append(small);
   }
 
-  // — Body —
-  const body = document.createElement('div');
-  body.className = 'layout-2-image-body';
-  if (bodyEl) {
-    const richtext = bodyEl.querySelector('div');
-    if (richtext) {
-      body.append(...richtext.childNodes);
-    }
+  if (bodyRichtext) {
+    const body = document.createElement('div');
+    body.className = 'layout-2-image-body';
+    body.append(...bodyRichtext.childNodes);
+    contentZone.append(body);
   }
 
-  // — CTA —
-  const elements: HTMLElement[] = [heading, subtitle, imageContainer, body];
-
-  if (ctaAnchor || ctaText) {
-    const cta = document.createElement('a');
-    cta.className = 'layout-2-image-cta';
-    cta.href = ctaAnchor?.href ?? '#';
-    cta.textContent = ctaText || ctaAnchor?.textContent?.trim() || 'DISCOVER MORE';
-    elements.push(cta);
+  if (ctaAnchor) {
+    const linkWrap = document.createElement('div');
+    linkWrap.className = 'layout-2-image-link';
+    ctaAnchor.className = 'layout-2-image-cta';
+    ctaAnchor.textContent = ctaText || ctaAnchor.textContent?.trim() || 'DISCOVER MORE';
+    linkWrap.append(ctaAnchor);
+    contentZone.append(linkWrap);
   }
 
-  block.replaceChildren(...elements);
+  // — Inner wrapper —
+  const inner = document.createElement('div');
+  inner.className = 'layout-2-image-inner';
+  inner.append(titleZone, contentZone);
+
+  block.replaceChildren(inner);
 }

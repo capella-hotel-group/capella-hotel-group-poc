@@ -41,11 +41,25 @@ export default async function decorate(block: HTMLElement): Promise<void> {
 
   // Row 2: richtext content overlay
   let contentOverlay: HTMLDivElement | null = null;
+  let scrollIcon: HTMLDivElement | null = null;
   const contentChildren = contentRow?.querySelectorAll<HTMLElement>(':scope > div > *');
   if (contentChildren && contentChildren.length > 0) {
     contentOverlay = document.createElement('div');
     contentOverlay.className = 'masthead-content';
     contentOverlay.append(...contentChildren);
+
+    // Extract icon from content (authored as :icon-name:) into separate scroll indicator
+    const iconSpan = contentOverlay.querySelector<HTMLElement>('span.icon');
+    if (iconSpan) {
+      const iconParent = iconSpan.closest('p');
+      scrollIcon = document.createElement('div');
+      scrollIcon.className = 'masthead-scroll-icon';
+      scrollIcon.append(iconSpan);
+      // Remove empty <p> that contained only the icon
+      if (iconParent && iconParent.childNodes.length === 0) {
+        iconParent.remove();
+      }
+    }
   }
 
   // "WATCH VIDEO" CTA — bottom-right corner
@@ -91,10 +105,11 @@ export default async function decorate(block: HTMLElement): Promise<void> {
     modalVideo.currentTime = 0;
   });
 
-  // Replace block contents — video + placeholder + content + CTA; modal is in document.body
+  // Replace block contents — video + placeholder + content + scroll icon + CTA; modal is in document.body
   const children: Element[] = [bgVideo];
   if (placeholder) children.push(placeholder);
   if (contentOverlay) children.push(contentOverlay);
+  if (scrollIcon) children.push(scrollIcon);
   children.push(cta);
   block.replaceChildren(...children);
 

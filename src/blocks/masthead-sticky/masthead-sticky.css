@@ -134,6 +134,38 @@ main .masthead-sticky .masthead-content {
     line-height: 1.2em;
 }
 
+/* Scroll indicator icon — animated hint to scroll down */
+main .masthead-sticky .masthead-scroll-icon {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 3;
+    width: 60px;
+    animation: masthead-scroll-hint 2s ease-in-out infinite;
+}
+
+main .masthead-sticky .masthead-scroll-icon .icon,
+main .masthead-sticky .masthead-scroll-icon img {
+    width: 60px;
+    height: 40px;
+}
+
+@keyframes masthead-scroll-hint {
+    0% {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+    60% {
+        opacity: 0;
+        transform: translateX(-50%) translateY(14px);
+    }
+    100% {
+        opacity: 0;
+        transform: translateX(-50%) translateY(14px);
+    }
+}
+
 /* Authoring: cap height to prevent layout issues in the Universal Editor */
 .adobe-ue-edit .masthead-sticky {
     max-height: 1080px;

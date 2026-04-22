@@ -82,6 +82,38 @@ export default async function decorate(block: HTMLElement): Promise<void> {
   if (section) {
     let snapTimer = 0;
     let isSnapping = false;
+    let snapRaf = 0;
+
+    function cancelSnap(): void {
+      if (!isSnapping) return;
+      cancelAnimationFrame(snapRaf);
+      isSnapping = false;
+    }
+
+    function smoothScroll(target: number, duration = 800): void {
+      const start = window.scrollY;
+      const distance = target - start;
+      if (Math.abs(distance) < 1) {
+        isSnapping = false;
+        return;
+      }
+      let t0 = 0;
+
+      function step(ts: number): void {
+        if (!t0) t0 = ts;
+        const p = Math.min((ts - t0) / duration, 1);
+        // ease-out cubic: fast start, gentle deceleration
+        const ease = 1 - (1 - p) ** 3;
+        window.scrollTo(0, start + distance * ease);
+        if (p < 1) {
+          snapRaf = requestAnimationFrame(step);
+        } else {
+          isSnapping = false;
+        }
+      }
+
+      snapRaf = requestAnimationFrame(step);
+    }
 
     const onScroll = (): void => {
       if (isSnapping) return;
@@ -92,15 +124,29 @@ export default async function decorate(block: HTMLElement): Promise<void> {
         if (y <= 0 || y >= h) return;
         const target = y / h < 0.5 ? 0 : h;
         isSnapping = true;
-        window.scrollTo({ top: target, behavior: 'smooth' });
+        smoothScroll(target);
       }, 300);
     };
 
-    const onScrollEnd = (): void => {
-      isSnapping = false;
-    };
+    // User input (wheel/touch/keyboard) cancels active snap immediately.
+    // These only fire from real user gestures, never from programmatic scrollTo.
+    window.addEventListener('wheel', cancelSnap, { passive: true });
+    window.addEventListener('touchstart', cancelSnap, { passive: true });
+    window.addEventListener('keydown', (e: KeyboardEvent) => {
+      if (
+        isSnapping &&
+        (e.key === 'ArrowUp' ||
+          e.key === 'ArrowDown' ||
+          e.key === 'PageUp' ||
+          e.key === 'PageDown' ||
+          e.key === ' ' ||
+          e.key === 'Home' ||
+          e.key === 'End')
+      ) {
+        cancelSnap();
+      }
+    });
 
     window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('scrollend', onScrollEnd);
   }
 }

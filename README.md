@@ -70,7 +70,11 @@ Despite the modernized development stack, the production output fully preserves 
 
 ## Spec-Driven Development (SDD)
 
-This project adopts an AI-assisted Spec-Driven Development workflow powered by [OpenSpec](https://openspec.dev) and GitHub Copilot. Reusable skills (`.github/skills/`) and prompts (`.github/prompts/`) encode the team's conventions and domain knowledge, enabling a repeatable, high-throughput delivery model where a single engineer can own a block end-to-end.
+This project adopts an AI-assisted **Spec-Driven Development** workflow powered by **[OpenSpec](https://github.com/openspec-dev/openspec-cli)** and GitHub Copilot. OpenSpec is an open-source CLI that brings a structured artifact lifecycle (proposal → design → specs → tasks) to AI-assisted coding — each change is tracked as a set of versioned artifacts, reviewed by the agent and the developer together, and archived once implemented.
+
+Reusable skills (`.github/skills/`) and prompts (`.github/prompts/`) encode the team's conventions and domain knowledge, enabling a repeatable, high-throughput delivery model where a single engineer can own a block end-to-end.
+
+> **Multi-editor support:** The prompts shipped in this repository target GitHub Copilot Chat (`.github/prompts/opsx-*.prompt.md`). For other AI-native editors, running `openspec init` will generate equivalent structures automatically — for example `.cursor/commands/opsx-*.md` for Cursor, or `.claude/commands/opsx-*.md` for Claude Code. The underlying OpenSpec CLI and artifact schema are editor-agnostic; only the invocation mechanism differs.
 
 ### AEM EDS Skills
 

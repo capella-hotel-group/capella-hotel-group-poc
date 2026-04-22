@@ -48,16 +48,25 @@ The immersive scene SHALL receive a reference to the `ScrollMotionController` an
 
 ---
 
-### Requirement: Textures are loaded from existing DOM image elements
+### Requirement: Textures are loaded directly from existing decoded DOM image elements
 
-The immersive scene SHALL create textures by passing the existing `<img>` element's `src` URL to `THREE.TextureLoader`. The material SHALL use `THREE.MeshBasicMaterial({ map: texture, side: THREE.FrontSide })`.
+The immersive scene SHALL create textures by wrapping the existing decoded `<img>` element directly via `new THREE.Texture(img)` with `tex.needsUpdate = true`. This avoids a second network round-trip and works cross-origin because the browser already decoded the image. The material SHALL use `THREE.MeshBasicMaterial({ map: texture })`.
+
+For `<img>` elements that are not yet decoded at init time (e.g. lazy-loaded images), the scene SHALL fall back to an async `new Image()` load with `crossOrigin = 'anonymous'`, updating the material map on load.
 
 If a texture fails to load, the corresponding plane SHALL render with a transparent black fallback material and SHALL NOT throw an uncaught error.
 
-#### Scenario: Texture loaded from img src
+#### Scenario: Texture reuses already-decoded DOM img element
 
-- **WHEN** an image element with `src = "/media/photo.jpg"` is present in a column
-- **THEN** `TextureLoader.load("/media/photo.jpg")` SHALL be called for that cell's mesh
+- **WHEN** an image element is present in a column with `img.complete === true` and `img.naturalWidth > 0`
+- **THEN** `new THREE.Texture(img)` SHALL be used directly for that cell's material
+- **AND** no additional network request SHALL be made for that image
+
+#### Scenario: Async fallback for images not yet decoded
+
+- **WHEN** an `<img>` element has not yet finished decoding at scene init time
+- **THEN** a `new Image()` element SHALL be created with `crossOrigin = 'anonymous'`
+- **AND** on load, the plane's material map SHALL be updated with the new texture
 
 ---
 

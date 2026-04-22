@@ -16,8 +16,8 @@
 
 ## 4. Validation
 
-- [ ] 4.1 Verify masthead renders above header on a page with the block
-- [ ] 4.2 Verify content sections overlap the masthead on scroll
-- [ ] 4.3 Verify header becomes sticky when it hits the top of the viewport
-- [ ] 4.4 Verify pages without the masthead block are unaffected (no `has-masthead` class)
-- [ ] 4.5 Run `npm run lint` — no errors
+- [x] 4.1 Verify masthead renders above header on a page with the block
+- [x] 4.2 Verify content sections overlap the masthead on scroll
+- [x] 4.3 Verify header becomes sticky when it hits the top of the viewport
+- [x] 4.4 Verify pages without the masthead block are unaffected (no `has-masthead` class)
+- [x] 4.5 Run `npm run lint` — no errors

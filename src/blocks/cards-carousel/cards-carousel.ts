@@ -210,6 +210,9 @@ export default async function decorate(block: HTMLElement): Promise<void> {
   }
 
   // Build slider structure
+  const sliderWrapper = document.createElement('div');
+  sliderWrapper.className = 'cc-slider-wrapper';
+
   const slider = document.createElement('div');
   slider.className = 'cc-slider';
 
@@ -271,6 +274,7 @@ export default async function decorate(block: HTMLElement): Promise<void> {
   });
 
   slider.append(track);
+  sliderWrapper.append(slider);
 
   // Arrows
   const arrowContainer = document.createElement('div');
@@ -298,7 +302,7 @@ export default async function decorate(block: HTMLElement): Promise<void> {
     '<span class="cc-drag-arrow cc-drag-arrow--left">&#9664;</span><span class="cc-drag-circle">Drag</span><span class="cc-drag-arrow cc-drag-arrow--right">&#9654;</span>';
   dragCursor.append(dragInner);
 
-  block.replaceChildren(headline, arrowContainer, slider, dragCursor);
+  block.replaceChildren(headline, arrowContainer, sliderWrapper, dragCursor);
 
   initCarousel(slider, track, cards, prevBtn, nextBtn, dragCursor);
 }

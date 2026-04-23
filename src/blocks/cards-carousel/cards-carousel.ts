@@ -4,8 +4,8 @@ import { createOptimizedPicture } from '@/app/aem';
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 const CARD_W = 360;
+const AWARD_CARD_W = 200;
 const GAP = 55;
-const STRIDE = CARD_W + GAP;
 const ANIM_DURATION = 500;
 
 // ── Tween helpers (same pattern as activities) ────────────────────────────────
@@ -32,6 +32,7 @@ function initCarousel(
   prevBtn: HTMLButtonElement,
   nextBtn: HTMLButtonElement,
   dragCursor: HTMLElement,
+  stride: number,
 ): void {
   const N = cards.length;
   if (N === 0) return;
@@ -51,7 +52,7 @@ function initCarousel(
   }
 
   function computeTargetX(idx: number): number {
-    return -(idx * STRIDE);
+    return -(idx * stride);
   }
 
   function applyTrack(): void {
@@ -67,7 +68,7 @@ function initCarousel(
   }
 
   function recalcCardsPerView(): void {
-    cardsPerView = Math.max(1, Math.floor(slider.offsetWidth / STRIDE));
+    cardsPerView = Math.max(1, Math.floor(slider.offsetWidth / stride));
   }
 
   // ── RAF loop ───────────────────────────────────────────────────────────────
@@ -111,7 +112,7 @@ function initCarousel(
 
   // ── Snap to nearest ───────────────────────────────────────────────────────
   function snapToNearest(): void {
-    const nearest = Math.round(-trackX / STRIDE);
+    const nearest = Math.round(-trackX / stride);
     go(nearest);
   }
 
@@ -208,6 +209,13 @@ export default async function decorate(block: HTMLElement): Promise<void> {
     }
     moveInstrumentation(titleRow, headline);
   }
+
+  // Detect card type from first item row to determine stride
+  const hasAwardCards =
+    itemRows[0] !== undefined &&
+    (itemRows[0].dataset.aueModel === 'carousel-card-award' || [...itemRows[0].children].length === 3);
+  const cardWidth = hasAwardCards ? AWARD_CARD_W : CARD_W;
+  const stride = cardWidth + GAP;
 
   // Build slider structure
   const sliderWrapper = document.createElement('div');
@@ -322,5 +330,5 @@ export default async function decorate(block: HTMLElement): Promise<void> {
 
   block.replaceChildren(headline, arrowContainer, sliderWrapper, dragCursor);
 
-  initCarousel(slider, track, cards, prevBtn, nextBtn, dragCursor);
+  initCarousel(slider, track, cards, prevBtn, nextBtn, dragCursor, stride);
 }

@@ -198,11 +198,13 @@ export default async function decorate(block: HTMLElement): Promise<void> {
   const itemRows = rows.slice(1);
 
   // Headline
-  const headline = document.createElement('div');
+  const headline = document.createElement('h2');
   headline.className = 'cc-headline';
-  const titleHTML = titleRow?.innerHTML?.trim() ?? '';
-  if (titleHTML) {
-    headline.innerHTML = DOMPurify.sanitize(titleHTML);
+  if (titleRow) {
+    const rawHTML = titleRow.querySelector('p')?.innerHTML ?? titleRow.textContent ?? '';
+    if (rawHTML.trim()) {
+      headline.innerHTML = DOMPurify.sanitize(rawHTML);
+    }
     moveInstrumentation(titleRow, headline);
   }
 

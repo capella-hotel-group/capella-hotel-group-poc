@@ -9,9 +9,6 @@
 
 .cc-headline {
     padding: 0 40px 40px;
-}
-
-.cc-headline h2 {
     font-family: var(--heading-font-family);
     font-size: 40px;
     font-weight: 400;

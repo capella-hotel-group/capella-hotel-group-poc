@@ -3,8 +3,8 @@ import { moveInstrumentation } from '@/app/scripts';
 import { createOptimizedPicture } from '@/app/aem';
 
 // ── Constants ─────────────────────────────────────────────────────────────────
-const CARD_W = 300;
-const GAP = 36;
+const CARD_W = 400;
+const GAP = 55;
 const STRIDE = CARD_W + GAP;
 const ANIM_DURATION = 500;
 
@@ -193,10 +193,9 @@ function initCarousel(
 export default async function decorate(block: HTMLElement): Promise<void> {
   const rows = [...block.children] as HTMLElement[];
 
-  // First two rows are block-level fields (title, link)
+  // First row is the block-level title field
   const titleRow = rows[0];
-  const linkRow = rows[1];
-  const itemRows = rows.slice(2);
+  const itemRows = rows.slice(1);
 
   // Headline
   const headline = document.createElement('div');
@@ -205,17 +204,6 @@ export default async function decorate(block: HTMLElement): Promise<void> {
   if (titleHTML) {
     headline.innerHTML = DOMPurify.sanitize(titleHTML);
     moveInstrumentation(titleRow, headline);
-  }
-
-  // Block-level link
-  const linkHref = linkRow?.querySelector<HTMLAnchorElement>('a')?.href ?? linkRow?.textContent?.trim() ?? '';
-  if (linkHref) {
-    const linkEl = document.createElement('a');
-    linkEl.className = 'cc-link';
-    linkEl.href = linkHref;
-    linkEl.textContent = linkRow?.textContent?.trim() ?? '';
-    moveInstrumentation(linkRow, linkEl);
-    headline.append(linkEl);
   }
 
   // Build slider structure
@@ -264,6 +252,10 @@ export default async function decorate(block: HTMLElement): Promise<void> {
     bodyDiv.append(h3);
 
     if (subtitle) {
+      const hr = document.createElement('hr');
+      hr.className = 'cc-card-divider';
+      bodyDiv.append(hr);
+
       const p = document.createElement('p');
       p.textContent = subtitle;
       bodyDiv.append(p);

@@ -13,27 +13,13 @@
 
 .cc-headline h2 {
     font-family: var(--heading-font-family);
-    font-size: var(--heading-font-size-xxl);
+    font-size: 40px;
     font-weight: 400;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    line-height: 1;
     margin: 0;
     color: var(--text-color);
-}
-
-.cc-link {
-    display: inline-block;
-    margin-top: 16px;
-    font-family: var(--body-font-family);
-    font-size: var(--body-font-size-s);
-    color: var(--text-color);
-    text-decoration: underline;
-    text-underline-offset: 4px;
-    transition: opacity 0.3s ease;
-}
-
-.cc-link:hover {
-    opacity: 0.6;
 }
 
 /* ── Arrows ── */
@@ -148,11 +134,20 @@
     margin: 0;
     padding: 0;
     display: flex;
-    gap: 36px;
+    gap: 55px;
     will-change: transform;
     touch-action: pan-y;
     cursor: grab;
     user-select: none;
+}
+
+.cc-track img,
+.cc-track a,
+.cc-track h3,
+.cc-track p {
+    user-select: none;
+    -webkit-user-drag: none;
+    pointer-events: none;
 }
 
 .cc-track:active {
@@ -166,7 +161,7 @@
 /* ── Card ── */
 
 .cc-card-wrapper {
-    flex: 0 0 300px;
+    flex: 0 0 400px;
 }
 
 .cc-card {
@@ -181,7 +176,7 @@
 }
 
 .cc-card-image {
-    width: 300px;
+    width: 400px;
     overflow: hidden;
     line-height: 0;
 }
@@ -199,16 +194,22 @@
 
 .cc-card-body h3 {
     font-family: var(--heading-font-family);
-    font-size: 30px;
+    font-size: 25px;
     font-weight: 400;
     letter-spacing: 0.5px;
-    margin: 0 0 4px;
+    margin: 0;
     color: var(--text-color);
+}
+
+.cc-card-divider {
+    border: none;
+    border-top: 1px solid #bbbcbc;
+    margin: 15px 0;
 }
 
 .cc-card-body p {
     font-family: var(--body-font-family);
-    font-size: 18px;
+    font-size: 13px;
     font-weight: 300;
     letter-spacing: 1.6px;
     text-transform: uppercase;
@@ -268,18 +269,18 @@
     }
 
     .cc-card-wrapper {
-        flex: 0 0 260px;
+        flex: 0 0 300px;
     }
 
     .cc-card-image {
-        width: 260px;
+        width: 300px;
     }
 
     .cc-card-body h3 {
-        font-size: 24px;
+        font-size: 20px;
     }
 
     .cc-card-body p {
-        font-size: 14px;
+        font-size: 12px;
     }
 }

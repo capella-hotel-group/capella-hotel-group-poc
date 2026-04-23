@@ -1,3 +1,4 @@
+import DOMPurify from 'dompurify';
 import { moveInstrumentation } from '@/app/scripts';
 import { createOptimizedPicture } from '@/app/aem';
 
@@ -199,12 +200,10 @@ export default async function decorate(block: HTMLElement): Promise<void> {
   // Headline
   const headline = document.createElement('div');
   headline.className = 'cc-headline';
-  const titleText = titleRow?.textContent?.trim() ?? '';
-  if (titleText) {
-    const h2 = document.createElement('h2');
-    h2.textContent = titleText;
+  const titleHTML = titleRow?.innerHTML?.trim() ?? '';
+  if (titleHTML) {
+    headline.innerHTML = DOMPurify.sanitize(titleHTML);
     moveInstrumentation(titleRow, headline);
-    headline.append(h2);
   }
 
   // Build slider structure

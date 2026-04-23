@@ -37,8 +37,7 @@
       "id": "cards-carousel",
       "fields": [
         {
-          "component": "text",
-          "valueType": "string",
+          "component": "richtext",
           "name": "title",
           "label": "Title"
         }

@@ -230,7 +230,8 @@ export default async function decorate(block: HTMLElement): Promise<void> {
     const link = cells[3]?.querySelector<HTMLAnchorElement>('a')?.href ?? cells[3]?.textContent?.trim() ?? '';
 
     const li = document.createElement('li');
-    li.className = 'cc-card-wrapper';
+    const cardType = row.dataset.aueModel ?? 'carousel-card';
+    li.className = `cc-card-wrapper cc-card-wrapper--${cardType}`;
     moveInstrumentation(row, li);
 
     const anchor = document.createElement('a');

@@ -175,6 +175,21 @@
           }
         },
         {
+          "title": "Award Card",
+          "id": "carousel-card-award",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/franklin/components/block/v1/block/item",
+                "template": {
+                  "name": "Award Card",
+                  "model": "carousel-card-award"
+                }
+              }
+            }
+          }
+        },
+        {
           "title": "Cards",
           "id": "cards",
           "plugins": {

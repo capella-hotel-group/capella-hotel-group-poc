@@ -44,7 +44,8 @@
   {
     "id": "cards-carousel",
     "components": [
-      "carousel-card"
+      "carousel-card",
+      "carousel-card-award"
     ]
   },
   {

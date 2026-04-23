@@ -228,8 +228,9 @@ export default async function decorate(block: HTMLElement): Promise<void> {
     const title = cells[1]?.textContent?.trim() ?? '';
 
     const li = document.createElement('li');
-    const cardType = row.dataset.aueModel ?? 'carousel-card';
-    const isAward = cardType === 'carousel-card-award';
+    // In UE: use data-aue-model. In production: award cards have 3 cells (no link field)
+    const isAward = row.dataset.aueModel === 'carousel-card-award' || cells.length === 3;
+    const cardType = isAward ? 'carousel-card-award' : 'carousel-card';
     li.className = `cc-card-wrapper cc-card-wrapper--${cardType}`;
     moveInstrumentation(row, li);
 

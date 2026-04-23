@@ -21,6 +21,6 @@
 
 ## 4. Validation
 
-- [ ] 4.1 Start dev server (`npm run start`), verify block renders with test content
-- [ ] 4.2 Run `npm run lint` and fix any issues
-- [ ] 4.3 Run `npm run build` to verify production build succeeds
+- [x] 4.1 Start dev server (`npm run start`), verify block renders with test content
+- [x] 4.2 Run `npm run lint` and fix any issues
+- [x] 4.3 Run `npm run build` to verify production build succeeds

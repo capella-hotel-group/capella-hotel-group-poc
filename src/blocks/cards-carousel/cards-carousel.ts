@@ -242,14 +242,14 @@ export default async function decorate(block: HTMLElement): Promise<void> {
     li.className = `cc-card-wrapper cc-card-wrapper--${cardType}`;
     moveInstrumentation(row, li);
 
-    const anchor = document.createElement('a');
-    anchor.className = 'cc-card';
-    if (!isAward) {
+    const cardEl = isAward ? document.createElement('div') : document.createElement('a');
+    cardEl.className = 'cc-card';
+    if (!isAward && cardEl instanceof HTMLAnchorElement) {
       const link = cells[3]?.querySelector<HTMLAnchorElement>('a')?.href ?? cells[3]?.textContent?.trim() ?? '';
       if (link) {
-        anchor.href = link;
-        anchor.target = '_blank';
-        anchor.rel = 'noopener noreferrer';
+        cardEl.href = link;
+        cardEl.target = '_blank';
+        cardEl.rel = 'noopener noreferrer';
       }
     }
 
@@ -293,8 +293,8 @@ export default async function decorate(block: HTMLElement): Promise<void> {
       }
     }
 
-    anchor.append(imageDiv, bodyDiv);
-    li.append(anchor);
+    cardEl.append(imageDiv, bodyDiv);
+    li.append(cardEl);
     track.append(li);
     cards.push(li);
   });
@@ -328,7 +328,11 @@ export default async function decorate(block: HTMLElement): Promise<void> {
     '<span class="cc-drag-arrow cc-drag-arrow--left">&#9664;</span><span class="cc-drag-circle">Drag</span><span class="cc-drag-arrow cc-drag-arrow--right">&#9654;</span>';
   dragCursor.append(dragInner);
 
-  block.replaceChildren(headline, arrowContainer, sliderWrapper, dragCursor);
+  if (hasAwardCards) {
+    block.replaceChildren(headline, sliderWrapper);
+  } else {
+    block.replaceChildren(headline, arrowContainer, sliderWrapper, dragCursor);
+  }
 
   initCarousel(slider, track, cards, prevBtn, nextBtn, dragCursor, stride);
 }

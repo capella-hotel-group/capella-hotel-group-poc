@@ -70,7 +70,7 @@ Despite the modernized development stack, the production output fully preserves 
 
 ## Spec-Driven Development (SDD)
 
-This project adopts an AI-assisted **Spec-Driven Development** workflow powered by **[OpenSpec](https://github.com/openspec-dev/openspec-cli)** and GitHub Copilot. OpenSpec is an open-source CLI that brings a structured artifact lifecycle (proposal → design → specs → tasks) to AI-assisted coding — each change is tracked as a set of versioned artifacts, reviewed by the agent and the developer together, and archived once implemented.
+This project adopts an AI-assisted **Spec-Driven Development** workflow powered by **[OpenSpec](https://github.com/Fission-AI/OpenSpec)** and GitHub Copilot. OpenSpec is an open-source CLI that brings a structured artifact lifecycle (proposal → design → specs → tasks) to AI-assisted coding — each change is tracked as a set of versioned artifacts, reviewed by the agent and the developer together, and archived once implemented.
 
 Reusable skills (`.github/skills/`) and prompts (`.github/prompts/`) encode the team's conventions and domain knowledge, enabling a repeatable, high-throughput delivery model where a single engineer can own a block end-to-end.
 

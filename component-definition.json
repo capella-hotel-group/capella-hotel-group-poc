@@ -144,52 +144,6 @@
           }
         },
         {
-          "title": "Cards Demo 3Lv",
-          "id": "cards-demo-3-lv",
-          "plugins": {
-            "xwalk": {
-              "page": {
-                "resourceType": "core/franklin/components/block/v1/block",
-                "template": {
-                  "name": "Cards Demo 3 Lv",
-                  "filter": "cards-demo-3-lv"
-                }
-              }
-            }
-          }
-        },
-        {
-          "title": "Card Group",
-          "id": "card-group",
-          "plugins": {
-            "xwalk": {
-              "page": {
-                "resourceType": "core/franklin/components/block/v1/block/item",
-                "template": {
-                  "name": "Card Group",
-                  "model": "card-group",
-                  "filter": "card-group"
-                }
-              }
-            }
-          }
-        },
-        {
-          "title": "Card Item",
-          "id": "card-item",
-          "plugins": {
-            "xwalk": {
-              "page": {
-                "resourceType": "core/franklin/components/block/v1/block/item",
-                "template": {
-                  "name": "Card Item",
-                  "model": "card-item"
-                }
-              }
-            }
-          }
-        },
-        {
           "title": "Cards",
           "id": "cards",
           "plugins": {

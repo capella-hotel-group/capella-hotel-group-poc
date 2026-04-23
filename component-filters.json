@@ -31,7 +31,6 @@
       "layout-2-image",
       "about-capella",
       "home-culture",
-      "cards-demo-3-lv",
       "capella-kyoto"
     ]
   },
@@ -39,18 +38,6 @@
     "id": "activities",
     "components": [
       "activity"
-    ]
-  },
-  {
-    "id": "cards-demo-3-lv",
-    "components": [
-      "card-group"
-    ]
-  },
-  {
-    "id": "card-group",
-    "components": [
-      "card-item"
     ]
   },
   {

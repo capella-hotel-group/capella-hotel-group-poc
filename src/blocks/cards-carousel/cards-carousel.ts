@@ -3,7 +3,7 @@ import { moveInstrumentation } from '@/app/scripts';
 import { createOptimizedPicture } from '@/app/aem';
 
 // ── Constants ─────────────────────────────────────────────────────────────────
-const CARD_W = 400;
+const CARD_W = 360;
 const GAP = 55;
 const STRIDE = CARD_W + GAP;
 const ANIM_DURATION = 500;

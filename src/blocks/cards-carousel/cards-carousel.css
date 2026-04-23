@@ -168,7 +168,7 @@
 /* ── Card ── */
 
 .cc-card-wrapper {
-    flex: 0 0 400px;
+    flex: 0 0 360px;
 }
 
 .cc-card {
@@ -183,7 +183,7 @@
 }
 
 .cc-card-image {
-    width: 400px;
+    width: 360px;
     overflow: hidden;
     line-height: 0;
 }

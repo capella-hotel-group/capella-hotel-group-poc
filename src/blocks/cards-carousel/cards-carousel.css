@@ -124,6 +124,16 @@
     overflow: hidden;
     position: relative;
     padding: 0 40px;
+    cursor: grab;
+    user-select: none;
+}
+
+.cc-slider:active {
+    cursor: grabbing;
+}
+
+.cc-no-scroll {
+    cursor: default;
 }
 
 .cc-track {
@@ -134,8 +144,6 @@
     gap: 55px;
     will-change: transform;
     touch-action: pan-y;
-    cursor: grab;
-    user-select: none;
 }
 
 .cc-track img,
@@ -149,10 +157,6 @@
 
 .cc-track:active {
     cursor: grabbing;
-}
-
-.cc-no-scroll .cc-track {
-    cursor: default;
 }
 
 /* ── Card ── */
@@ -220,21 +224,41 @@
     position: fixed;
     top: 0;
     left: 0;
+    pointer-events: none;
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.cc-drag-inner {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transform: translate(-50%, -50%) scale(0);
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.cc-drag-cursor--visible .cc-drag-inner {
+    transform: translate(-50%, -50%) scale(1);
+}
+
+.cc-drag-circle {
     width: 67px;
     height: 67px;
     border-radius: 50%;
-    border: 1px solid rgb(152 145 143);
+    border: 1px solid #fff;
     display: flex;
     align-items: center;
     justify-content: center;
-    pointer-events: none;
-    z-index: 1000;
     font-family: var(--body-font-family);
     font-size: 16px;
-    color: var(--text-color);
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    transform: translate(-50%, -50%);
+    color: #fff;
+}
+
+.cc-drag-arrow {
+    font-size: 10px;
+    color: #fff;
+    line-height: 1;
 }
 
 .cc-drag-cursor--visible {

@@ -116,18 +116,19 @@ function initCarousel(
   }
 
   // ── Drag interaction ───────────────────────────────────────────────────────
-  track.addEventListener('pointerdown', (e) => {
+  slider.addEventListener('pointerdown', (e) => {
     if (N <= cardsPerView) return;
     isDragging = true;
     dragMoved = false;
     startX = e.clientX;
     trackTween = null;
-    track.setPointerCapture(e.pointerId);
+    slider.setPointerCapture(e.pointerId);
   });
 
-  track.addEventListener('pointermove', (e) => {
+  slider.addEventListener('pointermove', (e) => {
     // Drag cursor tracking (always, not just when dragging)
-    dragCursor.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`;
+    dragCursor.style.left = `${e.clientX}px`;
+    dragCursor.style.top = `${e.clientY}px`;
 
     if (!isDragging) return;
     const dx = e.clientX - startX;
@@ -136,22 +137,22 @@ function initCarousel(
     applyTrack();
   });
 
-  track.addEventListener('pointerup', (e) => {
+  slider.addEventListener('pointerup', (e) => {
     if (!isDragging) return;
     isDragging = false;
-    track.releasePointerCapture(e.pointerId);
+    slider.releasePointerCapture(e.pointerId);
     snapToNearest();
   });
 
-  track.addEventListener('pointercancel', (e) => {
+  slider.addEventListener('pointercancel', (e) => {
     if (!isDragging) return;
     isDragging = false;
-    track.releasePointerCapture(e.pointerId);
+    slider.releasePointerCapture(e.pointerId);
     go(vIdx);
   });
 
   // Prevent link navigation when dragging
-  track.addEventListener(
+  slider.addEventListener(
     'click',
     (e) => {
       if (dragMoved) {
@@ -167,10 +168,10 @@ function initCarousel(
   nextBtn.addEventListener('click', () => go(vIdx + 1));
 
   // ── Drag cursor show/hide ──────────────────────────────────────────────────
-  track.addEventListener('pointerenter', () => {
+  slider.addEventListener('pointerenter', () => {
     if (N > cardsPerView) dragCursor.classList.add('cc-drag-cursor--visible');
   });
-  track.addEventListener('pointerleave', () => {
+  slider.addEventListener('pointerleave', () => {
     dragCursor.classList.remove('cc-drag-cursor--visible');
   });
 
@@ -290,7 +291,12 @@ export default async function decorate(block: HTMLElement): Promise<void> {
   // Drag cursor
   const dragCursor = document.createElement('div');
   dragCursor.className = 'cc-drag-cursor';
-  dragCursor.textContent = 'Drag';
+
+  const dragInner = document.createElement('div');
+  dragInner.className = 'cc-drag-inner';
+  dragInner.innerHTML =
+    '<span class="cc-drag-arrow cc-drag-arrow--left">&#9664;</span><span class="cc-drag-circle">Drag</span><span class="cc-drag-arrow cc-drag-arrow--right">&#9654;</span>';
+  dragCursor.append(dragInner);
 
   block.replaceChildren(headline, arrowContainer, slider, dragCursor);
 

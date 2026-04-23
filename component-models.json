@@ -309,16 +309,9 @@
         "label": "Title"
       },
       {
-        "component": "text",
-        "valueType": "string",
-        "name": "subtitle",
-        "label": "Subtitle"
-      },
-      {
-        "component": "text",
-        "valueType": "string",
-        "name": "link",
-        "label": "Link"
+        "component": "richtext",
+        "name": "body",
+        "label": "Body"
       }
     ]
   },

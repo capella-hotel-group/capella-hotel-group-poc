@@ -226,20 +226,22 @@ export default async function decorate(block: HTMLElement): Promise<void> {
     const picture = row.querySelector('picture');
     const img = picture?.querySelector<HTMLImageElement>('img');
     const title = cells[1]?.textContent?.trim() ?? '';
-    const subtitle = cells[2]?.textContent?.trim() ?? '';
-    const link = cells[3]?.querySelector<HTMLAnchorElement>('a')?.href ?? cells[3]?.textContent?.trim() ?? '';
 
     const li = document.createElement('li');
     const cardType = row.dataset.aueModel ?? 'carousel-card';
+    const isAward = cardType === 'carousel-card-award';
     li.className = `cc-card-wrapper cc-card-wrapper--${cardType}`;
     moveInstrumentation(row, li);
 
     const anchor = document.createElement('a');
     anchor.className = 'cc-card';
-    if (link) {
-      anchor.href = link;
-      anchor.target = '_blank';
-      anchor.rel = 'noopener noreferrer';
+    if (!isAward) {
+      const link = cells[3]?.querySelector<HTMLAnchorElement>('a')?.href ?? cells[3]?.textContent?.trim() ?? '';
+      if (link) {
+        anchor.href = link;
+        anchor.target = '_blank';
+        anchor.rel = 'noopener noreferrer';
+      }
     }
 
     // Card image
@@ -258,14 +260,28 @@ export default async function decorate(block: HTMLElement): Promise<void> {
     h3.textContent = title;
     bodyDiv.append(h3);
 
-    if (subtitle) {
-      const hr = document.createElement('hr');
-      hr.className = 'cc-card-divider';
-      bodyDiv.append(hr);
-
-      const p = document.createElement('p');
-      p.textContent = subtitle;
-      bodyDiv.append(p);
+    if (isAward) {
+      // Award card: richtext body field at cells[2]
+      const bodyHTML = cells[2]?.querySelector('p')?.innerHTML ?? cells[2]?.textContent?.trim() ?? '';
+      if (bodyHTML) {
+        const hr = document.createElement('hr');
+        hr.className = 'cc-card-divider';
+        bodyDiv.append(hr);
+        const bodyEl = document.createElement('div');
+        bodyEl.className = 'cc-card-richbody';
+        bodyEl.innerHTML = DOMPurify.sanitize(bodyHTML);
+        bodyDiv.append(bodyEl);
+      }
+    } else {
+      const subtitle = cells[2]?.textContent?.trim() ?? '';
+      if (subtitle) {
+        const hr = document.createElement('hr');
+        hr.className = 'cc-card-divider';
+        bodyDiv.append(hr);
+        const p = document.createElement('p');
+        p.textContent = subtitle;
+        bodyDiv.append(p);
+      }
     }
 
     anchor.append(imageDiv, bodyDiv);

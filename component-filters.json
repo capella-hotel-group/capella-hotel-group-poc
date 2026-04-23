@@ -30,13 +30,26 @@
       "text-with-image",
       "layout-2-image",
       "about-capella",
-      "home-culture"
+      "home-culture",
+      "cards-demo-3-lv"
     ]
   },
   {
     "id": "activities",
     "components": [
       "activity"
+    ]
+  },
+  {
+    "id": "cards-demo-3-lv",
+    "components": [
+      "card-group"
+    ]
+  },
+  {
+    "id": "card-group",
+    "components": [
+      "card-item"
     ]
   },
   {

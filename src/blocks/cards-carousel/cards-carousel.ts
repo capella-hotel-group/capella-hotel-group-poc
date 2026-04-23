@@ -44,6 +44,7 @@ function initCarousel(
   let isDragging = false;
   let dragMoved = false;
   let startX = 0;
+  let dragStartTrackX = 0;
   let rafId = 0;
 
   // ── Helpers ────────────────────────────────────────────────────────────────
@@ -68,7 +69,7 @@ function initCarousel(
   }
 
   function recalcCardsPerView(): void {
-    cardsPerView = Math.max(1, Math.floor(slider.offsetWidth / stride));
+    cardsPerView = Math.max(1, Math.floor((slider.offsetWidth + GAP) / stride));
   }
 
   // ── RAF loop ───────────────────────────────────────────────────────────────
@@ -95,7 +96,8 @@ function initCarousel(
   // ── Navigate ───────────────────────────────────────────────────────────────
   function go(idx: number, animated = true): void {
     vIdx = Math.max(0, Math.min(idx, maxIdx()));
-    const targetX = computeTargetX(vIdx);
+    const atEnd = vIdx >= maxIdx() && N > cardsPerView;
+    const targetX = atEnd ? slider.offsetWidth - (N * stride - GAP) : computeTargetX(vIdx);
 
     if (!animated) {
       trackX = targetX;
@@ -122,6 +124,7 @@ function initCarousel(
     isDragging = true;
     dragMoved = false;
     startX = e.clientX;
+    dragStartTrackX = trackX;
     trackTween = null;
     slider.setPointerCapture(e.pointerId);
   });
@@ -134,7 +137,7 @@ function initCarousel(
     if (!isDragging) return;
     const dx = e.clientX - startX;
     if (Math.abs(dx) > 3) dragMoved = true;
-    trackX = computeTargetX(vIdx) + dx;
+    trackX = dragStartTrackX + dx;
     applyTrack();
   });
 

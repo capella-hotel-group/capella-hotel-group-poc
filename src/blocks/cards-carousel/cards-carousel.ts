@@ -192,6 +192,21 @@ function initCarousel(
 export default async function decorate(block: HTMLElement): Promise<void> {
   const rows = [...block.children] as HTMLElement[];
 
+  // First row is the block-level title field
+  const titleRow = rows[0];
+  const itemRows = rows.slice(1);
+
+  // Headline
+  const headline = document.createElement('div');
+  headline.className = 'cc-headline';
+  const titleText = titleRow?.textContent?.trim() ?? '';
+  if (titleText) {
+    const h2 = document.createElement('h2');
+    h2.textContent = titleText;
+    moveInstrumentation(titleRow, headline);
+    headline.append(h2);
+  }
+
   // Build slider structure
   const slider = document.createElement('div');
   slider.className = 'cc-slider';
@@ -201,7 +216,7 @@ export default async function decorate(block: HTMLElement): Promise<void> {
 
   const cards: HTMLElement[] = [];
 
-  rows.forEach((row) => {
+  itemRows.forEach((row) => {
     const cells = [...row.children] as HTMLElement[];
     const picture = row.querySelector('picture');
     const img = picture?.querySelector<HTMLImageElement>('img');
@@ -272,7 +287,7 @@ export default async function decorate(block: HTMLElement): Promise<void> {
   dragCursor.className = 'cc-drag-cursor';
   dragCursor.textContent = 'Drag';
 
-  block.replaceChildren(arrowContainer, slider, dragCursor);
+  block.replaceChildren(headline, arrowContainer, slider, dragCursor);
 
   initCarousel(slider, track, cards, prevBtn, nextBtn, dragCursor);
 }

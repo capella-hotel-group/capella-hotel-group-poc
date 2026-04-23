@@ -5,6 +5,22 @@
     padding: 60px 0 80px;
 }
 
+/* ── Headline ── */
+
+.cc-headline {
+    padding: 0 40px 40px;
+}
+
+.cc-headline h2 {
+    font-family: var(--heading-font-family);
+    font-size: var(--heading-font-size-xxl);
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 0;
+    color: var(--text-color);
+}
+
 /* ── Arrows ── */
 
 .cc-arrows {
@@ -222,6 +238,10 @@
 @media (width < 600px) {
     .cards-carousel {
         padding: 40px 0 60px;
+    }
+
+    .cc-headline {
+        padding: 0 20px 24px;
     }
 
     .cc-arrows {

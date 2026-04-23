@@ -1,0 +1,50 @@
+import { moveInstrumentation as s } from '../../scripts/scripts.js';
+import { c as m } from '../../chunks/aem-core.js';
+/*! v1.0.0 | h99ac8b59*/ function h(o) {
+  const d = [...o.children],
+    r = document.createElement('div');
+  r.className = 'cards-demo-3-lv-container';
+  let e = null,
+    c = null;
+  (d.forEach((t) => {
+    const a = [...t.children];
+    if (a.length === 1 && !a[0].querySelector('picture')) {
+      ((e = document.createElement('section')), (e.className = 'cards-demo-3-lv-group'), s(t, e));
+      const l = document.createElement('h3');
+      ((l.className = 'cards-demo-3-lv-group-name'),
+        (l.textContent = a[0].textContent?.trim() ?? ''),
+        e.append(l),
+        (c = document.createElement('ul')),
+        (c.className = 'cards-demo-3-lv-list'),
+        e.append(c),
+        r.append(e));
+    } else {
+      c ||
+        ((e = document.createElement('section')),
+        (e.className = 'cards-demo-3-lv-group'),
+        (c = document.createElement('ul')),
+        (c.className = 'cards-demo-3-lv-list'),
+        e.append(c),
+        r.append(e));
+      const l = document.createElement('li');
+      for (
+        l.className = 'cards-demo-3-lv-card',
+          s(t, l),
+          a.forEach((n) => {
+            n.children.length === 1 && n.querySelector('picture')
+              ? (n.className = 'cards-demo-3-lv-card-image')
+              : (n.className = 'cards-demo-3-lv-card-body');
+          });
+        t.firstElementChild;
+      )
+        l.append(t.firstElementChild);
+      c.append(l);
+    }
+  }),
+    r.querySelectorAll('picture > img').forEach((t) => {
+      const a = m(t.src, t.alt, !1, [{ width: '750' }]);
+      (s(t, a.querySelector('img')), t.closest('picture')?.replaceWith(a));
+    }),
+    o.replaceChildren(r));
+}
+export { h as default };

@@ -259,6 +259,12 @@
         "component": "richtext",
         "name": "title",
         "label": "Title"
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "link",
+        "label": "Link"
       }
     ]
   },

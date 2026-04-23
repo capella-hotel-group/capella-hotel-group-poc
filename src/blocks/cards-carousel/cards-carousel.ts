@@ -193,9 +193,10 @@ function initCarousel(
 export default async function decorate(block: HTMLElement): Promise<void> {
   const rows = [...block.children] as HTMLElement[];
 
-  // First row is the block-level title field
+  // First two rows are block-level fields (title, link)
   const titleRow = rows[0];
-  const itemRows = rows.slice(1);
+  const linkRow = rows[1];
+  const itemRows = rows.slice(2);
 
   // Headline
   const headline = document.createElement('div');
@@ -204,6 +205,17 @@ export default async function decorate(block: HTMLElement): Promise<void> {
   if (titleHTML) {
     headline.innerHTML = DOMPurify.sanitize(titleHTML);
     moveInstrumentation(titleRow, headline);
+  }
+
+  // Block-level link
+  const linkHref = linkRow?.querySelector<HTMLAnchorElement>('a')?.href ?? linkRow?.textContent?.trim() ?? '';
+  if (linkHref) {
+    const linkEl = document.createElement('a');
+    linkEl.className = 'cc-link';
+    linkEl.href = linkHref;
+    linkEl.textContent = linkRow?.textContent?.trim() ?? '';
+    moveInstrumentation(linkRow, linkEl);
+    headline.append(linkEl);
   }
 
   // Build slider structure

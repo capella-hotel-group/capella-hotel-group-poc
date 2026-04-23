@@ -21,6 +21,21 @@
     color: var(--text-color);
 }
 
+.cc-link {
+    display: inline-block;
+    margin-top: 16px;
+    font-family: var(--body-font-family);
+    font-size: var(--body-font-size-s);
+    color: var(--text-color);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    transition: opacity 0.3s ease;
+}
+
+.cc-link:hover {
+    opacity: 0.6;
+}
+
 /* ── Arrows ── */
 
 .cc-arrows {

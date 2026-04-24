@@ -32,7 +32,8 @@
       "about-capella",
       "home-culture",
       "capella-kyoto",
-      "cards-carousel"
+      "cards-carousel",
+      "highlights-carousel"
     ]
   },
   {
@@ -67,6 +68,12 @@
       "image",
       "button",
       "title"
+    ]
+  },
+  {
+    "id": "highlights-carousel",
+    "components": [
+      "carousel-cards"
     ]
   },
   {

@@ -1,0 +1,293 @@
+/* ── Highlights Carousel Block ────────────────────────────────────────────── */
+
+.highlights-carousel {
+    position: relative;
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 60px 0 80px;
+    overflow: hidden;
+}
+
+/* ── Arrows ── */
+
+.cc-arrows {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 20px;
+    padding: 0 40px 24px;
+}
+
+.cc-arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    opacity: 1;
+    transition: opacity 0.3s ease;
+}
+
+.cc-arrow[disabled] {
+    opacity: 0.3;
+    cursor: default;
+    pointer-events: none;
+}
+
+.cc-arrow-icon {
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+
+.cc-shaft {
+    display: block;
+    width: 50px;
+    height: 1.2px;
+    background: rgb(152 145 143);
+    position: relative;
+}
+
+.cc-arrow--prev .cc-shaft::before,
+.cc-arrow--next .cc-shaft::after {
+    content: '';
+    display: block;
+    width: 13px;
+    height: 1.2px;
+    background: rgb(152 145 143);
+    position: absolute;
+    top: 50%;
+}
+
+.cc-arrow--prev .cc-shaft::before {
+    left: 0;
+    transform-origin: left center;
+    transform: translateY(-50%) rotate(-40deg);
+}
+
+.cc-arrow--prev .cc-shaft::after {
+    content: '';
+    display: block;
+    width: 13px;
+    height: 1.2px;
+    background: rgb(152 145 143);
+    position: absolute;
+    top: 50%;
+    left: 0;
+    transform-origin: left center;
+    transform: translateY(-50%) rotate(40deg);
+}
+
+.cc-arrow--next .cc-shaft::before {
+    content: '';
+    display: block;
+    width: 13px;
+    height: 1.2px;
+    background: rgb(152 145 143);
+    position: absolute;
+    top: 50%;
+    right: 0;
+    transform-origin: right center;
+    transform: translateY(-50%) rotate(40deg);
+}
+
+.cc-arrow--next .cc-shaft::after {
+    right: 0;
+    transform-origin: right center;
+    transform: translateY(-50%) rotate(-40deg);
+}
+
+/* Hide arrows when no scrolling needed */
+.cc-no-scroll ~ .cc-arrows,
+.highlights-carousel:has(.cc-no-scroll) .cc-arrows {
+    display: none;
+}
+
+/* ── Slider / Track ── */
+
+.cc-slider-wrapper {
+    padding: 0 40px;
+}
+
+.cc-slider {
+    overflow: hidden;
+    position: relative;
+    cursor: grab;
+    user-select: none;
+}
+
+.cc-slider:active {
+    cursor: grabbing;
+}
+
+.cc-no-scroll {
+    cursor: default;
+}
+
+.cc-track {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    gap: 55px;
+    will-change: transform;
+    touch-action: pan-y;
+}
+
+.cc-track img,
+.cc-track a,
+.cc-track h3,
+.cc-track p {
+    user-select: none;
+    -webkit-user-drag: none;
+    pointer-events: none;
+}
+
+.cc-track:active {
+    cursor: grabbing;
+}
+
+/* ── Card ── */
+
+.hc-card-wrapper {
+    flex: 0 0 400px;
+}
+
+.cc-card {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+}
+
+.cc-card:hover {
+    text-decoration: none;
+    color: inherit;
+}
+
+.cc-card-image {
+    width: 400px;
+    overflow: hidden;
+    line-height: 0;
+}
+
+.cc-card-image img {
+    width: 100%;
+    aspect-ratio: 5 / 7;
+    object-fit: cover;
+    display: block;
+}
+
+.cc-card-body {
+    padding-top: 16px;
+}
+
+.cc-card-body h3 {
+    font-family: Goudy, sans-serif;
+    font-size: 25px;
+    font-weight: 400;
+    letter-spacing: 0.5px;
+    margin: 0;
+    color: var(--text-color);
+}
+
+.cc-card-divider {
+    border: none;
+    border-top: 1px solid #bbbcbc;
+    margin: 15px 0;
+}
+
+.cc-card-body p {
+    font-family: Calibre, Arial, sans-serif;
+    font-size: 13px;
+    font-weight: 300;
+    letter-spacing: 1.6px;
+    text-transform: uppercase;
+    margin: 0;
+    color: var(--text-color);
+}
+
+/* ── Drag Cursor ── */
+
+.cc-drag-cursor {
+    position: fixed;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.cc-drag-inner {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transform: translate(-50%, -50%) scale(0);
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.cc-drag-cursor--visible .cc-drag-inner {
+    transform: translate(-50%, -50%) scale(1);
+}
+
+.cc-drag-circle {
+    width: 67px;
+    height: 67px;
+    border-radius: 50%;
+    border: 1px solid #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--body-font-family);
+    font-size: 16px;
+    color: #fff;
+}
+
+.cc-drag-arrow {
+    font-size: 10px;
+    color: #fff;
+    line-height: 1;
+}
+
+.cc-drag-cursor--visible {
+    opacity: 1;
+}
+
+/* Hide drag cursor when no scrolling */
+.highlights-carousel:has(.cc-no-scroll) .cc-drag-cursor {
+    display: none;
+}
+
+/* ── Responsive ── */
+
+@media (width < 600px) {
+    .highlights-carousel {
+        padding: 40px 0 60px;
+    }
+
+    .cc-arrows {
+        padding: 0 20px 16px;
+    }
+
+    .cc-slider-wrapper {
+        padding: 0 20px;
+    }
+
+    .hc-card-wrapper {
+        flex: 0 0 300px;
+    }
+
+    .cc-card-image {
+        width: 300px;
+    }
+
+    .cc-card-body h3 {
+        font-size: 20px;
+    }
+
+    .cc-card-body p {
+        font-size: 12px;
+    }
+}

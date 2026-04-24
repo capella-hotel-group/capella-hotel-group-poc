@@ -489,6 +489,12 @@
       {
         "component": "text",
         "valueType": "string",
+        "name": "alt",
+        "label": "Alt Text"
+      },
+      {
+        "component": "text",
+        "valueType": "string",
         "name": "title",
         "label": "Card Title"
       },

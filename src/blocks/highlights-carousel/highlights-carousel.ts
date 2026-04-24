@@ -1,3 +1,5 @@
+import { moveInstrumentation } from '@/app/scripts';
+
 // ── Constants ─────────────────────────────────────────────────────────────────
 const CARD_W = 400;
 const GAP = 55;
@@ -195,6 +197,7 @@ export default async function decorate(block) {
 
     const li = document.createElement('li');
     li.className = 'cc-card-wrapper hc-card-wrapper';
+    moveInstrumentation(row as HTMLElement, li);
 
     const cardEl = document.createElement('a');
     cardEl.className = 'cc-card';

@@ -7,6 +7,46 @@ function closeLangDropdown(trigger: HTMLButtonElement, dropdown: HTMLUListElemen
   dropdown.classList.remove('is-open');
 }
 
+function normalizePathname(pathname: string): string {
+  if (pathname.length > 1 && pathname.endsWith('/')) {
+    return pathname.slice(0, -1);
+  }
+  return pathname;
+}
+
+function isPathMatch(currentPath: string, candidatePath: string): boolean {
+  return currentPath === candidatePath || currentPath.startsWith(`${candidatePath}/`);
+}
+
+function resolveInitialLang(sourceItems: HTMLLIElement[]): { selectedIndex: number; label: string } {
+  const currentPath = normalizePathname(window.location.pathname);
+
+  let fallbackIndex = 0;
+  let fallbackLabel = sourceItems[0]?.textContent?.trim() ?? 'ENGLISH';
+  let hasLinkFallback = false;
+
+  for (let i = 0; i < sourceItems.length; i += 1) {
+    const srcItem = sourceItems[i];
+    const srcA = srcItem.querySelector<HTMLAnchorElement>('a');
+    const label = (srcA?.textContent ?? srcItem.textContent)?.trim() ?? '';
+
+    if (srcA && !hasLinkFallback) {
+      fallbackIndex = i;
+      fallbackLabel = label;
+      hasLinkFallback = true;
+    }
+
+    if (!srcA?.href) continue;
+
+    const candidatePath = normalizePathname(new URL(srcA.href, window.location.href).pathname);
+    if (isPathMatch(currentPath, candidatePath)) {
+      return { selectedIndex: i, label };
+    }
+  }
+
+  return { selectedIndex: fallbackIndex, label: fallbackLabel };
+}
+
 /**
  * Builds the language selector from the authored richtext.
  * Each <li> in the source list becomes a dropdown option.
@@ -14,13 +54,13 @@ function closeLangDropdown(trigger: HTMLButtonElement, dropdown: HTMLUListElemen
  */
 function buildLangZone(sourceList: Element): [HTMLDivElement, HTMLUListElement] {
   const sourceItems = [...sourceList.querySelectorAll<HTMLLIElement>('li')];
-  const firstLabel = sourceItems[0]?.textContent?.trim() ?? 'ENGLISH';
+  const { selectedIndex, label: initialLabel } = resolveInitialLang(sourceItems);
 
   const trigger = document.createElement('button');
   trigger.className = 'header-lang-trigger';
   trigger.setAttribute('aria-expanded', 'false');
   trigger.setAttribute('aria-haspopup', 'listbox');
-  trigger.textContent = `${firstLabel} ▾`;
+  trigger.textContent = `${initialLabel} ▾`;
 
   // Dropdown lives in document.body (appended in decorate) so the header's
   // box-shadow (z-index: 100) paints on top of it (z-index: 99).
@@ -30,19 +70,49 @@ function buildLangZone(sourceList: Element): [HTMLDivElement, HTMLUListElement] 
   moveInstrumentation(sourceList, dropdown);
 
   sourceItems.forEach((srcItem, i) => {
+    const srcA = srcItem.querySelector<HTMLAnchorElement>('a');
+    const itemLabel = (srcA?.textContent ?? srcItem.textContent)?.trim() ?? '';
+
     const item = document.createElement('li');
     item.setAttribute('role', 'option');
-    item.setAttribute('tabindex', '0');
-    item.textContent = srcItem.textContent?.trim() ?? '';
-    if (i === 0) item.setAttribute('aria-selected', 'true');
+    item.setAttribute('aria-label', itemLabel);
     moveInstrumentation(srcItem, item);
 
-    item.addEventListener('click', () => {
-      trigger.textContent = `${item.textContent ?? ''} ▾`;
+    function selectOption(): void {
+      trigger.textContent = `${itemLabel} ▾`;
       dropdown.querySelectorAll('li').forEach((li) => li.removeAttribute('aria-selected'));
       item.setAttribute('aria-selected', 'true');
       closeLangDropdown(trigger, dropdown);
-    });
+    }
+
+    if (srcA) {
+      item.setAttribute('tabindex', '0');
+      if (i === selectedIndex) item.setAttribute('aria-selected', 'true');
+
+      const link = document.createElement('a');
+      link.className = 'header-lang-link';
+      link.href = srcA.href;
+      link.textContent = itemLabel;
+      moveInstrumentation(srcA, link);
+
+      link.addEventListener('click', () => {
+        selectOption();
+      });
+
+      item.addEventListener('keydown', (event: KeyboardEvent) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          link.click();
+        }
+      });
+
+      item.append(link);
+    } else {
+      item.setAttribute('aria-disabled', 'true');
+      item.classList.add('is-disabled');
+      item.setAttribute('tabindex', '-1');
+      item.textContent = itemLabel;
+    }
 
     dropdown.append(item);
   });

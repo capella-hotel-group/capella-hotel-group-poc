@@ -119,10 +119,7 @@ header {
     align-items: center;
     gap: 28px;
     pointer-events: auto;
-}
-
-.header-nav-side-right {
-    justify-content: flex-end;
+    justify-content: center;
 }
 
 .header-nav-link {

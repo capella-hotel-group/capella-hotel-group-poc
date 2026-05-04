@@ -240,3 +240,17 @@ main .section.highlight {
     margin: 0;
     padding: 40px 0;
 }
+
+/* section gutter */
+main > .section[data-gutter='none'] {
+    padding-block: 0;
+}
+main > .section[data-gutter='sm'] {
+    padding-block: 24px;
+}
+main > .section[data-gutter='md'] {
+    padding-block: 48px;
+}
+main > .section[data-gutter='lg'] {
+    padding-block: 80px;
+}

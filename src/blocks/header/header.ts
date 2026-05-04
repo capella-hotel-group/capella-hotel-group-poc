@@ -165,11 +165,18 @@ function buildLangZone(sourceList: Element): [HTMLDivElement, HTMLUListElement] 
  */
 function buildNavZone(sourceList: Element): HTMLElement {
   const items = [...sourceList.querySelectorAll<HTMLLIElement>('li')];
+  const splitIndex = Math.ceil(items.length / 2);
 
   const nav = document.createElement('nav');
   nav.className = 'header-nav';
   nav.setAttribute('aria-label', 'Primary navigation');
   moveInstrumentation(sourceList, nav);
+
+  const left = document.createElement('div');
+  left.className = 'header-nav-side header-nav-side-left';
+
+  const right = document.createElement('div');
+  right.className = 'header-nav-side header-nav-side-right';
 
   function makeNavLink(srcItem: HTMLLIElement): HTMLAnchorElement {
     const srcA = srcItem.querySelector<HTMLAnchorElement>('a');
@@ -181,7 +188,15 @@ function buildNavZone(sourceList: Element): HTMLElement {
     return a;
   }
 
-  items.forEach((item) => nav.append(makeNavLink(item)));
+  items.forEach((item, index) => {
+    if (index < splitIndex) {
+      left.append(makeNavLink(item));
+    } else {
+      right.append(makeNavLink(item));
+    }
+  });
+
+  nav.append(left, right);
 
   return nav;
 }

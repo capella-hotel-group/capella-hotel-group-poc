@@ -103,7 +103,26 @@ header {
 
 /* ── Center: Brand navigation ────────────────────────────── */
 .header-nav {
-    display: contents; /* children participate directly in parent flex */
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 68px;
+    align-items: center;
+    width: min(680px, calc(100% - 420px));
+    pointer-events: none;
+}
+
+.header-nav-side {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+    pointer-events: auto;
+}
+
+.header-nav-side-right {
+    justify-content: flex-end;
 }
 
 .header-nav-link {

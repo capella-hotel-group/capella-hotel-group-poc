@@ -9,6 +9,7 @@ import { getEnv } from '@/utils/env';
 export interface TurneoConfig {
   baseUrl: string;
   apiKey: string;
+  dynamicMock: boolean;
 }
 
 // const TURNEO_PRODUCTION_URL = 'https://api.pro.turneo.co';
@@ -26,11 +27,13 @@ export function getTurneoConfig(): TurneoConfig {
       baseUrl: TURNEO_MOCK_URL,
       // TODO: Replace with actual production API key (ideally from a server proxy)
       apiKey: 'TURNEO_PROD_API_KEY',
+      dynamicMock: false,
     };
   }
 
   return {
     baseUrl: TURNEO_MOCK_URL,
     apiKey: 'mock',
+    dynamicMock: false,
   };
 }

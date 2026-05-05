@@ -1,3 +1,63 @@
+/* === Block Container === */
+
+.turneo-experiences {
+    min-height: 100vh;
+    padding: 80px 24px;
+    box-sizing: border-box;
+}
+
+/* === Headline === */
+
+.turneo-experiences-headline {
+    font-family: var(--heading-font-family);
+    font-size: var(--heading-font-size-l);
+    color: var(--text-color);
+    margin: 0 0 32px;
+    text-align: center;
+}
+
+/* === Date Filter === */
+
+.turneo-experiences-filter {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+}
+
+.turneo-experiences-filter-label {
+    font-family: var(--body-font-family);
+    font-size: var(--body-font-size-s);
+    color: var(--text-color);
+}
+
+.turneo-experiences-filter-input {
+    font-family: var(--body-font-family);
+    font-size: var(--body-font-size-s);
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    color: var(--text-color);
+}
+
+.turneo-experiences-filter-btn {
+    font-family: var(--body-font-family);
+    font-size: var(--body-font-size-s);
+    font-weight: 500;
+    padding: 8px 16px;
+    background-color: var(--header-cta-bg);
+    color: var(--background-color);
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.turneo-experiences-filter-btn:hover {
+    background-color: var(--header-cta-hover-bg);
+}
+
 /* === Card Grid === */
 
 .turneo-experiences-grid {
@@ -173,10 +233,11 @@
 .turneo-experiences-popup-content {
     position: relative;
     background-color: var(--background-color);
-    border-radius: 12px;
-    max-width: 1100px;
-    width: 100%;
-    max-height: 90vh;
+    border-radius: 0;
+    width: 100vw;
+    height: 100vh;
+    max-width: none;
+    max-height: none;
     overflow-y: auto;
     display: grid;
     grid-template-columns: 1fr;
@@ -402,4 +463,68 @@
     left: 0;
     color: #c62828;
     font-weight: 600;
+}
+
+/* === Availability Section === */
+
+.turneo-experiences-availability-loading,
+.turneo-experiences-availability-error,
+.turneo-experiences-availability-empty {
+    font-family: var(--body-font-family);
+    font-size: var(--body-font-size-s);
+    color: var(--dark-color);
+    margin: 0;
+    font-style: italic;
+}
+
+.turneo-experiences-availability-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.turneo-experiences-availability-date {
+    font-family: var(--body-font-family);
+    font-size: var(--body-font-size-s);
+    font-weight: 600;
+    color: var(--text-color);
+    margin-top: 12px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid #eee;
+}
+
+.turneo-experiences-availability-slot {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 0;
+    font-family: var(--body-font-family);
+    font-size: var(--body-font-size-xs);
+}
+
+.turneo-experiences-availability-time {
+    font-weight: 500;
+    color: var(--text-color);
+    min-width: 60px;
+}
+
+.turneo-experiences-availability-rate-status {
+    font-size: var(--body-font-size-xs);
+    color: #2e7d32;
+    text-transform: uppercase;
+    font-weight: 500;
+}
+
+.turneo-experiences-availability-qty {
+    color: var(--dark-color);
+    margin-left: auto;
+}
+
+.turneo-experiences-availability-rate {
+    font-family: var(--body-font-family);
+    font-size: var(--body-font-size-s);
+    color: var(--text-color);
+    margin-top: 12px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid #eee;
 }

@@ -1,22 +1,51 @@
 import DOMPurify from 'dompurify';
-import { fetchExperiences, type TurneoExperience } from '@/utils/turneo-api';
+import {
+  fetchExperiences,
+  fetchRates,
+  type TurneoExperience,
+  type TurneoRateDetail,
+  type FetchExperiencesParams,
+} from '@/utils/turneo-api';
+
+const FALLBACK_IMAGE =
+  'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MDAiIGhlaWdodD0iMjUwIiB2aWV3Qm94PSIwIDAgNDAwIDI1MCI+PHJlY3Qgd2lkdGg9IjQwMCIgaGVpZ2h0PSIyNTAiIGZpbGw9IiNlZWUiLz48dGV4dCB4PSI1MCUiIHk9IjUwJSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzk5OSIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTYiPkltYWdlIHVuYXZhaWxhYmxlPC90ZXh0Pjwvc3ZnPg==';
+
+function setFallbackImage(img: HTMLImageElement): void {
+  img.onerror = null;
+  img.src = FALLBACK_IMAGE;
+}
 
 export default async function decorate(block: HTMLElement): Promise<void> {
-  const storeId = block.querySelector('p')?.textContent?.trim() || '';
+  // Model fields → cell indices:
+  //   cells[0] = headline (text)
+  //   cells[1] = storeId (text)
+  const row = block.children[0] as HTMLElement | undefined;
+  const cells = row ? ([...row.children] as HTMLElement[]) : [];
+  const headlineText = cells[0]?.querySelector('p')?.textContent?.trim() || '';
+  const storeId = cells[1]?.querySelector('p')?.textContent?.trim() || '';
 
   // Show skeleton loading state
-  renderSkeleton(block);
+  renderSkeleton(block, headlineText);
 
   try {
     const experiences = await fetchExperiences(storeId ? { storeId } : undefined);
-    renderCards(block, experiences);
+    renderCards(block, experiences, headlineText, storeId);
   } catch (error) {
     renderError(block);
     console.error('[turneo-experiences] Failed to fetch experiences:', error);
   }
 }
 
-function renderSkeleton(block: HTMLElement): void {
+function renderSkeleton(block: HTMLElement, headline: string): void {
+  const wrapper = document.createDocumentFragment();
+
+  if (headline) {
+    const h2 = document.createElement('h2');
+    h2.className = 'turneo-experiences-headline';
+    h2.textContent = headline;
+    wrapper.append(h2);
+  }
+
   const grid = document.createElement('div');
   grid.className = 'turneo-experiences-grid';
 
@@ -34,7 +63,8 @@ function renderSkeleton(block: HTMLElement): void {
     grid.append(card);
   }
 
-  block.replaceChildren(grid);
+  wrapper.append(grid);
+  block.replaceChildren(...Array.from(wrapper.childNodes));
 }
 
 function renderError(block: HTMLElement): void {
@@ -44,7 +74,20 @@ function renderError(block: HTMLElement): void {
   block.replaceChildren(errorEl);
 }
 
-function renderCards(block: HTMLElement, experiences: TurneoExperience[]): void {
+function renderCards(block: HTMLElement, experiences: TurneoExperience[], headline: string, storeId: string): void {
+  const wrapper = document.createDocumentFragment();
+
+  if (headline) {
+    const h2 = document.createElement('h2');
+    h2.className = 'turneo-experiences-headline';
+    h2.textContent = headline;
+    wrapper.append(h2);
+  }
+
+  // Date filter
+  const filterBar = createDateFilter(block, storeId, headline);
+  wrapper.append(filterBar);
+
   const grid = document.createElement('div');
   grid.className = 'turneo-experiences-grid';
 
@@ -53,7 +96,54 @@ function renderCards(block: HTMLElement, experiences: TurneoExperience[]): void 
     grid.append(card);
   });
 
-  block.replaceChildren(grid);
+  wrapper.append(grid);
+  block.replaceChildren(...Array.from(wrapper.childNodes));
+}
+
+function createDateFilter(block: HTMLElement, storeId: string, headline: string): HTMLElement {
+  const bar = document.createElement('div');
+  bar.className = 'turneo-experiences-filter';
+
+  const label = document.createElement('span');
+  label.className = 'turneo-experiences-filter-label';
+  label.textContent = 'Dates:';
+
+  const fromInput = document.createElement('input');
+  fromInput.type = 'date';
+  fromInput.className = 'turneo-experiences-filter-input';
+  fromInput.setAttribute('aria-label', 'From date (ISO 8601: YYYY-MM-DD)');
+  fromInput.placeholder = 'YYYY-MM-DD';
+
+  const toInput = document.createElement('input');
+  toInput.type = 'date';
+  toInput.className = 'turneo-experiences-filter-input';
+  toInput.setAttribute('aria-label', 'Until date (ISO 8601: YYYY-MM-DD)');
+  toInput.placeholder = 'YYYY-MM-DD';
+
+  const filterBtn = document.createElement('button');
+  filterBtn.type = 'button';
+  filterBtn.className = 'turneo-experiences-filter-btn';
+  filterBtn.textContent = 'Filter';
+
+  bar.append(label, fromInput, toInput, filterBtn);
+
+  filterBtn.addEventListener('click', async () => {
+    const from = fromInput.value || undefined;
+    const until = toInput.value || undefined;
+    const params: FetchExperiencesParams = {};
+    if (storeId) params.storeId = storeId;
+    if (from) params.from = from;
+    if (until) params.until = until;
+
+    try {
+      const experiences = await fetchExperiences(Object.keys(params).length > 0 ? params : undefined);
+      renderCards(block, experiences, headline, storeId);
+    } catch (error) {
+      console.error('[turneo-experiences] Failed to fetch with date filter:', error);
+    }
+  });
+
+  return bar;
 }
 
 function createCard(experience: TurneoExperience): HTMLElement {
@@ -68,6 +158,12 @@ function createCard(experience: TurneoExperience): HTMLElement {
     img.src = experience.images[0].url;
     img.alt = experience.name;
     img.loading = 'lazy';
+    img.onerror = () => setFallbackImage(img);
+    imageContainer.append(img);
+  } else {
+    const img = document.createElement('img');
+    img.src = FALLBACK_IMAGE;
+    img.alt = experience.name;
     imageContainer.append(img);
   }
 
@@ -128,6 +224,9 @@ function openDetailPopup(experience: TurneoExperience, triggerEl: HTMLElement): 
   overlay.append(content);
   document.body.append(overlay);
   document.body.style.overflow = 'hidden';
+
+  // Load availability data
+  loadAvailability(info, experience.id);
 
   // Focus management
   closeBtn.focus();
@@ -190,6 +289,7 @@ function createImageSlider(experience: TurneoExperience): HTMLElement {
     img.src = image.url;
     img.alt = experience.name;
     img.loading = 'lazy';
+    img.onerror = () => setFallbackImage(img);
     slide.append(img);
     track.append(slide);
   });
@@ -344,4 +444,65 @@ function formatDuration(duration: { hours?: number; minutes?: number }): string 
   if (duration.hours) parts.push(`${duration.hours}h`);
   if (duration.minutes) parts.push(`${duration.minutes}min`);
   return parts.join(' ') || 'Variable';
+}
+
+// --- Rates & Availability Section ---
+
+async function loadAvailability(container: HTMLElement, experienceId: string): Promise<void> {
+  const section = document.createElement('div');
+  section.className = 'turneo-experiences-popup-section turneo-experiences-availability';
+  section.innerHTML =
+    '<h4>Availability</h4><p class="turneo-experiences-availability-loading">Loading availability…</p>';
+  container.append(section);
+
+  const today = new Date();
+  const until = new Date(today);
+  until.setDate(until.getDate() + 30);
+
+  const from = today.toISOString().split('T')[0];
+  const untilStr = until.toISOString().split('T')[0];
+
+  try {
+    const rates = await fetchRates({ experienceId, from, until: untilStr });
+    renderRateSlots(section, rates);
+  } catch (error) {
+    console.error('[turneo-experiences] Failed to load availability:', error);
+    section.innerHTML =
+      '<h4>Availability</h4><p class="turneo-experiences-availability-error">Unable to load availability.</p>';
+  }
+}
+
+function renderRateSlots(section: HTMLElement, rates: TurneoRateDetail[]): void {
+  if (rates.length === 0) {
+    section.innerHTML =
+      '<h4>Availability</h4><p class="turneo-experiences-availability-empty">No availability found for the next 30 days.</p>';
+    return;
+  }
+
+  let html = '<h4>Availability</h4><div class="turneo-experiences-availability-list">';
+  rates.forEach((rate) => {
+    html += `<div class="turneo-experiences-availability-rate"><strong>${DOMPurify.sanitize(rate.rateName)}</strong>`;
+    html += ` <span class="turneo-experiences-availability-rate-status">[${DOMPurify.sanitize(rate.rateStatus)}]</span>`;
+    if (rate.duration) {
+      html += ` — ${DOMPurify.sanitize(rate.duration)}`;
+    }
+    html += '</div>';
+
+    if (rate.availableDates && rate.availableDates.length > 0) {
+      rate.availableDates.forEach((slot) => {
+        const dateStr = slot.startDate || slot.date || '';
+        const timeStr = slot.startTime || '';
+        const qty = slot.availableQuantity ?? '—';
+        html += `<div class="turneo-experiences-availability-slot">
+          <span class="turneo-experiences-availability-time">${DOMPurify.sanitize(dateStr)} ${DOMPurify.sanitize(timeStr)}</span>
+          <span class="turneo-experiences-availability-qty">${qty} spots</span>
+        </div>`;
+      });
+    } else {
+      html += '<div class="turneo-experiences-availability-slot"><span>No dates available</span></div>';
+    }
+  });
+  html += '</div>';
+
+  section.innerHTML = html;
 }

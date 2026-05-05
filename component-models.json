@@ -964,6 +964,13 @@
     "fields": [
       {
         "component": "text",
+        "name": "headline",
+        "label": "Headline",
+        "description": "Section headline displayed above the experiences grid.",
+        "valueType": "string"
+      },
+      {
+        "component": "text",
         "name": "storeId",
         "label": "Store ID",
         "description": "Turneo store ID to filter experiences. Leave empty to show all.",

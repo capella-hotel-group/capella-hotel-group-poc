@@ -960,6 +960,18 @@
     ]
   },
   {
+    "id": "turneo-experiences",
+    "fields": [
+      {
+        "component": "text",
+        "name": "storeId",
+        "label": "Store ID",
+        "description": "Turneo store ID to filter experiences. Leave empty to show all.",
+        "valueType": "string"
+      }
+    ]
+  },
+  {
     "id": "video-photo-player",
     "fields": [
       {

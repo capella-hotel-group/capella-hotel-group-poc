@@ -11,7 +11,7 @@ export interface TurneoConfig {
   apiKey: string;
 }
 
-const TURNEO_PRODUCTION_URL = 'https://api.pro.turneo.co';
+// const TURNEO_PRODUCTION_URL = 'https://api.pro.turneo.co';
 const TURNEO_MOCK_URL = 'https://stoplight.io/mocks/turneo/turneo-experiences-api/45542131';
 
 /**
@@ -23,7 +23,7 @@ export function getTurneoConfig(): TurneoConfig {
 
   if (env === ENV.PROD) {
     return {
-      baseUrl: TURNEO_PRODUCTION_URL,
+      baseUrl: TURNEO_MOCK_URL,
       // TODO: Replace with actual production API key (ideally from a server proxy)
       apiKey: 'TURNEO_PROD_API_KEY',
     };

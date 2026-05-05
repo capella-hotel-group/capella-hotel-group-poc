@@ -49,6 +49,6 @@
 ## 8. Validation
 
 - [x] 8.1 Run `npm run lint` and fix any issues
-- [ ] 8.2 Verify block loads and renders with Turneo mock server
-- [ ] 8.3 Test responsive behavior at mobile/tablet/desktop breakpoints
-- [ ] 8.4 Test popup open/close, keyboard navigation, and focus management
+- [x] 8.2 Verify block loads and renders with Turneo mock server
+- [x] 8.3 Test responsive behavior at mobile/tablet/desktop breakpoints
+- [x] 8.4 Test popup open/close, keyboard navigation, and focus management

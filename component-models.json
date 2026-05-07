@@ -921,6 +921,39 @@
     ]
   },
   {
+    "id": "text-intro",
+    "fields": [
+      {
+        "component": "reference",
+        "valueType": "string",
+        "name": "image",
+        "label": "Background Image",
+        "multi": false
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "subtitle",
+        "label": "Subtitle",
+        "value": ""
+      },
+      {
+        "component": "richtext",
+        "valueType": "string",
+        "name": "heading",
+        "label": "Heading",
+        "value": ""
+      },
+      {
+        "component": "richtext",
+        "valueType": "string",
+        "name": "body",
+        "label": "Body",
+        "value": ""
+      }
+    ]
+  },
+  {
     "id": "text-with-image",
     "fields": [
       {
@@ -962,13 +995,6 @@
   {
     "id": "turneo-experiences",
     "fields": [
-      {
-        "component": "text",
-        "name": "headline",
-        "label": "Headline",
-        "description": "Section headline displayed above the experiences grid.",
-        "valueType": "string"
-      },
       {
         "component": "text",
         "name": "storeId",

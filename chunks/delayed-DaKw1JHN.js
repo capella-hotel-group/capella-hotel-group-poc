@@ -1,0 +1,1 @@
+/*! v1.0.0 | hd4dbfd42*/const e=document.createElement("turneo-widget");e.setAttribute("store","capella-poc");document.body.querySelector("main")?.appendChild(e);const t=document.createElement("script");t.src="https://widget-turneo.vercel.app/turneo-widget.iife.js";document.body.appendChild(t);

@@ -481,6 +481,53 @@ When invoked by another agent, include the result:
 
 ---
 
+## Step 8 — Generate content entry prompt
+
+After Step 7 passes (or after Step 5 when invoked by another agent that skips the build), generate a ready-to-copy prompt the developer can give to any AEM AI assistant to enter realistic demo content that matches the Figma design.
+
+### Demo value rules per field type
+
+| Field `component`    | How to derive demo value                                                                                                                                                                                             |
+| -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `text`               | Extract visible layer text from the Figma node; if unavailable, write a short, on-brand placeholder (≤ 80 chars) that matches the tone and length visible in the design                                              |
+| `richtext`           | Extract body copy from the Figma node; if unavailable, write 1–2 sentences of realistic hotel/luxury-lifestyle copy matching the apparent length of the text area in the design                                      |
+| `reference` (image)  | Describe the asset in natural language ("a luxury hotel lobby at dusk, warm lighting") and suggest a placeholder DAM path: `/content/dam/<block-name>/<field-name>.jpg` — note it must be replaced with a real asset |
+| `aem-content` (link) | Use a plausible internal path visible in Figma (button label → slug) or fall back to `/en/<block-name>`                                                                                                              |
+| `boolean`            | Set to the value shown in the Figma default/first frame                                                                                                                                                              |
+| `select`             | Set to the variant value that matches the Figma frame being implemented                                                                                                                                              |
+
+**For container+filter blocks:** generate demo entries for **3 items** (or as many as are visible in the Figma node, up to 3) to show meaningful variety. Vary the copy and image descriptions across items.
+
+### Output format
+
+Output the prompt in a fenced code block immediately after this heading:
+
+> **Content entry prompt — copy and paste into AEM Copilot chat**
+
+The prompt body must:
+
+1. Open with one line identifying the target block:
+   > "On the current page, find (or insert) the **\<Block Title\>** block."
+2. List every model field with its suggested demo value, one field per line, in the format:
+   > `- <Field Label>: <demo value>`
+3. For container+filter blocks, repeat the field list for each item, labelled **Item 1**, **Item 2**, etc.
+4. Close with:
+   > "Save all fields. The content should match the Figma design."
+
+After the code block, add this note on its own line:
+
+> _Copy this prompt and paste it into the AEM Copilot chat (or hand it to your AEM AI) to populate realistic demo content._
+
+### Agent return value
+
+When invoked by another agent, include in the returned JSON:
+
+```json
+{ "blockName": "<block-name>", "files": [...], "sectionJsonUpdated": true, "jsonRegenerated": true, "buildPassed": true, "contentPromptGenerated": true }
+```
+
+---
+
 ## Optional Next Steps
 
 After the block builds successfully, these skills are available if needed:

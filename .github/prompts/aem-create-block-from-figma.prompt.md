@@ -40,4 +40,4 @@ Use the **aem-skill-create-block-from-figma** skill with the parsed inputs:
 - `figmaUrl`: the validated Figma URL
 - `description`: the optional developer brief (omit if not provided)
 
-The skill handles all workflow steps: Figma MCP lookup, node analysis, field mapping, file generation, AEM registration, and build verification.
+The skill handles all workflow steps: Figma MCP lookup, node analysis, field mapping, file generation, AEM registration, build verification, and — at the very end — a ready-to-copy **content entry prompt** the developer can paste into AEM Copilot chat to populate realistic demo content matching the Figma design.

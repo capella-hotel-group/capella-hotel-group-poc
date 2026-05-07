@@ -1,0 +1,29 @@
+/* promo-content block */
+.promo-content {
+    /* container styles */
+}
+
+.promo-content-item {
+    /* item styles */
+}
+
+.promo-content-image {
+    width: 100%;
+}
+
+.promo-content-image img {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+}
+
+.promo-content-body {
+    color: var(--text-color);
+    background-color: var(--background-color);
+}
+
+@media (width >= 900px) {
+    .promo-content {
+        /* desktop overrides */
+    }
+}

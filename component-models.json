@@ -938,17 +938,38 @@
         "value": ""
       },
       {
+        "component": "text",
+        "valueType": "string",
+        "name": "title",
+        "label": "Title",
+        "value": ""
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "subtitle",
+        "label": "Subtitle",
+        "value": ""
+      },
+      {
         "component": "richtext",
-        "name": "text",
+        "name": "desc",
         "value": "",
-        "label": "Text",
+        "label": "Description",
         "valueType": "string"
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "ctaLabel",
+        "label": "CTA Label",
+        "value": ""
       },
       {
         "component": "aem-content",
         "valueType": "string",
-        "name": "link",
-        "label": "Link"
+        "name": "ctaLink",
+        "label": "CTA Link"
       }
     ]
   },

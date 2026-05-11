@@ -36,7 +36,8 @@
       "cards-carousel",
       "highlights-carousel",
       "promo-content",
-      "turneo-experiences"
+      "turneo-experiences",
+      "product-carousel"
     ]
   },
   {
@@ -96,6 +97,12 @@
     "id": "panding-gallery",
     "components": [
       "panding-gallery-item"
+    ]
+  },
+  {
+    "id": "product-carousel",
+    "components": [
+      "product-carousel-item"
     ]
   }
 ]

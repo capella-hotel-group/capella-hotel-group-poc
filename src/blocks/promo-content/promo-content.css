@@ -120,3 +120,63 @@
     padding: 0.9rem 0;
   }
 }
+
+@media (max-width: 1024px) {
+  /* tablet + mobile: stack image above content */
+  .promo-content {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    padding: 1.5rem 0;
+    min-height: auto;
+  }
+
+  /* Make the background image participate in normal flow so it's shown above the card */
+  .promo-content-bg {
+    position: relative;
+    inset: auto;
+    width: 100%;
+    height: 340px;
+    z-index: 0;
+    border-radius: 1.25rem 1.25rem 0 0;
+    overflow: hidden;
+    margin: 0 auto;
+  }
+  .promo-content-bg picture,
+  .promo-content-bg img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    border-radius: 1.25rem 1.25rem 0 0;
+  }
+
+  /* Card sits below the image instead of overlaying it */
+  .promo-content-card {
+    position: relative;
+    z-index: 1;
+    max-width: 95vw;
+    width: auto;
+    margin: 1.25rem auto 2rem auto;
+    background: var(--promo-card-bg, #FBE9D0);
+    border-radius: 1.25rem;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+    padding: 1.6rem 1.2rem;
+  }
+
+  .promo-content-title {
+    font-size: 1.75rem;
+    line-height: 1.12;
+  }
+
+  .promo-content-description {
+    font-size: 1rem;
+  }
+
+  .promo-content-cta {
+    width: 100%;
+    display: block;
+    text-align: center;
+  }
+}

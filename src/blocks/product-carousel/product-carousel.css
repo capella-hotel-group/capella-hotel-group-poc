@@ -1,3 +1,7 @@
+/* =========================
+   BASE
+========================= */
+
 .product-carousel {
   display: flex;
   align-items: center;
@@ -47,6 +51,10 @@
   background: #9d7537;
 }
 
+/* =========================
+   SLIDER
+========================= */
+
 .product-carousel__slider-wrapper {
   position: relative;
   width: 75%;
@@ -62,7 +70,7 @@
 
 .product-carousel__slide {
   position: relative;
-  flex: 0 0 28%; /* base percentage width */
+  flex: 0 0 28%;
   opacity: 0.6;
   transform: scale(0.95);
   transition: all 0.4s ease;
@@ -75,6 +83,10 @@
   z-index: 2;
 }
 
+/* =========================
+   IMAGE + CARD
+========================= */
+
 .product-carousel__image {
   overflow: hidden;
 }
@@ -84,9 +96,7 @@
   display: block;
   width: 100%;
   object-fit: cover;
-  transition:
-    height 0.4s ease,
-    transform 0.4s ease;
+  transition: height 0.4s ease;
 }
 
 .product-carousel__slide.active img {
@@ -106,9 +116,7 @@
   min-width: 240px;
   opacity: 0;
   transform: translateY(20px);
-  transition:
-    opacity 0.3s ease,
-    transform 0.3s ease;
+  transition: all 0.3s ease;
   box-shadow: 0 8px 24px rgb(0 0 0 / 10%);
 }
 
@@ -137,6 +145,10 @@
   font-weight: 700;
   color: #222;
 }
+
+/* =========================
+   NAV
+========================= */
 
 .product-carousel__nav {
   position: absolute;
@@ -170,6 +182,10 @@
   right: -24px;
 }
 
+/* =========================
+   DOTS
+========================= */
+
 .product-carousel__dots {
   display: flex;
   justify-content: center;
@@ -192,7 +208,25 @@
   transform: scale(1.2);
 }
 
+/* =========================
+   TABLET (<= 991px)
+========================= */
+
 @media (max-width: 991px) {
+  .product-carousel__slide .product-carousel__image img {
+    height: 480px;
+  }
+
+  .product-carousel__slider .product-carousel__slide {
+    flex: 0 0 33.333%;
+    transition: transform 0.4s ease, opacity 0.4s ease;
+  }
+
+  .product-carousel__slide.active {
+    transform: scale(1.05);
+    opacity: 1;
+  }
+  
   .product-carousel {
     flex-direction: column;
     padding: 48px 24px;
@@ -208,36 +242,44 @@
     font-size: 36px;
   }
 
-  .product-carousel__slide {
-    width: 220px;
+  .product-carousel__slider-wrapper {
+    position: relative;
+    padding-bottom: 90px;
   }
 
-  .product-carousel__slide.active {
-    width: 320px;
+  .product-carousel__dots,
+  .product-carousel__nav {
+    position: absolute;
+    bottom: 18px;
   }
 
-  .product-carousel__slide.active img {
-    height: 460px;
+  .product-carousel__dots {
+    left: 50%;
+    transform: translateX(-50%);
+    margin: 0;
   }
 
-  .product-carousel__slide:not(.active) img {
-    height: 340px;
+  .product-carousel__nav {
+    top: auto;
+    transform: none;
+    width: 44px;
+    height: 44px;
   }
 
   .product-carousel__nav--prev {
-    left: 0;
+    left: calc(50% - 110px);
   }
 
   .product-carousel__nav--next {
-    right: 0;
+    left: calc(50% + 66px);
   }
 }
 
-@media (max-width: 767px) {
-  .product-carousel__nav {
-    display: none;
-  }
+/* =========================
+   MOBILE (<= 767px)
+========================= */
 
+@media (max-width: 767px) {
   .product-carousel__headline {
     font-size: 30px;
   }
@@ -246,19 +288,42 @@
     font-size: 15px;
   }
 
+  /* single-slide view */
+  .product-carousel__slider-wrapper {
+    overflow: hidden;
+    padding-bottom: 80px;
+  }
+
+  .product-carousel__slider {
+    gap: 0;
+  }
+
   .product-carousel__slide {
-    width: 200px;
+    flex: 0 0 100%;
+    opacity: 0;
+    transform: scale(1);
+    transition: opacity 0.4s ease;
   }
 
   .product-carousel__slide.active {
-    width: 280px;
+    opacity: 1;
+    flex: 0 0 100%;
   }
 
-  .product-carousel__slide.active img {
-    height: 380px;
+  /* nav alignment */
+  .product-carousel__nav {
+    bottom: 10px;
   }
 
-  .product-carousel__slide:not(.active) img {
-    height: 280px;
+  .product-carousel__nav--prev {
+    left: calc(50% - 100px);
+  }
+
+  .product-carousel__nav--next {
+    left: calc(50% + 60px);
+  }
+
+  .product-carousel__dots {
+    margin-top: 16px;
   }
 }

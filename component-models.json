@@ -1049,24 +1049,9 @@
     "id": "tabs-with-blocks",
     "fields": [
       {
-        "component": "array",
-        "name": "tabs",
-        "label": "Tabs",
-        "items": {
-          "component": "object",
-          "fields": [
-            {
-              "component": "text",
-              "name": "label",
-              "label": "Tab Label"
-            },
-            {
-              "component": "blocks",
-              "name": "blocks",
-              "label": "Tab Content Blocks"
-            }
-          ]
-        }
+        "component": "text",
+        "name": "test",
+        "label": "Test"
       }
     ]
   },

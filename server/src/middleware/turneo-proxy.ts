@@ -7,13 +7,22 @@ import type { Request, Response } from 'express';
 import { getConfig } from '../config.js';
 
 /**
- * Builds the upstream Turneo URL from the incoming request path.
- * Strips the `/api` prefix so `/api/experiences` → `/experiences`.
+ * Builds the upstream Turneo URL from the incoming request.
+ * - Path comes from req.originalUrl (full path, unaffected by router mounting)
+ * - Query params come from req.query (includes any params injected by route middleware, e.g. storeId)
  */
 function buildUpstreamUrl(req: Request): string {
   const { turneoBaseUrl } = getConfig();
-  const upstreamPath = req.originalUrl.replace(/^\/api/, '');
-  return `${turneoBaseUrl}${upstreamPath}`;
+  const upstreamPath = req.originalUrl.split('?')[0].replace(/^\/api/, '');
+  const url = new URL(`${turneoBaseUrl}${upstreamPath}`);
+
+  for (const [key, value] of Object.entries(req.query)) {
+    if (typeof value === 'string') {
+      url.searchParams.set(key, value);
+    }
+  }
+
+  return url.toString();
 }
 
 /**
@@ -43,8 +52,14 @@ export async function proxyToTurneo(req: Request, res: Response): Promise<void> 
     fetchOptions.body = JSON.stringify(req.body);
   }
 
+  const startMs = Date.now();
+  console.log(`[turneo-proxy]     upstream → ${req.method} ${upstreamUrl}`);
+
   try {
     const upstream = await fetch(upstreamUrl, fetchOptions);
+    const elapsed = Date.now() - startMs;
+
+    console.log(`[turneo-proxy]     upstream ← ${upstream.status} ${upstream.statusText} (${elapsed}ms)`);
 
     // Forward status code
     res.status(upstream.status);
@@ -58,7 +73,8 @@ export async function proxyToTurneo(req: Request, res: Response): Promise<void> 
     const body = await upstream.text();
     res.send(body);
   } catch (error) {
-    console.error('[turneo-proxy] Upstream request failed:', error);
+    const elapsed = Date.now() - startMs;
+    console.error(`[turneo-proxy]     upstream ✗ failed after ${elapsed}ms —`, error);
     res.status(502).json({ error: 'Bad Gateway — failed to reach Turneo API' });
   }
 }

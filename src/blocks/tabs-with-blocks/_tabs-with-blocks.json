@@ -21,9 +21,9 @@
       "id": "tabs-with-blocks",
       "fields": [
         {
-        "component": "text",
-        "name": "test",
-        "label": "Test"
+        "component": "blocks",
+        "name": "content",
+        "label": "Tab Content Blocks"
         }
     ]
     }

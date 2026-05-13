@@ -21,23 +21,11 @@
       "id": "tabs-with-blocks",
       "fields": [
         {
-          "component": "multifield",
-          "name": "tabs",
-          "label": "Tabs",
-          "fields": [
-            {
-              "component": "text",
-              "name": "label",
-              "label": "Tab Label"
-            },
-            {
-              "component": "blocks",
-              "name": "blocks",
-              "label": "Tab Content Blocks"
-            }
-          ]
+        "component": "text",
+        "name": "test",
+        "label": "Test"
         }
-      ]
+    ]
     }
   ],
   "filters": []

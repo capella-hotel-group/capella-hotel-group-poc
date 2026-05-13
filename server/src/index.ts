@@ -28,6 +28,13 @@ app.use(rateLimiter);
 // Parse JSON bodies (for POST requests)
 app.use(express.json());
 
+// Request logger
+app.use((req, _res, next) => {
+  const origin = req.headers.origin ?? req.headers.referer ?? '-';
+  console.log(`[turneo-proxy] --> ${req.method} ${req.originalUrl} (origin: ${origin})`);
+  next();
+});
+
 // Health check
 app.get('/health', (_req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });

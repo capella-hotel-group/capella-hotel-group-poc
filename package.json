@@ -12,6 +12,8 @@
     "vite:watch": "vite build -w -c vite.config.ts",
     "vite:watch:editor": "vite build -w -c vite.config-editor.ts",
     "start": "npm-run-all --parallel tsc:watch vite:watch vite:watch:editor aem:up",
+    "proxy": "cd server && npm run dev",
+    "start:full": "npm-run-all --parallel start proxy",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",

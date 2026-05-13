@@ -1130,6 +1130,10 @@
     ]
   },
   {
+    "id": "turneo-proxy-test",
+    "fields": []
+  },
+  {
     "id": "video-photo-player",
     "fields": [
       {

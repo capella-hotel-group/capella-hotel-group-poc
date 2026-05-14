@@ -6,8 +6,8 @@
 import { getTurneoConfig } from '@/configs/turneo';
 
 export interface TurneoImage {
-  url: string;
-  caption?: string;
+  urlHigh: string;
+  altText?: string;
 }
 
 export interface TurneoInclusion {
@@ -20,9 +20,66 @@ export interface TurneoExclusion {
   exclusionId: string;
 }
 
+export interface TurneoCommissionSetting {
+  id: string;
+  type: string;
+  reseller: string;
+  value: number;
+}
+
+export interface TurneoExternalLink {
+  type: string;
+  name: string;
+  value: string;
+}
+
+export interface TurneoMeetingPoint {
+  id: string;
+  type: string;
+  city?: string;
+  country?: string;
+  address?: string;
+  title?: string;
+  description?: string;
+  latitude?: number;
+  longitude?: number;
+  timeBeforeStart?: number;
+}
+
+export interface TurneoRefundTier {
+  hoursBeforeStart: number;
+  refundPercentage: number;
+}
+
+export interface TurneoRefundPolicy {
+  tiers: TurneoRefundTier[];
+}
+
+export interface TurneoRating {
+  score: number;
+  reviewsCount: number;
+}
+
+export interface TurneoTags {
+  likelyToSellOut?: boolean;
+  popular?: boolean;
+  exclusive?: boolean;
+  private?: string;
+}
+
+export interface TurneoLocalized {
+  language: string;
+  status: string;
+}
+
 export interface TurneoOrganizer {
   name?: string;
-  description?: string;
+  partnerId?: string;
+  phone?: string;
+  partnerEmail?: string;
+  website?: string;
+  logo?: string;
+  aboutUs?: string;
   partnerRating?: number;
   partnerReviews?: number;
 }
@@ -36,6 +93,7 @@ export interface TurneoLocation {
 }
 
 export interface TurneoDuration {
+  days?: number;
   hours?: number;
   minutes?: number;
 }
@@ -56,17 +114,33 @@ export interface TurneoExperience {
   status?: string;
   highlight: string;
   description: string;
+  discount?: number;
+  commission?: number;
+  commissionSettings?: TurneoCommissionSetting[];
   images: TurneoImage[];
   videos?: string[];
+  externalLinks?: TurneoExternalLink[];
   organizer?: TurneoOrganizer;
   categories?: TurneoCategories;
   location?: TurneoLocation;
+  meetingPoints?: TurneoMeetingPoint[];
   duration?: TurneoDuration;
   included?: TurneoInclusion[];
   excluded?: TurneoExclusion[];
   languages?: string;
+  code?: string;
+  cutOffTime?: number;
+  cancellationPolicy?: number;
+  refundPolicy?: TurneoRefundPolicy;
+  availabilitySource?: string;
+  allowFreePickup?: boolean;
+  allowedPartners?: string[];
+  rating?: TurneoRating;
+  tags?: TurneoTags;
   minPrice?: TurneoMoney;
-  discount?: number;
+  availableFrom?: string;
+  localized?: TurneoLocalized[];
+  otherNotes?: string;
 }
 
 export interface TurneoExperiencesResponse {

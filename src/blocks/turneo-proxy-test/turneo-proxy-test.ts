@@ -1,133 +1,167 @@
+import DOMPurify from 'dompurify';
 import { fetchExperiencesViaProxy } from '@/utils/turneo-proxy-api';
-import { getTurneoProxyConfig } from '@/configs/turneo-proxy';
 import type { TurneoExperience } from '@/utils/turneo-proxy-api';
 
 export default async function decorate(block: HTMLElement): Promise<void> {
-  // Model fields → cell indices:
-  //   (no author fields — this is a developer test block)
-  const { baseUrl } = getTurneoProxyConfig();
-
   const wrapper = document.createElement('div');
   wrapper.className = 'turneo-proxy-test-wrapper';
 
-  const header = buildHeader(baseUrl);
-  wrapper.append(header);
+  const gridEl = document.createElement('div');
+  gridEl.className = 'turneo-proxy-test-grid';
 
-  const statusEl = header.querySelector<HTMLElement>('.turneo-proxy-test-status');
-  const labelEl = header.querySelector<HTMLElement>('.turneo-proxy-test-status-label');
+  const filter = buildFilter(async (from, to) => {
+    setGridLoading(gridEl);
+    try {
+      const params = from || to ? { from: from || undefined, until: to || undefined } : undefined;
+      const experiences = await fetchExperiencesViaProxy(params);
+      gridEl.replaceChildren(...buildGridChildren(experiences));
+    } catch (error) {
+      gridEl.replaceChildren(buildError(error));
+    }
+  });
 
+  wrapper.append(filter, gridEl);
+
+  // Initial load
+  setGridLoading(gridEl);
   try {
     const experiences = await fetchExperiencesViaProxy();
-    if (statusEl) {
-      statusEl.classList.add('turneo-proxy-test-status--ok');
-      statusEl.setAttribute('title', 'Proxy reachable');
-    }
-    if (labelEl) labelEl.textContent = `Connected — ${experiences.length} experience(s) returned`;
-
-    const grid = buildGrid(experiences);
-    wrapper.append(grid);
+    gridEl.replaceChildren(...buildGridChildren(experiences));
   } catch (error) {
-    if (statusEl) {
-      statusEl.classList.add('turneo-proxy-test-status--error');
-      statusEl.setAttribute('title', 'Proxy unreachable');
-    }
-    if (labelEl) labelEl.textContent = 'Error — proxy not reachable';
-    wrapper.append(buildError(error));
+    gridEl.replaceChildren(buildError(error));
   }
 
   block.replaceChildren(wrapper);
 }
 
-function buildHeader(proxyUrl: string): HTMLElement {
-  const header = document.createElement('div');
-  header.className = 'turneo-proxy-test-header';
+function buildFilter(onSearch: (from: string, to: string) => Promise<void>): HTMLElement {
+  const bar = document.createElement('div');
+  bar.className = 'turneo-proxy-test-filter';
 
-  const title = document.createElement('h2');
-  title.className = 'turneo-proxy-test-title';
-  title.textContent = 'Turneo Proxy Test';
+  const fromGroup = buildDateField('from', 'Check-in');
+  const toGroup = buildDateField('to', 'Check-out');
 
-  const meta = document.createElement('div');
-  meta.className = 'turneo-proxy-test-meta';
+  const fromInput = fromGroup.querySelector<HTMLInputElement>('input')!;
+  const toInput = toGroup.querySelector<HTMLInputElement>('input')!;
 
-  const status = document.createElement('span');
-  status.className = 'turneo-proxy-test-status';
+  // Keep min/max in sync
+  fromInput.addEventListener('change', () => {
+    if (fromInput.value) toInput.min = fromInput.value;
+  });
+  toInput.addEventListener('change', () => {
+    if (toInput.value) fromInput.max = toInput.value;
+  });
 
-  const label = document.createElement('span');
-  label.className = 'turneo-proxy-test-status-label';
-  label.textContent = 'Loading…';
+  const btn = document.createElement('button');
+  btn.className = 'turneo-proxy-test-filter-btn';
+  btn.type = 'button';
+  btn.textContent = 'Search';
+  btn.addEventListener('click', async () => {
+    btn.disabled = true;
+    btn.textContent = 'Searching…';
+    await onSearch(fromInput.value, toInput.value);
+    btn.disabled = false;
+    btn.textContent = 'Search';
+  });
 
-  const url = document.createElement('code');
-  url.className = 'turneo-proxy-test-url';
-  url.textContent = `${proxyUrl}/experiences`;
-
-  meta.append(status, label);
-  header.append(title, meta, url);
-  return header;
+  bar.append(fromGroup, toGroup, btn);
+  return bar;
 }
 
-function buildGrid(experiences: TurneoExperience[]): HTMLElement {
-  const section = document.createElement('div');
-  section.className = 'turneo-proxy-test-grid';
+function buildDateField(id: string, label: string): HTMLElement {
+  const group = document.createElement('div');
+  group.className = 'turneo-proxy-test-filter-field';
 
+  const lbl = document.createElement('label');
+  lbl.className = 'turneo-proxy-test-filter-label';
+  lbl.htmlFor = `tpt-${id}`;
+  lbl.textContent = label;
+
+  const inputWrap = document.createElement('div');
+  inputWrap.className = 'turneo-proxy-test-filter-input-wrap';
+
+  const icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  icon.setAttribute('viewBox', '0 0 20 20');
+  icon.setAttribute('fill', 'none');
+  icon.setAttribute('aria-hidden', 'true');
+  icon.innerHTML =
+    '<rect x="2" y="4" width="16" height="14" rx="2" stroke="currentColor" stroke-width="1.5"/>' +
+    '<path d="M2 8h16" stroke="currentColor" stroke-width="1.5"/>' +
+    '<path d="M6 2v4M14 2v4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>';
+
+  const input = document.createElement('input');
+  input.type = 'date';
+  input.id = `tpt-${id}`;
+  input.className = 'turneo-proxy-test-filter-input';
+  input.min = new Date().toISOString().split('T')[0];
+
+  inputWrap.append(icon, input);
+  group.append(lbl, inputWrap);
+  return group;
+}
+
+function setGridLoading(gridEl: HTMLElement): void {
+  gridEl.innerHTML = '';
+  for (let i = 0; i < 8; i++) {
+    const skeleton = document.createElement('div');
+    skeleton.className = 'turneo-proxy-test-skeleton';
+    gridEl.append(skeleton);
+  }
+}
+
+function buildGridChildren(experiences: TurneoExperience[]): HTMLElement[] {
   if (experiences.length === 0) {
     const empty = document.createElement('p');
     empty.className = 'turneo-proxy-test-empty';
-    empty.textContent = 'No experiences returned from proxy.';
-    section.append(empty);
-    return section;
+    empty.textContent = 'No experiences returned.';
+    return [empty];
   }
-
-  for (const exp of experiences) {
-    section.append(buildCard(exp));
-  }
-
-  return section;
+  return experiences.map(buildCard);
 }
 
 function buildCard(exp: TurneoExperience): HTMLElement {
-  const card = document.createElement('div');
+  const card = document.createElement('article');
   card.className = 'turneo-proxy-test-card';
 
-  const name = document.createElement('p');
-  name.className = 'turneo-proxy-test-card-name';
-  name.textContent = exp.name;
-
-  const idEl = document.createElement('code');
-  idEl.className = 'turneo-proxy-test-card-id';
-  idEl.textContent = exp.id;
-
-  const meta = document.createElement('div');
-  meta.className = 'turneo-proxy-test-card-meta';
-
-  if (exp.location?.city ?? exp.location?.country) {
-    const loc = document.createElement('span');
-    loc.textContent = [exp.location?.city, exp.location?.country].filter(Boolean).join(', ');
-    meta.append(loc);
+  // Thumbnail
+  const thumbnail = document.createElement('div');
+  thumbnail.className = 'turneo-proxy-test-card-thumbnail';
+  if (exp.images && exp.images.length > 0) {
+    const img = document.createElement('img');
+    img.src = exp.images[0].urlHigh;
+    img.alt = exp.images[0].altText ?? exp.name;
+    img.loading = 'lazy';
+    img.onerror = () => {
+      img.onerror = null;
+      thumbnail.removeChild(img);
+    };
+    thumbnail.append(img);
   }
+
+  // Body
+  const body = document.createElement('div');
+  body.className = 'turneo-proxy-test-card-body';
+
+  const title = document.createElement('h3');
+  title.className = 'turneo-proxy-test-card-title';
+  title.textContent = exp.name;
+
+  const desc = document.createElement('p');
+  desc.className = 'turneo-proxy-test-card-desc';
+  desc.innerHTML = DOMPurify.sanitize(exp.highlight || exp.description || '');
+
+  const footer = document.createElement('div');
+  footer.className = 'turneo-proxy-test-card-footer';
 
   if (exp.minPrice) {
     const price = document.createElement('span');
     price.className = 'turneo-proxy-test-card-price';
     price.textContent = `From ${exp.minPrice.currency} ${exp.minPrice.amount}`;
-    meta.append(price);
+    footer.append(price);
   }
 
-  const toggle = document.createElement('button');
-  toggle.className = 'turneo-proxy-test-card-toggle';
-  toggle.textContent = 'Show raw JSON';
-  toggle.type = 'button';
-
-  const raw = document.createElement('pre');
-  raw.className = 'turneo-proxy-test-card-raw';
-  raw.hidden = true;
-  raw.textContent = JSON.stringify(exp, null, 2);
-
-  toggle.addEventListener('click', () => {
-    raw.hidden = !raw.hidden;
-    toggle.textContent = raw.hidden ? 'Show raw JSON' : 'Hide raw JSON';
-  });
-
-  card.append(name, idEl, meta, toggle, raw);
+  body.append(title, desc, footer);
+  card.append(thumbnail, body);
   return card;
 }
 

@@ -155,7 +155,7 @@ function createCard(experience: TurneoExperience): HTMLElement {
   imageContainer.className = 'turneo-experiences-card-image';
   if (experience.images && experience.images.length > 0) {
     const img = document.createElement('img');
-    img.src = experience.images[0].url;
+    img.src = experience.images[0].urlHigh;
     img.alt = experience.name;
     img.loading = 'lazy';
     img.onerror = () => setFallbackImage(img);
@@ -286,7 +286,7 @@ function createImageSlider(experience: TurneoExperience): HTMLElement {
     const slide = document.createElement('div');
     slide.className = 'turneo-experiences-slider-slide';
     const img = document.createElement('img');
-    img.src = image.url;
+    img.src = image.urlHigh;
     img.alt = experience.name;
     img.loading = 'lazy';
     img.onerror = () => setFallbackImage(img);

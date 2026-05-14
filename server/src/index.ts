@@ -40,6 +40,11 @@ app.get('/health', (_req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
+// Index
+app.get('/', (_req, res) => {
+  res.json({ message: '👋 Hello, dev! Turneo proxy is up and running.', timestamp: new Date().toISOString() });
+});
+
 // API routes
 app.use('/api/experiences', experiencesRouter);
 app.use('/api/orders', ordersRouter);

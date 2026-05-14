@@ -12,7 +12,7 @@ export interface TurneoProxyConfig {
 }
 
 // TODO: Replace with actual deployed proxy URL for production
-// const TURNEO_PROXY_PROD_URL = 'https://turneo-proxy.example.com/api';
+const TURNEO_PROXY_PROD_URL = 'https://threaded-supports-friday-humans.trycloudflare.com/api';
 const TURNEO_PROXY_DEV_URL = 'http://localhost:3001/api';
 
 /**
@@ -24,7 +24,7 @@ export function getTurneoProxyConfig(): TurneoProxyConfig {
 
   if (env === ENV.PROD || env === ENV.STAGE) {
     return {
-      baseUrl: TURNEO_PROXY_DEV_URL,
+      baseUrl: TURNEO_PROXY_PROD_URL,
     };
   }
 

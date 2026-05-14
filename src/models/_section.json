@@ -95,7 +95,9 @@
         "highlights-carousel",
         "promo-content",
         "turneo-experiences",
-        "turneo-proxy-test"
+        "turneo-proxy-test",
+        "product-carousel",
+        "tabs-with-blocks"
       ]
     }
   ]

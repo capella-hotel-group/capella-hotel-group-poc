@@ -1,6 +1,6 @@
 import DOMPurify from 'dompurify';
-import { fetchExperiencesViaProxy } from '@/utils/turneo-proxy-api';
-import type { TurneoExperience } from '@/utils/turneo-proxy-api';
+import { fetchExperiencesViaAppBuilder } from '@/utils/turneo-appbuilder-api';
+import type { AppBuilderExperience, FetchAppBuilderParams } from '@/utils/turneo-appbuilder-api';
 
 export default async function decorate(block: HTMLElement): Promise<void> {
   const wrapper = document.createElement('div');
@@ -12,8 +12,9 @@ export default async function decorate(block: HTMLElement): Promise<void> {
   const filter = buildFilter(async (from, to) => {
     setGridLoading(gridEl);
     try {
-      const params = from || to ? { from: from || undefined, until: to || undefined } : undefined;
-      const experiences = await fetchExperiencesViaProxy(params);
+      const params: FetchAppBuilderParams | undefined =
+        from || to ? { from: from || undefined, until: to || undefined } : undefined;
+      const experiences = await fetchExperiencesViaAppBuilder(params);
       gridEl.replaceChildren(...buildGridChildren(experiences));
     } catch (error) {
       gridEl.replaceChildren(buildError(error));
@@ -25,7 +26,7 @@ export default async function decorate(block: HTMLElement): Promise<void> {
   // Initial load
   setGridLoading(gridEl);
   try {
-    const experiences = await fetchExperiencesViaProxy();
+    const experiences = await fetchExperiencesViaAppBuilder();
     gridEl.replaceChildren(...buildGridChildren(experiences));
   } catch (error) {
     gridEl.replaceChildren(buildError(error));
@@ -109,7 +110,7 @@ function setGridLoading(gridEl: HTMLElement): void {
   }
 }
 
-function buildGridChildren(experiences: TurneoExperience[]): HTMLElement[] {
+function buildGridChildren(experiences: AppBuilderExperience[]): HTMLElement[] {
   if (experiences.length === 0) {
     const empty = document.createElement('p');
     empty.className = 'turneo-proxy-test-empty';
@@ -119,17 +120,17 @@ function buildGridChildren(experiences: TurneoExperience[]): HTMLElement[] {
   return experiences.map(buildCard);
 }
 
-function buildCard(exp: TurneoExperience): HTMLElement {
+function buildCard(exp: AppBuilderExperience): HTMLElement {
   const card = document.createElement('article');
   card.className = 'turneo-proxy-test-card';
 
   // Thumbnail
   const thumbnail = document.createElement('div');
   thumbnail.className = 'turneo-proxy-test-card-thumbnail';
-  if (exp.images && exp.images.length > 0) {
+  if (exp.image) {
     const img = document.createElement('img');
-    img.src = exp.images[0].urlHigh;
-    img.alt = exp.images[0].altText ?? exp.name;
+    img.src = exp.image;
+    img.alt = exp.title;
     img.loading = 'lazy';
     img.onerror = () => {
       img.onerror = null;
@@ -142,9 +143,9 @@ function buildCard(exp: TurneoExperience): HTMLElement {
   const body = document.createElement('div');
   body.className = 'turneo-proxy-test-card-body';
 
-  const title = document.createElement('h3');
-  title.className = 'turneo-proxy-test-card-title';
-  title.textContent = exp.name;
+  const titleEl = document.createElement('h3');
+  titleEl.className = 'turneo-proxy-test-card-title';
+  titleEl.textContent = exp.title;
 
   const desc = document.createElement('p');
   desc.className = 'turneo-proxy-test-card-desc';
@@ -156,11 +157,11 @@ function buildCard(exp: TurneoExperience): HTMLElement {
   if (exp.minPrice) {
     const price = document.createElement('span');
     price.className = 'turneo-proxy-test-card-price';
-    price.textContent = `From ${exp.minPrice.currency} ${exp.minPrice.amount}`;
+    price.textContent = `From ${exp.minPrice.currency} ${exp.minPrice.amount} / ${exp.minPrice.unit}`;
     footer.append(price);
   }
 
-  body.append(title, desc, footer);
+  body.append(titleEl, desc, footer);
   card.append(thumbnail, body);
   return card;
 }
@@ -170,15 +171,12 @@ function buildError(error: unknown): HTMLElement {
   box.className = 'turneo-proxy-test-error';
 
   const msg = document.createElement('p');
-  msg.textContent = 'Could not reach the proxy server. Make sure it is running:';
-
-  const cmd = document.createElement('code');
-  cmd.textContent = 'npm run proxy';
+  msg.textContent = 'Could not load experiences from the App Builder API.';
 
   const detail = document.createElement('pre');
   detail.className = 'turneo-proxy-test-error-detail';
   detail.textContent = error instanceof Error ? error.message : String(error);
 
-  box.append(msg, cmd, detail);
+  box.append(msg, detail);
   return box;
 }

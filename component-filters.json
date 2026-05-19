@@ -106,5 +106,11 @@
     "components": [
       "product-carousel-item"
     ]
+  },
+  {
+    "id": "tabs-with-fragments",
+    "components": [
+      "tabs-with-fragments-item"
+    ]
   }
 ]

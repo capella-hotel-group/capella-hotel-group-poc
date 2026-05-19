@@ -556,15 +556,15 @@
           }
         },
         {
-          "title": "Tabs With Blocks",
-          "id": "tabs-with-blocks",
+          "title": "Tabs With Fragments",
+          "id": "tabs-with-fragments",
           "plugins": {
             "xwalk": {
               "page": {
                 "resourceType": "core/franklin/components/block/v1/block",
                 "template": {
-                  "name": "Tabs With Blocks",
-                  "model": "tabs-with-blocks"
+                  "name": "Tabs With Fragments",
+                  "model": "tabs-with-fragments"
                 }
               }
             }

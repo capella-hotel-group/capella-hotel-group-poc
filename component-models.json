@@ -1046,12 +1046,24 @@
     ]
   },
   {
-    "id": "tabs-with-blocks",
+    "id": "tabs-with-fragments",
     "fields": [
       {
-        "component": "blocks",
-        "name": "content",
-        "label": "Tab Content Blocks"
+        "component": "multifield",
+        "name": "tabs",
+        "label": "Tabs",
+        "fields": [
+          {
+            "component": "text",
+            "name": "title",
+            "label": "Tab Title"
+          },
+          {
+            "component": "reference",
+            "name": "fragment",
+            "label": "Fragment Reference"
+          }
+        ]
       }
     ]
   },

@@ -1,4 +1,5 @@
 import { loadFragment } from '@/blocks/fragment/fragment';
+import { moveInstrumentation } from '@/app/scripts';
 
 async function loadPanelFragment(panel: HTMLElement): Promise<void> {
 const fragmentPath = panel.dataset.fragmentPath;
@@ -28,7 +29,6 @@ rows.forEach((row: HTMLElement, i: number) => {
   const fragmentEl = row.children[1] as HTMLElement;
   const fragmentPath = fragmentEl.querySelector('a')?.getAttribute('href');
 
-  // Tab button
   const btn = document.createElement('button');
   btn.setAttribute('role', 'tab');
   btn.setAttribute('aria-selected', i === 0 ? 'true' : 'false');
@@ -37,7 +37,6 @@ rows.forEach((row: HTMLElement, i: number) => {
   btn.textContent = titleEl.textContent?.trim() ?? '';
   tabList.appendChild(btn);
 
-  // Tab panel
   const panel = document.createElement('div');
   panel.setAttribute('role', 'tabpanel');
   panel.setAttribute('aria-labelledby', `twf-tab-${i}`);
@@ -46,6 +45,8 @@ rows.forEach((row: HTMLElement, i: number) => {
   panel.hidden = i !== 0;
   if (fragmentPath) panel.dataset.fragmentPath = fragmentPath;
 
+  moveInstrumentation(row, panel); // ✅ added
+
   panels.push(panel);
   row.remove();
 });
@@ -53,10 +54,8 @@ rows.forEach((row: HTMLElement, i: number) => {
 block.appendChild(tabList);
 panels.forEach((p) => block.appendChild(p));
 
-// Eagerly load first tab
 await loadPanelFragment(panels[0]);
 
-// Tab switching
 tabList.querySelectorAll<HTMLButtonElement>('[role="tab"]').forEach((btn, i) => {
   btn.addEventListener('click', async () => {
     tabList.querySelectorAll('[role="tab"]').forEach((b) => b.setAttribute('aria-selected', 'false'));

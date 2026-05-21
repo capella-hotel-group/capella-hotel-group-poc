@@ -39,7 +39,14 @@
       "turneo-experiences",
       "turneo-proxy-test",
       "product-carousel",
-      "tabs-with-fragments"
+      "tabs-with-fragments",
+      "accordion-with-fragments"
+    ]
+  },
+  {
+    "id": "accordion-with-fragments",
+    "components": [
+      "accordion-with-fragments-item"
     ]
   },
   {

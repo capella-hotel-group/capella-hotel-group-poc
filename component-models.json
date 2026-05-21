@@ -201,6 +201,27 @@
     ]
   },
   {
+    "id": "accordion-with-fragments",
+    "fields": []
+  },
+  {
+    "id": "accordion-with-fragments-item",
+    "fields": [
+      {
+        "component": "text",
+        "name": "title",
+        "label": "Accordion Title",
+        "valueType": "string"
+      },
+      {
+        "component": "aem-content",
+        "name": "fragment",
+        "label": "Fragment Reference",
+        "valueType": "string"
+      }
+    ]
+  },
+  {
     "id": "activities",
     "fields": [
       {

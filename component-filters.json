@@ -40,7 +40,8 @@
       "turneo-proxy-test",
       "product-carousel",
       "tabs-with-fragments",
-      "accordion-with-fragments"
+      "accordion-with-fragments",
+      "tabs"
     ]
   },
   {
@@ -118,6 +119,22 @@
     "id": "tabs-with-fragments",
     "components": [
       "tabs-with-fragments-item"
+    ]
+  },
+  {
+    "id": "tabs",
+    "components": [
+      "tab"
+    ]
+  },
+  {
+    "id": "tab",
+    "components": [
+      "text-intro",
+      "title",
+      "image",
+      "text-with-image",
+      "product-carousel"
     ]
   }
 ]

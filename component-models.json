@@ -1088,6 +1088,22 @@
     ]
   },
   {
+    "id": "tabs",
+    "container": true
+  },
+  {
+    "id": "tab",
+    "container": true,
+    "fields": [
+      {
+        "component": "text",
+        "name": "title",
+        "label": "Tab Title",
+        "valueType": "string"
+      }
+    ]
+  },
+  {
     "id": "text-intro",
     "fields": [
       {

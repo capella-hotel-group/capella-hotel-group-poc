@@ -1,0 +1,46 @@
+{
+  "definitions": [
+    {
+      "title": "Tab Section",
+      "id": "tab-section",
+      "plugins": {
+        "xwalk": {
+          "page": {
+            "resourceType": "core/franklin/components/section/v1/section",
+            "template": {
+              "model": "tab-section"
+            }
+          }
+        }
+      }
+    }
+  ],
+  "models": [
+    {
+      "id": "tab-section",
+      "fields": [
+        {
+          "component": "text",
+          "name": "tabLabel",
+          "label": "Tab Label",
+          "description": "Label displayed in the tab navigation"
+        }
+      ]
+    }
+  ],
+  "filters": [
+    {
+      "id": "tab-section",
+      "components": [
+        "text",
+        "image",
+        "button",
+        "text-intro",
+        "text-with-image",
+        "promo-content",
+        "product-carousel",
+        "tabs-with-blocks"
+      ]
+    }
+  ]
+}

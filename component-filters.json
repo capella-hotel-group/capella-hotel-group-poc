@@ -2,7 +2,8 @@
   {
     "id": "main",
     "components": [
-      "section"
+      "section",
+      "tab-section"
     ]
   },
   {
@@ -113,6 +114,19 @@
     "id": "product-carousel",
     "components": [
       "product-carousel-item"
+    ]
+  },
+  {
+    "id": "tab-section",
+    "components": [
+      "text",
+      "image",
+      "button",
+      "text-intro",
+      "text-with-image",
+      "promo-content",
+      "product-carousel",
+      "tabs-with-blocks"
     ]
   },
   {

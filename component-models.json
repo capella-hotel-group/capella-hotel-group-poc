@@ -1067,6 +1067,17 @@
     ]
   },
   {
+    "id": "tab-section",
+    "fields": [
+      {
+        "component": "text",
+        "name": "tabLabel",
+        "label": "Tab Label",
+        "description": "Label displayed in the tab navigation"
+      }
+    ]
+  },
+  {
     "id": "tabs-with-fragments",
     "fields": []
   },

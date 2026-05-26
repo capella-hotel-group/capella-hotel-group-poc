@@ -165,6 +165,17 @@
     ]
   },
   {
+    "id": "tab-section",
+    "fields": [
+      {
+        "component": "text",
+        "name": "tabLabel",
+        "label": "Tab Label",
+        "description": "Label displayed in the tab navigation"
+      }
+    ]
+  },
+  {
     "id": "about-capella",
     "fields": [
       {
@@ -1063,17 +1074,6 @@
         "valueType": "string",
         "name": "ctaLink",
         "label": "CTA Link"
-      }
-    ]
-  },
-  {
-    "id": "tab-section",
-    "fields": [
-      {
-        "component": "text",
-        "name": "tabLabel",
-        "label": "Tab Label",
-        "description": "Label displayed in the tab navigation"
       }
     ]
   },

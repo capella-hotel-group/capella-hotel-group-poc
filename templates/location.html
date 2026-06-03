@@ -1,0 +1,24 @@
+<div class="location-list">
+  {{#data.locationListingList.items}}
+    <div class="location-card">
+      
+      <picture>
+        <img src="{{image._path}}" alt="{{title}}">
+      </picture>
+
+      <div class="content">
+        <h3>{{title}}</h3>
+
+        <p>{{description.plaintext}}</p>
+
+        <div class="tags">
+          {{#tag}}
+            <span class="tag">{{.}}</span>
+          {{/tag}}
+        </div>
+
+      </div>
+
+    </div>
+  {{/data.locationListingList.items}}
+</div>

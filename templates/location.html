@@ -1,19 +1,39 @@
-<div class="location-card">
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>{{properties.elements.title.value}}</title>
+  </head>
 
-  <h1>{{properties.elements.title.value}}</h1>
+  <body>
+    <header></header>
 
-  <div class="image">
-    <img src="{{properties.elements.image.value}}" alt="{{properties.elements.title.value}}" />
-  </div>
+    <main>
+      <div class="location-card">
 
-  <div class="description">
-    {{{properties.elements.description.value}}}
-  </div>
+        <!-- TITLE -->
+        <h1>{{properties.elements.title.value}}</h1>
 
-  <div class="tags">
-    {{#properties.elements.tag.value}}
-      <span class="tag">{{.}}</span>
-    {{/properties.elements.tag.value}}
-  </div>
+        <!-- IMAGE -->
+        <div class="image">
+          <img src="{{properties.elements.image.value}}" 
+               alt="{{properties.elements.title.value}}">
+        </div>
 
-</div>
+        <!-- DESCRIPTION (HTML must use triple braces) -->
+        <div class="description">
+          {{{properties.elements.description.value}}}
+        </div>
+
+        <!-- TAGS (array) -->
+        <div class="tags">
+          {{#properties.elements.tag.value}}
+            <span class="tag">{{.}}</span>
+          {{/properties.elements.tag.value}}
+        </div>
+
+      </div>
+    </main>
+
+    <footer></footer>
+  </body>
+</html>

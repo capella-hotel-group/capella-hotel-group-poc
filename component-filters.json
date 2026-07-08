@@ -121,7 +121,7 @@
   {
     "id": "offer-carousel",
     "components": [
-      "image"
+      "offer-carousel-item"
     ]
   },
   {

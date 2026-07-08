@@ -534,6 +534,21 @@
           }
         },
         {
+          "title": "Offer Carousel Item",
+          "id": "offer-carousel-item",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/franklin/components/block/v1/block/item",
+                "template": {
+                  "name": "Offer Carousel Item",
+                  "model": "offer-carousel-item"
+                }
+              }
+            }
+          }
+        },
+        {
           "title": "Panding Gallery",
           "id": "panding-gallery",
           "plugins": {

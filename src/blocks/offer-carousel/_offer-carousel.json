@@ -7,8 +7,24 @@
         "xwalk": {
           "page": {
             "resourceType": "core/franklin/components/block/v1/block",
-            "template": {              "name": "Offer Carousel",
+            "template": {
+              "name": "Offer Carousel",
               "filter": "offer-carousel"
+            }
+          }
+        }
+      }
+    },
+    {
+      "title": "Offer Carousel Item",
+      "id": "offer-carousel-item",
+      "plugins": {
+        "xwalk": {
+          "page": {
+            "resourceType": "core/franklin/components/block/v1/block/item",
+            "template": {
+              "name": "Offer Carousel Item",
+              "model": "offer-carousel-item"
             }
           }
         }
@@ -19,12 +35,31 @@
     {
       "id": "offer-carousel",
       "fields": []
+    },
+    {
+      "id": "offer-carousel-item",
+      "fields": [
+        {
+          "component": "reference",
+          "valueType": "string",
+          "name": "image",
+          "label": "Slide Image",
+          "multi": false
+        },
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "imageAlt",
+          "label": "Image Alt Text",
+          "value": ""
+        }
+      ]
     }
   ],
   "filters": [
     {
       "id": "offer-carousel",
-      "components": ["image"]
+      "components": ["offer-carousel-item"]
     }
   ]
 }

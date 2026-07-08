@@ -42,7 +42,21 @@
       "product-carousel",
       "tabs-with-fragments",
       "accordion-with-fragments",
-      "tabs"
+      "tabs",
+      "offer-carousel"
+    ]
+  },
+  {
+    "id": "tab-section",
+    "components": [
+      "text",
+      "image",
+      "button",
+      "text-intro",
+      "text-with-image",
+      "promo-content",
+      "product-carousel",
+      "tabs-with-blocks"
     ]
   },
   {
@@ -105,6 +119,12 @@
     ]
   },
   {
+    "id": "offer-carousel",
+    "components": [
+      "image"
+    ]
+  },
+  {
     "id": "panding-gallery",
     "components": [
       "panding-gallery-item"
@@ -114,19 +134,6 @@
     "id": "product-carousel",
     "components": [
       "product-carousel-item"
-    ]
-  },
-  {
-    "id": "tab-section",
-    "components": [
-      "text",
-      "image",
-      "button",
-      "text-intro",
-      "text-with-image",
-      "promo-content",
-      "product-carousel",
-      "tabs-with-blocks"
     ]
   },
   {

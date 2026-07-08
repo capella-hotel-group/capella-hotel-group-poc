@@ -1,0 +1,30 @@
+{
+  "definitions": [
+    {
+      "title": "Offer Carousel",
+      "id": "offer-carousel",
+      "plugins": {
+        "xwalk": {
+          "page": {
+            "resourceType": "core/franklin/components/block/v1/block",
+            "template": {              "name": "Offer Carousel",
+              "filter": "offer-carousel"
+            }
+          }
+        }
+      }
+    }
+  ],
+  "models": [
+    {
+      "id": "offer-carousel",
+      "fields": []
+    }
+  ],
+  "filters": [
+    {
+      "id": "offer-carousel",
+      "components": ["image"]
+    }
+  ]
+}

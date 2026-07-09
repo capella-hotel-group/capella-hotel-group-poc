@@ -1,6 +1,6 @@
 /* offer-carousel block — full-bleed single-image carousel */
 .offer-carousel {
-    padding: 24px 0;
+    padding: 24px clamp(16px, 5vw, 80px);
 }
 
 /* ---- Viewport (holds the track + overlaid arrows) ---- */
@@ -53,12 +53,29 @@
     border: none;
     background: none;
     color: var(--background-color);
-    font-size: 32px;
-    line-height: 1;
     cursor: pointer;
     transform: translateY(-50%);
     transition: opacity 0.3s ease;
     filter: drop-shadow(0 1px 3px rgb(0 0 0 / 40%));
+}
+
+/* Chevron drawn with borders so the stroke weight is precise/thin */
+.offer-carousel-nav::before {
+    content: '';
+    width: 14px;
+    height: 14px;
+    border: solid currentcolor;
+    border-width: 1.5px 1.5px 0 0;
+}
+
+.offer-carousel-nav--prev::before {
+    transform: rotate(-135deg);
+    margin-left: 4px;
+}
+
+.offer-carousel-nav--next::before {
+    transform: rotate(45deg);
+    margin-right: 4px;
 }
 
 .offer-carousel-nav:hover {
@@ -116,19 +133,22 @@
 
 @media (width >= 900px) {
     .offer-carousel {
-        padding: 40px 0;
+        padding: 40px clamp(16px, 5vw, 80px);
     }
 
     .offer-carousel-track {
         grid-auto-columns: 100%;
         gap: 0;
         padding: 0;
-    }
-
-    .offer-carousel-nav {
+    }    .offer-carousel-nav {
         width: 56px;
         height: 56px;
-        font-size: 40px;
+    }
+
+    .offer-carousel-nav::before {
+        width: 18px;
+        height: 18px;
+        border-width: 1.5px 1.5px 0 0;
     }
 
     .offer-carousel-nav--prev {

@@ -32,18 +32,15 @@ export default async function decorate(block: HTMLElement): Promise<void> {
   });
 
   viewport.append(track);
-
   // ----- Navigation arrows -----
   const prevBtn = document.createElement('button');
   prevBtn.type = 'button';
   prevBtn.className = 'offer-carousel-nav offer-carousel-nav--prev';
   prevBtn.setAttribute('aria-label', 'Previous offer');
-  prevBtn.innerHTML = '&#10094;';
   const nextBtn = document.createElement('button');
   nextBtn.type = 'button';
   nextBtn.className = 'offer-carousel-nav offer-carousel-nav--next';
   nextBtn.setAttribute('aria-label', 'Next offer');
-  nextBtn.innerHTML = '&#10095;';
 
   // Arrows overlay the image, so nest them in the viewport for correct centering.
   viewport.append(prevBtn, nextBtn);

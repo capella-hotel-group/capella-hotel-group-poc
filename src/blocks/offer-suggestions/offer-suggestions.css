@@ -101,12 +101,14 @@
     opacity: 0.7;
 }
 
-/* ---- Responsive: 2 or 3 columns (from the Columns select) ---- */
+/* ---- Responsive: columns from the Columns select ---- */
+/* Mobile (base): always 1 column (see .offer-suggestions-grid) */
+
+/* Tablet & up: both variants show 2 columns */
 @media (width >= 768px) {
-    .offer-suggestions.two-column-card .offer-suggestions-grid {
+    .offer-suggestions.two-column-card .offer-suggestions-grid,
+    .offer-suggestions.three-column-card .offer-suggestions-grid {
         grid-template-columns: repeat(2, 1fr);
-    }    .offer-suggestions.three-column-card .offer-suggestions-grid {
-        grid-template-columns: repeat(3, 1fr);
     }
 
     /* On desktop the title and CTA sit on one row, left-aligned & vertically centered */
@@ -120,5 +122,12 @@
     .offer-suggestions-cta {
         flex-shrink: 0;
         white-space: nowrap;
+    }
+}
+
+/* Desktop: the three-column variant expands to 3 columns */
+@media (width >= 1024px) {
+    .offer-suggestions.three-column-card .offer-suggestions-grid {
+        grid-template-columns: repeat(3, 1fr);
     }
 }

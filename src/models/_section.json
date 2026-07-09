@@ -98,6 +98,7 @@
         "turneo-proxy-test",
         "product-carousel",
         "offer-carousel",
+        "offer-suggestions",
         "tabs-with-blocks"
       ]
     }

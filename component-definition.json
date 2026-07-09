@@ -560,7 +560,7 @@
                   "model": "offer-suggestions",
                   "filter": "offer-suggestions",
                   "heading": "",
-                  "classes": "",
+                  "classes": "two-column-card",
                   "showBackground": false
                 }
               }

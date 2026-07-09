@@ -911,10 +911,11 @@
         "value": ""
       },
       {
-        "component": "multiselect",
+        "component": "select",
         "valueType": "string",
         "name": "classes",
         "label": "Columns",
+        "value": "two-column-card",
         "options": [
           {
             "name": "Two Column Card",

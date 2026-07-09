@@ -62,10 +62,10 @@
 /* Chevron drawn with borders so the stroke weight is precise/thin */
 .offer-carousel-nav::before {
     content: '';
-    width: 14px;
-    height: 14px;
+    width: 15px;
+    height: 15px;
     border: solid currentcolor;
-    border-width: 1.5px 1.5px 0 0;
+    border-width: 2.5px 2.5px 0 0;
 }
 
 .offer-carousel-nav--prev::before {
@@ -80,6 +80,13 @@
 
 .offer-carousel-nav:hover {
     opacity: 0.7;
+}
+
+/* Disabled at a carousel boundary (first/last slide): lighter + not clickable */
+.offer-carousel-nav.is-disabled {
+    opacity: 0.35;
+    cursor: default;
+    pointer-events: none;
 }
 
 .offer-carousel-nav--prev {
@@ -134,21 +141,21 @@
 @media (width >= 900px) {
     .offer-carousel {
         padding: 40px clamp(16px, 5vw, 80px);
-    }
-
-    .offer-carousel-track {
+    }    .offer-carousel-track {
         grid-auto-columns: 100%;
         gap: 0;
         padding: 0;
-    }    .offer-carousel-nav {
+    }
+
+    .offer-carousel-nav {
         width: 56px;
         height: 56px;
     }
 
     .offer-carousel-nav::before {
-        width: 18px;
-        height: 18px;
-        border-width: 1.5px 1.5px 0 0;
+        width: 20px;
+        height: 20px;
+        border-width: 2.5px 2.5px 0 0;
     }
 
     .offer-carousel-nav--prev {

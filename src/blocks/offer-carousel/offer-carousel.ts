@@ -63,9 +63,19 @@ export default async function decorate(block: HTMLElement): Promise<void> {
 
   // ----- Carousel logic -----
   const dotEls = [...dots.children] as HTMLElement[];
-
   const setActiveDot = (index: number): void => {
     dotEls.forEach((dot, i) => dot.classList.toggle('is-active', i === index));
+  };
+  // Dim + disable the prev arrow on the first slide and the next arrow on the last slide.
+  const updateArrows = (index: number): void => {
+    prevBtn.classList.toggle('is-disabled', index <= 0);
+    nextBtn.classList.toggle('is-disabled', index >= slides.length - 1);
+  };
+
+  // Keep dots + arrows in sync for a given slide index.
+  const updateControls = (index: number): void => {
+    setActiveDot(index);
+    updateArrows(index);
   };
 
   const currentIndex = (): number => {
@@ -81,22 +91,24 @@ export default async function decorate(block: HTMLElement): Promise<void> {
     });
     return closest;
   };
-
   const goToIndex = (index: number): void => {
     const target = slides[index];
     if (!target) return;
     target.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
-    setActiveDot(index);
+    updateControls(index);
   };
 
   const handlePrev = (): void => goToIndex(Math.max(0, currentIndex() - 1));
   const handleNext = (): void => goToIndex(Math.min(slides.length - 1, currentIndex() + 1));
-  const handleScroll = (): void => setActiveDot(currentIndex());
+  const handleScroll = (): void => updateControls(currentIndex());
 
   prevBtn.addEventListener('click', handlePrev);
   nextBtn.addEventListener('click', handleNext);
   track.addEventListener('scroll', handleScroll, { passive: true });
   dotEls.forEach((dot, index) => dot.addEventListener('click', () => goToIndex(index)));
+
+  // Set the initial arrow visibility (prev hidden on slide 0).
+  updateControls(0);
 
   // ----- Cleanup when the block leaves the DOM (Universal Editor add/remove) -----
   const observer = new MutationObserver(() => {

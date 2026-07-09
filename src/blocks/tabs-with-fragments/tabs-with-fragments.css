@@ -1,35 +1,53 @@
+/* tabs-with-fragments — centered uppercase nav with active underline */
 .tabs-with-fragments-list {
-display: flex;
-border-bottom: 2px solid #e0e0e0;
-margin-bottom: 1.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: clamp(20px, 4vw, 48px);
+    margin-bottom: clamp(24px, 4vw, 48px);
+    padding-bottom: 0;
 }
 
 .tabs-with-fragments-list [role="tab"] {
-padding: 0.75rem 1.5rem;
-border: none;
-border-bottom: 3px solid transparent;
-background: none;
-cursor: pointer;
-font-size: 1rem;
-color: #444;
-margin-bottom: -2px;
-transition: color 0.2s, border-color 0.2s;
+    position: relative;
+    padding: 12px 2px;
+    border: none;
+    background: none;
+    color: var(--text-color);
+    font-family: var(--body-font-family);
+    font-size: var(--body-font-size-xs);
+    letter-spacing: var(--header-letter-spacing);
+    text-transform: uppercase;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+}
+
+/* Underline indicator */
+.tabs-with-fragments-list [role="tab"]::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    height: 1px;
+    background-color: currentcolor;
+    transform: scaleX(0);
+    transition: transform 0.25s ease;
 }
 
 .tabs-with-fragments-list [role="tab"]:hover {
-color: #000;
+    opacity: 0.7;
 }
 
-.tabs-with-fragments-list [role="tab"][aria-selected="true"] {
-border-bottom-color: #0066cc;
-color: #0066cc;
-font-weight: 600;
+.tabs-with-fragments-list [role="tab"][aria-selected="true"]::after {
+    transform: scaleX(1);
 }
 
 .tabs-with-fragments-panel {
-padding: 1rem 0;
+    padding: 1rem 0;
 }
 
 .tabs-with-fragments-panel[hidden] {
-display: none;
+    display: none;
 }

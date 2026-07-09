@@ -11,7 +11,9 @@
               "name": "Offer Suggestions",
               "model": "offer-suggestions",
               "filter": "offer-suggestions",
-              "classes": ""
+              "heading": "",
+              "classes": "",
+              "showBackground": false
             }
           }
         }

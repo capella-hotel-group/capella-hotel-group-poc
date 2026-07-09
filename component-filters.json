@@ -43,7 +43,8 @@
       "tabs-with-fragments",
       "accordion-with-fragments",
       "tabs",
-      "offer-carousel"
+      "offer-carousel",
+      "offer-suggestions"
     ]
   },
   {
@@ -122,6 +123,12 @@
     "id": "offer-carousel",
     "components": [
       "offer-carousel-item"
+    ]
+  },
+  {
+    "id": "offer-suggestions",
+    "components": [
+      "offer-suggestions-item"
     ]
   },
   {

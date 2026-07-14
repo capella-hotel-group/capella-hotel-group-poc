@@ -38,6 +38,7 @@ export default defineConfig({
     emptyOutDir: isWatch,
     modulePreload: false,
     cssCodeSplit: true,
+    chunkSizeWarningLimit: 550,
     target: 'es2022',
 
     rollupOptions: {
@@ -58,13 +59,20 @@ export default defineConfig({
         entryFileNames: '[name].js',
         chunkFileNames: (chunkInfo) => {
           // Stable infrastructure chunks — fixed paths so head.html can modulepreload them
-          if (['aem-core', 'dompurify', 'three', 'env'].includes(chunkInfo.name)) return 'chunks/[name].js';
+          if (
+            ['aem-core', 'dompurify', 'three-core', 'three-renderers', 'three-examples', 'env'].includes(chunkInfo.name)
+          ) {
+            return 'chunks/[name].js';
+          }
           return 'chunks/[name]-[hash].js';
         },
         manualChunks: (id) => {
           if (id.includes('src/app/aem.ts')) return 'aem-core';
           if (id.includes('node_modules/dompurify')) return 'dompurify';
-          if (id.includes('node_modules/three')) return 'three';
+          // Split Three.js core from examples/jsm helpers to avoid a single oversized vendor chunk.
+          if (id.includes('node_modules/three/examples/')) return 'three-examples';
+          if (id.includes('node_modules/three/src/renderers/')) return 'three-renderers';
+          if (id.includes('node_modules/three')) return 'three-core';
           if (id.includes('src/utils/env.ts') || id.includes('src/configs/environments.ts')) return 'env';
           return undefined;
         },

@@ -1,2 +1,2 @@
-/*! v1.0.0 | h565bcd78*/
-.video{position:relative;width:100%}.video-wrapper{width:100%;aspect-ratio:16 / 9;background-color:#000;overflow:hidden}.video-player{width:100%;height:100%;object-fit:contain;display:block}
+/*! v1.0.0 | haa356e32*/
+.video{width:100%;position:relative}.video-wrapper{aspect-ratio:16/9;background-color:#000;width:100%;overflow:hidden}.video-player{object-fit:contain;width:100%;height:100%;display:block}

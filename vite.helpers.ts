@@ -54,7 +54,7 @@ export function versionBannerPlugin(version: string): Plugin {
       return { code: `${banner}\n${code}`, map: null };
     },
     generateBundle(_opts, bundle) {
-      for (const file of Object.values(bundle)) {
+      for (const file of Object.values(bundle) as Array<{ type: string; source?: string; fileName: string }>) {
         if (file.type === 'asset' && typeof file.source === 'string' && file.fileName.endsWith('.css')) {
           const banner = `/*! v${version} | h${shortHash(file.source)}*/`;
           file.source = `${banner}\n${file.source}`;

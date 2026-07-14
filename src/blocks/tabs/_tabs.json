@@ -37,7 +37,8 @@
   "models": [
     {
       "id": "tabs",
-      "container": true
+      "container": true,
+      "fields": []
     },
     {
       "id": "tab",

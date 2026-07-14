@@ -97,6 +97,9 @@
         "turneo-experiences",
         "turneo-proxy-test",
         "product-carousel",
+        "tabs-with-fragments",
+        "accordion-with-fragments",
+        "tabs",
         "offer-carousel",
         "offer-suggestions",
         "tabs-with-blocks"

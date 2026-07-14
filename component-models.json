@@ -165,17 +165,6 @@
     ]
   },
   {
-    "id": "tab-section",
-    "fields": [
-      {
-        "component": "text",
-        "name": "tabLabel",
-        "label": "Tab Label",
-        "description": "Label displayed in the tab navigation"
-      }
-    ]
-  },
-  {
     "id": "about-capella",
     "fields": [
       {
@@ -1204,7 +1193,8 @@
   },
   {
     "id": "tabs",
-    "container": true
+    "container": true,
+    "fields": []
   },
   {
     "id": "tab",

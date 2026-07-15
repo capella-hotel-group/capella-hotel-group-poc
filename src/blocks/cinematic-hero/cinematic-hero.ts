@@ -251,6 +251,9 @@ export default async function decorate(block: HTMLElement): Promise<void> {
   const dom = buildDOM(config, items, state);
   block.replaceChildren(dom.root);
 
+  // Set initial indicator position (experiences = left, destinations = right)
+  dom.indicatorEl.style.transform = state.activeMode === 'destinations' ? 'translateX(50%)' : 'translateX(0%)';
+
   const media = new MediaManager(dom.videoA, dom.videoB, dom.posterEl);
 
   // Load first item immediately
@@ -284,6 +287,95 @@ export default async function decorate(block: HTMLElement): Promise<void> {
     if (item) {
       media.switchTo(item).catch(() => {});
     }
+  });
+
+  let modeLocked = false;
+
+  async function switchMode(newMode: HeroMode): Promise<void> {
+    if (modeLocked || newMode === state.activeMode) return;
+    modeLocked = true;
+
+    state.activeMode = newMode;
+
+    // 1. Update mode button states
+    dom.modeBtns.forEach((btn) => {
+      const isActive = btn.dataset.mode === newMode;
+      btn.setAttribute('aria-selected', String(isActive));
+      btn.classList.toggle('cinematic-hero-mode-btn--active', isActive);
+    });
+
+    // 2. Slide indicator toward new mode
+    const indicatorTargetX = newMode === 'destinations' ? '50%' : '0%';
+    const indicatorAnim = dom.indicatorEl.animate(
+      [
+        { transform: `translateX(${newMode === 'destinations' ? '0%' : '50%'})` },
+        { transform: `translateX(${indicatorTargetX})` },
+      ],
+      { duration: 280, easing: 'ease-out', fill: 'forwards' },
+    );
+    indicatorAnim.finished
+      .then(() => {
+        dom.indicatorEl.style.transform = `translateX(${indicatorTargetX})`;
+        indicatorAnim.cancel();
+      })
+      .catch(() => {});
+
+    // 3. Fade out current item list
+    const fadeOutAnim = dom.itemListEl.animate([{ opacity: 1 }, { opacity: 0 }], {
+      duration: 180,
+      easing: 'linear',
+      fill: 'forwards',
+    });
+    await fadeOutAnim.finished.catch(() => {});
+    dom.itemListEl.style.opacity = '0';
+    fadeOutAnim.cancel();
+
+    // 4. Swap list content
+    const newModeItems = items.filter((i) => i.mode === newMode);
+    const newActiveIndex = state.activeIndex[newMode];
+    selectorUI.renderItems(newModeItems, newActiveIndex);
+    selectorUI.measureRows();
+
+    // 5. Move anchors to new active row (no animation — they'll fade in at correct position)
+    selectorUI.activateItem(newActiveIndex, false);
+
+    // 6. Fade in new list + update media in parallel
+    const newActiveItem = newModeItems[newActiveIndex];
+    if (newActiveItem) {
+      media.switchTo(newActiveItem).catch(() => {});
+    }
+
+    const fadeInAnim = dom.itemListEl.animate([{ opacity: 0 }, { opacity: 1 }], {
+      duration: 240,
+      easing: 'ease-out',
+      fill: 'forwards',
+    });
+    await fadeInAnim.finished.catch(() => {});
+    dom.itemListEl.style.opacity = '1';
+    fadeInAnim.cancel();
+
+    modeLocked = false;
+  }
+
+  // Wire mode buttons
+  dom.modeBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const newMode = btn.dataset.mode as HeroMode;
+      if (newMode) switchMode(newMode);
+    });
+  });
+
+  // Keyboard: ArrowLeft/ArrowRight on mode buttons
+  dom.modeBtns.forEach((btn) => {
+    btn.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+        e.preventDefault();
+        const targetIdx = e.key === 'ArrowLeft' ? 0 : 1;
+        dom.modeBtns[targetIdx]?.focus();
+        const newMode = dom.modeBtns[targetIdx]?.dataset.mode as HeroMode | undefined;
+        if (newMode && newMode !== state.activeMode) switchMode(newMode);
+      }
+    });
   });
 
   const introElements: IntroElements = {

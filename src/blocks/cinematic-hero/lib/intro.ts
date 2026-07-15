@@ -24,51 +24,66 @@ function delay(ms: number): Promise<void> {
 export async function runIntro(elements: IntroElements): Promise<void> {
   const { prefix, suffix, itemList, controls } = elements;
 
-  // Initial state: UI invisible
+  // Initial state: UI invisible, prefix/suffix appear centered
   prefix.style.opacity = '0';
   suffix.style.opacity = '0';
   itemList.style.opacity = '0';
   controls.style.opacity = '0';
-
-  // Initial centering transform (make prefix/suffix appear as one phrase)
   prefix.style.transform = `translateX(${SPLIT_TRANSLATE_PX}px)`;
   suffix.style.transform = `translateX(-${SPLIT_TRANSLATE_PX}px)`;
 
   // 0.70s: fade in sentence
   await delay(T_SENTENCE_FADEIN);
-  await Promise.all([
-    prefix.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 300, easing: 'linear', fill: 'forwards' }).finished,
-    suffix.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 300, easing: 'linear', fill: 'forwards' }).finished,
-  ]).catch(() => {});
+  const prefixFadeIn = prefix.animate([{ opacity: 0 }, { opacity: 1 }], {
+    duration: 300,
+    easing: 'linear',
+    fill: 'forwards',
+  });
+  const suffixFadeIn = suffix.animate([{ opacity: 0 }, { opacity: 1 }], {
+    duration: 300,
+    easing: 'linear',
+    fill: 'forwards',
+  });
+  await Promise.all([prefixFadeIn.finished, suffixFadeIn.finished]).catch(() => {});
   prefix.style.opacity = '1';
   suffix.style.opacity = '1';
+  prefixFadeIn.cancel();
+  suffixFadeIn.cancel();
 
-  // 2.75s: split horizontally
+  // 2.75s: split horizontally + reveal items
   await delay(T_SENTENCE_SPLIT - T_SENTENCE_FADEIN - 300);
-  await Promise.all([
-    prefix.animate([{ transform: `translateX(${SPLIT_TRANSLATE_PX}px)` }, { transform: 'translateX(0)' }], {
-      duration: 250,
-      easing: 'ease-out',
-      fill: 'forwards',
-    }).finished,
-    suffix.animate([{ transform: `translateX(-${SPLIT_TRANSLATE_PX}px)` }, { transform: 'translateX(0)' }], {
-      duration: 250,
-      easing: 'ease-out',
-      fill: 'forwards',
-    }).finished,
-    itemList.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 250, easing: 'ease-out', fill: 'forwards' })
-      .finished,
-  ]).catch(() => {});
+  const prefixSplit = prefix.animate(
+    [{ transform: `translateX(${SPLIT_TRANSLATE_PX}px)` }, { transform: 'translateX(0)' }],
+    { duration: 250, easing: 'ease-out', fill: 'forwards' },
+  );
+  const suffixSplit = suffix.animate(
+    [{ transform: `translateX(-${SPLIT_TRANSLATE_PX}px)` }, { transform: 'translateX(0)' }],
+    { duration: 250, easing: 'ease-out', fill: 'forwards' },
+  );
+  const itemsFadeIn = itemList.animate([{ opacity: 0 }, { opacity: 1 }], {
+    duration: 250,
+    easing: 'ease-out',
+    fill: 'forwards',
+  });
+  await Promise.all([prefixSplit.finished, suffixSplit.finished, itemsFadeIn.finished]).catch(() => {});
   prefix.style.transform = 'translateX(0)';
   suffix.style.transform = 'translateX(0)';
   itemList.style.opacity = '1';
+  prefixSplit.cancel();
+  suffixSplit.cancel();
+  itemsFadeIn.cancel();
 
   // 3.50s: controls fade in
   await delay(T_ITEMS_REVEAL - T_SENTENCE_SPLIT - 250);
-  controls
-    .animate([{ opacity: 0 }, { opacity: 1 }], { duration: 200, easing: 'linear', fill: 'forwards' })
-    .finished.then(() => {
+  const controlsFadeIn = controls.animate([{ opacity: 0 }, { opacity: 1 }], {
+    duration: 200,
+    easing: 'linear',
+    fill: 'forwards',
+  });
+  controlsFadeIn.finished
+    .then(() => {
       controls.style.opacity = '1';
+      controlsFadeIn.cancel();
     })
     .catch(() => {});
 

@@ -1,0 +1,707 @@
+import { moveInstrumentation as e } from '../../scripts/scripts.js';
+import { r as t } from '../../chunks/env.js';
+function n(e, t) {
+  document.dispatchEvent(new CustomEvent(e, { detail: t, bubbles: !0 }));
+}
+function r(e, t, r) {
+  n(`cinematic-hero:impression`, { blockId: e, mode: t, item: r });
+}
+function i(e, t, r, i) {
+  n(`cinematic-hero:item-select`, { previousItem: e, newItem: t, mode: r, inputSource: i });
+}
+function a(e, t, r) {
+  n(`cinematic-hero:mode-change`, { previousMode: e, newMode: t, newActiveItem: r });
+}
+function o(e) {
+  n(`cinematic-hero:sound-toggle`, { muted: e });
+}
+function s(e, t, r) {
+  n(`cinematic-hero:media-error`, { item: e, mediaUrl: t, errorType: r });
+}
+var c = 0.12,
+  l = class {
+    constructor(e, t) {
+      ((this.rafId = 0),
+        (this.targetX = 0),
+        (this.targetY = 0),
+        (this.currentX = 0),
+        (this.currentY = 0),
+        (this.active = !1),
+        (this.mounted = !1),
+        (this.onPointerMove = (e) => {
+          ((this.targetX = e.clientX), (this.targetY = e.clientY), this.active || this.startRAF());
+        }),
+        (this.onPointerEnter = () => {
+          ((this.active = !0), (this.cursorEl.style.opacity = `1`), this.startRAF());
+        }),
+        (this.onPointerLeave = () => {
+          ((this.active = !1), (this.cursorEl.style.opacity = `0`));
+        }),
+        (this.tick = () => {
+          ((this.currentX += (this.targetX - this.currentX) * c),
+            (this.currentY += (this.targetY - this.currentY) * c),
+            (this.cursorEl.style.transform = `translate(calc(${this.currentX}px - 50%), calc(${this.currentY}px - 50%))`),
+            this.active || Math.abs(this.targetX - this.currentX) > 0.5
+              ? (this.rafId = requestAnimationFrame(this.tick))
+              : (this.rafId = 0));
+        }),
+        (this.container = e),
+        (this.cursorEl = t));
+    }
+    mount() {
+      this.mounted ||
+        (window.matchMedia(`(pointer: fine)`).matches &&
+          (window.matchMedia(`(prefers-reduced-motion: reduce)`).matches ||
+            ((this.mounted = !0),
+            this.container.addEventListener(`pointermove`, this.onPointerMove),
+            this.container.addEventListener(`pointerenter`, this.onPointerEnter),
+            this.container.addEventListener(`pointerleave`, this.onPointerLeave),
+            (this.container.style.cursor = `none`))));
+    }
+    startRAF() {
+      this.rafId ||= requestAnimationFrame(this.tick);
+    }
+    destroy() {
+      ((this.mounted = !1),
+        cancelAnimationFrame(this.rafId),
+        (this.rafId = 0),
+        this.container.removeEventListener(`pointermove`, this.onPointerMove),
+        this.container.removeEventListener(`pointerenter`, this.onPointerEnter),
+        this.container.removeEventListener(`pointerleave`, this.onPointerLeave),
+        (this.container.style.cursor = ``));
+    }
+  },
+  u = 700,
+  d = 2750,
+  f = 3500,
+  p = 3750,
+  m = 120;
+function h(e) {
+  return new Promise((t) => setTimeout(t, e));
+}
+async function g(e, t) {
+  let { prefix: n, suffix: r, itemList: i, controls: a } = e;
+  ((n.style.opacity = `0`),
+    (r.style.opacity = `0`),
+    (i.style.opacity = `0`),
+    (a.style.opacity = `0`),
+    (n.style.transform = `translateX(${m}px)`),
+    (r.style.transform = `translateX(-${m}px)`),
+    await h(u));
+  let o = n.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 300, easing: `linear`, fill: `forwards` }),
+    s = r.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 300, easing: `linear`, fill: `forwards` });
+  (await Promise.all([o.finished, s.finished]).catch(() => {}),
+    (n.style.opacity = `1`),
+    (r.style.opacity = `1`),
+    o.cancel(),
+    s.cancel(),
+    await h(d - u - 300));
+  let c = n.animate([{ transform: `translateX(${m}px)` }, { transform: `translateX(0)` }], {
+      duration: 250,
+      easing: `ease-out`,
+      fill: `forwards`,
+    }),
+    l = r.animate([{ transform: `translateX(-${m}px)` }, { transform: `translateX(0)` }], {
+      duration: 250,
+      easing: `ease-out`,
+      fill: `forwards`,
+    }),
+    g = i.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 250, easing: `ease-out`, fill: `forwards` });
+  (await Promise.all([c.finished, l.finished, g.finished]).catch(() => {}),
+    (n.style.transform = `translateX(0)`),
+    (r.style.transform = `translateX(0)`),
+    (i.style.opacity = `1`),
+    c.cancel(),
+    l.cancel(),
+    g.cancel(),
+    t?.(),
+    await h(f - d - 250));
+  let _ = a.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 200, easing: `linear`, fill: `forwards` });
+  (_.finished
+    .then(() => {
+      ((a.style.opacity = `1`), _.cancel());
+    })
+    .catch(() => {}),
+    await h(p - f));
+}
+function _(e) {
+  let { prefix: t, suffix: n, itemList: r, controls: i } = e;
+  ((t.style.opacity = `1`),
+    (t.style.transform = `translateX(0)`),
+    (n.style.opacity = `1`),
+    (n.style.transform = `translateX(0)`),
+    (r.style.opacity = `1`),
+    (i.style.opacity = `1`));
+}
+var v = 360,
+  y = class {
+    constructor(e, t, n) {
+      ((this.activeLayer = `a`),
+        (this.sequenceId = 0),
+        (this.muted = !0),
+        (this.onError = () => {}),
+        (this.videoA = e),
+        (this.videoB = t),
+        (this.posterEl = n),
+        (e.style.opacity = `0`),
+        (t.style.opacity = `0`));
+    }
+    get activeVideo() {
+      return this.activeLayer === `a` ? this.videoA : this.videoB;
+    }
+    get inactiveVideo() {
+      return this.activeLayer === `a` ? this.videoB : this.videoA;
+    }
+    setErrorHandler(e) {
+      this.onError = e;
+    }
+    setMuted(e) {
+      ((this.muted = e), (this.videoA.muted = e), (this.videoB.muted = e));
+    }
+    pause() {
+      (this.videoA.pause(), this.videoB.pause());
+    }
+    resume() {
+      parseFloat(this.activeVideo.style.opacity ?? `0`) > 0 && this.activeVideo.play().catch(() => {});
+    }
+    async switchTo(e) {
+      this.sequenceId += 1;
+      let t = this.sequenceId,
+        n = this.inactiveVideo,
+        r = this.activeVideo;
+      if (
+        ((this.posterEl.style.backgroundImage = `url(${e.posterUrl})`),
+        (this.posterEl.style.backgroundPosition = this.getFocalPosition(e)),
+        (n.src = e.videoUrl),
+        (n.muted = this.muted),
+        (n.style.objectPosition = this.getFocalPosition(e)),
+        await new Promise((t, r) => {
+          let i = new AbortController(),
+            { signal: a } = i;
+          (n.addEventListener(
+            `loadeddata`,
+            () => {
+              (i.abort(), t());
+            },
+            { signal: a },
+          ),
+            n.addEventListener(
+              `error`,
+              () => {
+                (i.abort(), r(Error(`Video load error: ${e.videoUrl}`)));
+              },
+              { signal: a },
+            ),
+            n.load());
+        }).catch((t) => {
+          let n = t instanceof Error ? t.message : `load-error`;
+          this.onError(e, n);
+        }),
+        this.sequenceId !== t)
+      )
+        return;
+      n.play().catch(() => {});
+      let i = n.animate([{ opacity: `0` }, { opacity: `1` }], { duration: v, easing: `linear`, fill: `forwards` }),
+        a = r.animate([{ opacity: `1` }, { opacity: `0` }], { duration: v, easing: `linear`, fill: `forwards` });
+      (await Promise.all([i.finished, a.finished]).catch(() => {}),
+        this.sequenceId === t &&
+          ((n.style.opacity = `1`),
+          (r.style.opacity = `0`),
+          i.cancel(),
+          a.cancel(),
+          r.pause(),
+          r.removeAttribute(`src`),
+          r.load(),
+          (this.activeLayer = this.activeLayer === `a` ? `b` : `a`)));
+    }
+    getFocalPosition(e) {
+      return window.matchMedia(`(width < 768px)`).matches ? e.focalMobile : e.focalDesktop;
+    }
+    destroy() {
+      ((this.sequenceId = 2 ** 53 - 1),
+        this.videoA.pause(),
+        this.videoB.pause(),
+        this.videoA.removeAttribute(`src`),
+        this.videoB.removeAttribute(`src`),
+        this.videoA.load(),
+        this.videoB.load());
+    }
+  },
+  b = 310,
+  x = 190,
+  S = 120,
+  C = class {
+    constructor(e, t, n) {
+      ((this.items = []),
+        (this.rowOffsets = []),
+        (this.activeIndex = 0),
+        (this.selectCallbacks = []),
+        (this.hoverTimer = null),
+        (this.pendingAnchorAnimations = []),
+        (this.pendingOpacityAnimations = []),
+        (this.introComplete = !1),
+        (this.prefixEl = e),
+        (this.suffixEl = t),
+        (this.itemListEl = n));
+    }
+    setIntroComplete(e) {
+      this.introComplete = e;
+    }
+    onSelect(e) {
+      this.selectCallbacks.push(e);
+    }
+    emitSelect(e) {
+      this.selectCallbacks.forEach((t) => t(e));
+    }
+    renderItems(e, t) {
+      ((this.items = e),
+        (this.activeIndex = t),
+        (this.itemListEl.innerHTML = ``),
+        e.forEach((e, n) => {
+          let r = document.createElement(`li`);
+          ((r.className = `cinematic-hero-item`),
+            r.setAttribute(`role`, `option`),
+            r.setAttribute(`aria-selected`, n === t ? `true` : `false`),
+            (r.dataset.index = String(n)));
+          let i = document.createElement(`button`);
+          ((i.className = `cinematic-hero-item-btn`),
+            (i.type = `button`),
+            (i.textContent = e.label),
+            i.addEventListener(`pointerenter`, () => this.handlePointerEnter(n)),
+            i.addEventListener(`pointerleave`, () => this.handlePointerLeave()),
+            i.addEventListener(`keydown`, (e) => this.handleKeyDown(e, n)),
+            i.addEventListener(`click`, () => this.handleClick(n)),
+            r.append(i),
+            this.itemListEl.append(r));
+        }));
+    }
+    handlePointerEnter(e) {
+      this.introComplete &&
+        (this.clearHoverTimer(),
+        (this.hoverTimer = setTimeout(() => {
+          (this.activateItem(e, !0), this.emitSelect(e));
+        }, S)));
+    }
+    handlePointerLeave() {
+      this.clearHoverTimer();
+    }
+    handleKeyDown(e, t) {
+      if (!this.introComplete) return;
+      let n = this.items.length,
+        r = t;
+      if (e.key === `ArrowDown`) (e.preventDefault(), (r = Math.min(n - 1, t + 1)));
+      else if (e.key === `ArrowUp`) (e.preventDefault(), (r = Math.max(0, t - 1)));
+      else if (e.key === `Home`) (e.preventDefault(), (r = 0));
+      else if (e.key === `End`) (e.preventDefault(), (r = n - 1));
+      else return;
+      r !== t &&
+        (this.activateItem(r, !0), this.emitSelect(r), this.itemListEl.children[r]?.querySelector(`button`)?.focus());
+    }
+    handleClick(e) {
+      if (!this.introComplete) return;
+      this.clearHoverTimer();
+      let t = this.items[e];
+      if (e === this.activeIndex && t?.link) {
+        window.location.href = t.link;
+        return;
+      }
+      (this.activateItem(e, !0), this.emitSelect(e));
+    }
+    clearHoverTimer() {
+      this.hoverTimer !== null && (clearTimeout(this.hoverTimer), (this.hoverTimer = null));
+    }
+    measureRows() {
+      let e = this.itemListEl.getBoundingClientRect().top;
+      this.rowOffsets = [...this.itemListEl.children].map((t) => {
+        let n = t.getBoundingClientRect();
+        return n.top + n.height / 2 - e;
+      });
+    }
+    activateItem(e, t) {
+      let n = this.activeIndex;
+      this.activeIndex = e;
+      let r = [...this.itemListEl.children];
+      r.forEach((t, n) => {
+        t.setAttribute(`aria-selected`, n === e ? `true` : `false`);
+      });
+      let i = r[n]?.querySelector(`.cinematic-hero-item-btn`),
+        a = r[e]?.querySelector(`.cinematic-hero-item-btn`);
+      if (
+        (this.pendingOpacityAnimations.forEach((e) => e.cancel()), (this.pendingOpacityAnimations = []), i && n !== e)
+      ) {
+        let e = i.animate([{ opacity: 1 }, { opacity: 0.35 }], { duration: t ? x : 0, fill: `forwards` });
+        (this.pendingOpacityAnimations.push(e),
+          e.finished
+            .then(() => {
+              ((i.style.opacity = `0.35`),
+                e.cancel(),
+                (this.pendingOpacityAnimations = this.pendingOpacityAnimations.filter((t) => t !== e)));
+            })
+            .catch(() => {}));
+      }
+      if (a) {
+        let e = a.animate([{ opacity: 0.35 }, { opacity: 1 }], { duration: t ? x : 0, fill: `forwards` });
+        (this.pendingOpacityAnimations.push(e),
+          e.finished
+            .then(() => {
+              ((a.style.opacity = `1`),
+                e.cancel(),
+                (this.pendingOpacityAnimations = this.pendingOpacityAnimations.filter((t) => t !== e)));
+            })
+            .catch(() => {}));
+      }
+      this.rowOffsets.length === 0 && this.measureRows();
+      let o = this.rowOffsets[e];
+      if (o === void 0) return;
+      (this.pendingAnchorAnimations.forEach((e) => e.cancel()), (this.pendingAnchorAnimations = []));
+      let s = this.itemListEl.getBoundingClientRect(),
+        c = this.prefixEl.getBoundingClientRect(),
+        l = this.suffixEl.getBoundingClientRect(),
+        u = s.top,
+        d = c.top + c.height / 2,
+        f = l.top + l.height / 2,
+        p = u + o,
+        m = p - d,
+        h = p - f,
+        g = this.getCurrentTranslateY(this.prefixEl),
+        _ = this.getCurrentTranslateY(this.suffixEl),
+        v = this.prefixEl.animate([{ transform: `translateY(${g}px)` }, { transform: `translateY(${g + m}px)` }], {
+          duration: t ? b : 0,
+          easing: `ease-out`,
+          fill: `forwards`,
+        }),
+        y = this.suffixEl.animate([{ transform: `translateY(${_}px)` }, { transform: `translateY(${_ + h}px)` }], {
+          duration: t ? b : 0,
+          easing: `ease-out`,
+          fill: `forwards`,
+        });
+      ((this.pendingAnchorAnimations = [v, y]),
+        v.finished
+          .then(() => {
+            ((this.prefixEl.style.transform = `translateY(${g + m}px)`), v.cancel());
+          })
+          .catch(() => {}),
+        y.finished
+          .then(() => {
+            ((this.suffixEl.style.transform = `translateY(${_ + h}px)`), y.cancel());
+          })
+          .catch(() => {}));
+    }
+    getCurrentTranslateY(e) {
+      return new DOMMatrix(getComputedStyle(e).transform).m42;
+    }
+    destroy() {
+      (this.clearHoverTimer(),
+        this.pendingAnchorAnimations.forEach((e) => e.cancel()),
+        this.pendingOpacityAnimations.forEach((e) => e.cancel()));
+    }
+  };
+function w(e) {
+  let t = [...e.children];
+  return {
+    prefix: t[0]?.textContent?.trim() || `See`,
+    suffix: t[1]?.textContent?.trim() || `with new eyes`,
+    experiencesLabel: t[2]?.textContent?.trim() || `Experiences`,
+    destinationsLabel: t[3]?.textContent?.trim() || `Destinations`,
+  };
+}
+function T(e) {
+  return e
+    .map((e) => {
+      let n = [...e.children],
+        r = n[0]?.textContent?.trim() ?? ``,
+        i = (n[1]?.textContent?.trim().toLowerCase() ?? ``) === `destinations` ? `destinations` : `experiences`,
+        a = n[2]?.querySelector(`a`),
+        o = t(a?.href ?? n[2]?.textContent?.trim() ?? ``),
+        s = (n[3]?.querySelector(`picture`) ?? null)?.querySelector(`img`)?.src ?? ``,
+        c = n[4]?.querySelector(`a`)?.href ?? null,
+        l = n[5]?.textContent?.trim() || `center`,
+        u = n[6]?.textContent?.trim() || `center`,
+        d = n[7]?.textContent?.trim().toLowerCase() === `true`;
+      return !r || !o
+        ? null
+        : {
+            label: r,
+            mode: i,
+            videoUrl: o,
+            posterUrl: s,
+            link: c,
+            focalDesktop: l,
+            focalMobile: u,
+            hasAudio: d,
+            sourceRow: e,
+          };
+    })
+    .filter((e) => e !== null);
+}
+function E(t, n) {
+  let r = document.createElement(`li`);
+  ((r.className = `cinematic-hero-item`),
+    r.setAttribute(`role`, `option`),
+    r.setAttribute(`aria-selected`, n === 0 ? `true` : `false`),
+    (r.dataset.index = String(n)),
+    (r.dataset.mode = t.mode),
+    e(t.sourceRow, r));
+  let i = document.createElement(`button`);
+  return (
+    (i.className = `cinematic-hero-item-btn`),
+    (i.type = `button`),
+    (i.textContent = t.label),
+    r.append(i),
+    t.link && (i.dataset.href = t.link),
+    r
+  );
+}
+function D(e, t, n) {
+  let r = document.createDocumentFragment(),
+    i = document.createElement(`div`);
+  i.className = `cinematic-hero-media`;
+  let a = document.createElement(`div`);
+  a.className = `cinematic-hero-poster`;
+  let o = t.find((e) => e.mode === n.activeMode) ?? t[0];
+  o?.posterUrl && ((a.style.backgroundImage = `url(${o.posterUrl})`), (a.style.backgroundPosition = o.focalDesktop));
+  let s = document.createElement(`video`);
+  ((s.className = `cinematic-hero-video cinematic-hero-video--a`),
+    (s.muted = !0),
+    (s.playsInline = !0),
+    (s.loop = !0),
+    s.setAttribute(`aria-hidden`, `true`));
+  let c = document.createElement(`video`);
+  ((c.className = `cinematic-hero-video cinematic-hero-video--b`),
+    (c.muted = !0),
+    (c.playsInline = !0),
+    (c.loop = !0),
+    c.setAttribute(`aria-hidden`, `true`),
+    i.append(a, s, c));
+  let l = document.createElement(`div`);
+  ((l.className = `cinematic-hero-overlay`), l.setAttribute(`aria-hidden`, `true`));
+  let u = document.createElement(`div`);
+  ((u.className = `cinematic-hero-selector`), u.setAttribute(`aria-label`, `Experience selector`));
+  let d = document.createElement(`div`);
+  ((d.className = `cinematic-hero-prefix`), (d.textContent = e.prefix), d.setAttribute(`aria-hidden`, `true`));
+  let f = document.createElement(`ul`);
+  ((f.className = `cinematic-hero-items`),
+    f.setAttribute(`role`, `listbox`),
+    f.setAttribute(`aria-label`, `Select content`),
+    t
+      .filter((e) => e.mode === n.activeMode)
+      .forEach((e, t) => {
+        f.append(E(e, t));
+      }));
+  let p = document.createElement(`div`);
+  ((p.className = `cinematic-hero-suffix`),
+    (p.textContent = e.suffix),
+    p.setAttribute(`aria-hidden`, `true`),
+    u.append(d, f, p));
+  let m = document.createElement(`div`);
+  m.className = `cinematic-hero-controls`;
+  let h = document.createElement(`button`);
+  ((h.className = `cinematic-hero-sound`),
+    (h.type = `button`),
+    h.setAttribute(`aria-label`, `Unmute video`),
+    h.setAttribute(`aria-pressed`, `false`),
+    t.some((e) => e.hasAudio) || (h.hidden = !0));
+  let g = document.createElement(`div`);
+  ((g.className = `cinematic-hero-mode`),
+    g.setAttribute(`role`, `tablist`),
+    g.setAttribute(`aria-label`, `Content mode`));
+  let _ = document.createElement(`button`);
+  ((_.className = `cinematic-hero-mode-btn`),
+    (_.type = `button`),
+    _.setAttribute(`role`, `tab`),
+    (_.dataset.mode = `experiences`),
+    (_.textContent = e.experiencesLabel));
+  let v = document.createElement(`div`);
+  ((v.className = `cinematic-hero-mode-track`), v.setAttribute(`aria-hidden`, `true`));
+  let y = document.createElement(`div`);
+  ((y.className = `cinematic-hero-mode-indicator`), v.append(y));
+  let b = document.createElement(`button`);
+  ((b.className = `cinematic-hero-mode-btn`),
+    (b.type = `button`),
+    b.setAttribute(`role`, `tab`),
+    (b.dataset.mode = `destinations`),
+    (b.textContent = e.destinationsLabel));
+  let x = [_, b];
+  (x.forEach((e) => {
+    let t = e.dataset.mode === n.activeMode;
+    (e.setAttribute(`aria-selected`, String(t)), e.classList.toggle(`cinematic-hero-mode-btn--active`, t));
+  }),
+    g.append(_, v, b),
+    m.append(h, g));
+  let S = document.createElement(`div`);
+  return (
+    (S.className = `cinematic-hero-cursor`),
+    S.setAttribute(`aria-hidden`, `true`),
+    r.append(i, l, u, m, S),
+    {
+      root: r,
+      mediaEl: i,
+      posterEl: a,
+      videoA: s,
+      videoB: c,
+      overlayEl: l,
+      prefixEl: d,
+      suffixEl: p,
+      itemListEl: f,
+      controlsEl: m,
+      soundBtn: h,
+      modeBtns: x,
+      indicatorEl: y,
+      cursorEl: S,
+    }
+  );
+}
+function O() {
+  return !!(
+    window.matchMedia(`(prefers-reduced-motion: reduce)`).matches ||
+    document.documentElement.classList.contains(`adobe-ue-edit`) ||
+    window.self !== window.top
+  );
+}
+async function k(e) {
+  let t = [...e.children];
+  if (t.length < 2) return;
+  let n = w(t[0]),
+    c = T(t.slice(1));
+  if (c.length === 0) return;
+  let u = { activeMode: `experiences`, activeIndex: { experiences: 0, destinations: 0 }, introComplete: !1, muted: !0 },
+    d = D(n, c, u);
+  (e.replaceChildren(d.root),
+    (d.indicatorEl.style.transform = u.activeMode === `destinations` ? `translateX(50%)` : `translateX(0%)`));
+  let f = new y(d.videoA, d.videoB, d.posterEl);
+  f.setErrorHandler((e, t) => s(e.label, e.videoUrl, t));
+  let p = c.find((e) => e.mode === u.activeMode) ?? c[0];
+  p && f.switchTo(p).catch(() => {});
+  let m = new C(d.prefixEl, d.suffixEl, d.itemListEl),
+    h = c.filter((e) => e.mode === u.activeMode);
+  (m.renderItems(h, u.activeIndex[u.activeMode]),
+    document.fonts ? document.fonts.ready.then(() => m.measureRows()) : m.measureRows());
+  let v = new ResizeObserver(() => {
+    m.measureRows();
+  });
+  (v.observe(e),
+    m.onSelect((e) => {
+      let t = c.filter((e) => e.mode === u.activeMode)[u.activeIndex[u.activeMode]];
+      u.activeIndex[u.activeMode] = e;
+      let n = c.filter((e) => e.mode === u.activeMode)[e];
+      n && (f.switchTo(n).catch(() => {}), i(t?.label ?? ``, n.label, u.activeMode, `pointer`));
+    }));
+  let b = !1;
+  async function x(e) {
+    if (b || e === u.activeMode) return;
+    b = !0;
+    let t = u.activeMode;
+    ((u.activeMode = e),
+      d.modeBtns.forEach((t) => {
+        let n = t.dataset.mode === e;
+        (t.setAttribute(`aria-selected`, String(n)), t.classList.toggle(`cinematic-hero-mode-btn--active`, n));
+      }));
+    let n = e === `destinations` ? `50%` : `0%`,
+      r = d.indicatorEl.animate(
+        [{ transform: `translateX(${e === `destinations` ? `0%` : `50%`})` }, { transform: `translateX(${n})` }],
+        { duration: 280, easing: `ease-out`, fill: `forwards` },
+      );
+    r.finished
+      .then(() => {
+        ((d.indicatorEl.style.transform = `translateX(${n})`), r.cancel());
+      })
+      .catch(() => {});
+    let i = d.itemListEl.animate([{ opacity: 1 }, { opacity: 0 }], {
+      duration: 180,
+      easing: `linear`,
+      fill: `forwards`,
+    });
+    (await i.finished.catch(() => {}), (d.itemListEl.style.opacity = `0`), i.cancel());
+    let o = c.filter((t) => t.mode === e),
+      s = u.activeIndex[e];
+    (m.renderItems(o, s), m.measureRows(), m.activateItem(s, !1));
+    let l = o[s];
+    l && f.switchTo(l).catch(() => {});
+    let p = d.itemListEl.animate([{ opacity: 0 }, { opacity: 1 }], {
+      duration: 240,
+      easing: `ease-out`,
+      fill: `forwards`,
+    });
+    (await p.finished.catch(() => {}), (d.itemListEl.style.opacity = `1`), p.cancel());
+    let h = c.filter((t) => t.mode === e)[s];
+    (a(t, e, h?.label ?? ``), (b = !1));
+  }
+  (d.modeBtns.forEach((e) => {
+    e.addEventListener(`click`, () => {
+      let t = e.dataset.mode;
+      t && x(t);
+    });
+  }),
+    d.modeBtns.forEach((e) => {
+      e.addEventListener(`keydown`, (e) => {
+        if (e.key === `ArrowLeft` || e.key === `ArrowRight`) {
+          e.preventDefault();
+          let t = e.key === `ArrowLeft` ? 0 : 1;
+          d.modeBtns[t]?.focus();
+          let n = d.modeBtns[t]?.dataset.mode;
+          n && n !== u.activeMode && x(n);
+        }
+      });
+    }));
+  let S = { prefix: d.prefixEl, suffix: d.suffixEl, itemList: d.itemListEl, controls: d.controlsEl };
+  (typeof Element.prototype.animate == `function`
+    ? O()
+      ? (_(S),
+        m.measureRows(),
+        m.activateItem(u.activeIndex[u.activeMode], !1),
+        m.setIntroComplete(!0),
+        (u.introComplete = !0))
+      : g(S, () => {
+          (m.measureRows(), m.activateItem(u.activeIndex[u.activeMode], !0));
+        }).then(() => {
+          (m.setIntroComplete(!0), (u.introComplete = !0));
+          let e = c.filter((e) => e.mode === u.activeMode),
+            t = e[(u.activeIndex[u.activeMode] + 1) % e.length];
+          if (t) {
+            let e = document.createElement(`video`);
+            ((e.preload = `metadata`), (e.src = t.videoUrl));
+          }
+        })
+    : (_(S),
+      m.measureRows(),
+      m.activateItem(u.activeIndex[u.activeMode], !1),
+      m.setIntroComplete(!0),
+      (u.introComplete = !0)),
+    d.soundBtn.addEventListener(`click`, () => {
+      ((u.muted = !u.muted),
+        f.setMuted(u.muted),
+        d.soundBtn.setAttribute(`aria-pressed`, String(!u.muted)),
+        d.soundBtn.setAttribute(`aria-label`, u.muted ? `Unmute video` : `Mute video`),
+        o(u.muted));
+    }));
+  let E = setTimeout(() => {
+      let t = c.filter((e) => e.mode === u.activeMode)[u.activeIndex[u.activeMode]];
+      r(e.id || `cinematic-hero`, u.activeMode, t?.label ?? ``);
+    }, 2e3),
+    k = new IntersectionObserver(
+      (e) => {
+        e[0].intersectionRatio >= 0.25 ? f.resume() : f.pause();
+      },
+      { threshold: [0, 0.25] },
+    );
+  k.observe(e);
+  let A = () => {
+    document.hidden ? f.pause() : f.resume();
+  };
+  document.addEventListener(`visibilitychange`, A);
+  let j = new l(e, d.cursorEl);
+  j.mount();
+  let M = new MutationObserver(() => {
+    e.isConnected ||
+      (clearTimeout(E),
+      j.destroy(),
+      m.destroy(),
+      f.destroy(),
+      k.disconnect(),
+      v.disconnect(),
+      document.removeEventListener(`visibilitychange`, A),
+      M.disconnect());
+  });
+  M.observe(document.body, { childList: !0, subtree: !0 });
+}
+export { D as buildDOM, k as default };

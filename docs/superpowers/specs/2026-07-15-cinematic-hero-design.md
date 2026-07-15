@@ -1,7 +1,7 @@
 # Cinematic Hero Block — Design Specification
 
-**Date:** 2026-07-15  
-**Block name:** `cinematic-hero`  
+**Date:** 2026-07-15
+**Block name:** `cinematic-hero`
 **Status:** Approved, ready for implementation planning
 
 ---

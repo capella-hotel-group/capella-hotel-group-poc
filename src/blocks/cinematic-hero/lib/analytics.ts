@@ -22,6 +22,7 @@ export function emitModeChange(previousMode: HeroMode, newMode: HeroMode, newAct
   emit('cinematic-hero:mode-change', { previousMode, newMode, newActiveItem });
 }
 
+// ponytail: stub — wire when item tap-to-navigate is implemented
 export function emitItemNavigation(item: string, href: string): void {
   emit('cinematic-hero:item-navigate', { item, href });
 }

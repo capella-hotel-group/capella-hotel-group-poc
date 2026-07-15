@@ -1,7 +1,7 @@
 // src/blocks/cinematic-hero/cinematic-hero.ts
 import { moveInstrumentation } from '@/app/scripts';
 import { resolveDAMUrl } from '@/utils/env';
-import { emitHeroImpression, emitItemSelect, emitMediaError, emitSoundToggle } from './lib/analytics';
+import { emitHeroImpression, emitItemSelect, emitMediaError, emitModeChange, emitSoundToggle } from './lib/analytics';
 import { CursorController } from './lib/cursor';
 import { runIntro, skipIntro } from './lib/intro';
 import { MediaManager } from './lib/media-manager';
@@ -299,6 +299,7 @@ export default async function decorate(block: HTMLElement): Promise<void> {
   async function switchMode(newMode: HeroMode): Promise<void> {
     if (modeLocked || newMode === state.activeMode) return;
     modeLocked = true;
+    const prevMode = state.activeMode;
 
     state.activeMode = newMode;
 
@@ -359,6 +360,8 @@ export default async function decorate(block: HTMLElement): Promise<void> {
     dom.itemListEl.style.opacity = '1';
     fadeInAnim.cancel();
 
+    const newActiveItemForAnalytics = items.filter((i) => i.mode === newMode)[newActiveIndex];
+    emitModeChange(prevMode, newMode, newActiveItemForAnalytics?.label ?? '');
     modeLocked = false;
   }
 

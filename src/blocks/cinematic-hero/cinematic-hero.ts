@@ -1,6 +1,7 @@
 // src/blocks/cinematic-hero/cinematic-hero.ts
 import { moveInstrumentation } from '@/app/scripts';
 import { resolveDAMUrl } from '@/utils/env';
+import { emitHeroImpression, emitItemSelect, emitMediaError, emitSoundToggle } from './lib/analytics';
 import { CursorController } from './lib/cursor';
 import { runIntro, skipIntro } from './lib/intro';
 import { MediaManager } from './lib/media-manager';
@@ -256,6 +257,7 @@ export default async function decorate(block: HTMLElement): Promise<void> {
   dom.indicatorEl.style.transform = state.activeMode === 'destinations' ? 'translateX(50%)' : 'translateX(0%)';
 
   const media = new MediaManager(dom.videoA, dom.videoB, dom.posterEl);
+  media.setErrorHandler((item, errorType) => emitMediaError(item.label, item.videoUrl, errorType));
 
   // Load first item immediately
   const firstItem = items.find((i) => i.mode === state.activeMode) ?? items[0];
@@ -283,10 +285,12 @@ export default async function decorate(block: HTMLElement): Promise<void> {
 
   // Wire item selection to media switch
   selectorUI.onSelect((index) => {
+    const prevItem = items.filter((i) => i.mode === state.activeMode)[state.activeIndex[state.activeMode]];
     state.activeIndex[state.activeMode] = index;
     const item = items.filter((i) => i.mode === state.activeMode)[index];
     if (item) {
       media.switchTo(item).catch(() => {});
+      emitItemSelect(prevItem?.label ?? '', item.label, state.activeMode, 'pointer');
     }
   });
 
@@ -407,7 +411,14 @@ export default async function decorate(block: HTMLElement): Promise<void> {
     media.setMuted(state.muted);
     dom.soundBtn.setAttribute('aria-pressed', String(!state.muted));
     dom.soundBtn.setAttribute('aria-label', state.muted ? 'Unmute video' : 'Mute video');
+    emitSoundToggle(state.muted);
   });
+
+  // Impression: emit after block is visible for > 2s
+  const impressionTimer = setTimeout(() => {
+    const firstItem = items.filter((i) => i.mode === state.activeMode)[state.activeIndex[state.activeMode]];
+    emitHeroImpression(block.id || 'cinematic-hero', state.activeMode, firstItem?.label ?? '');
+  }, 2000);
 
   // Pause/resume on visibility
   const observer = new IntersectionObserver(
@@ -422,14 +433,30 @@ export default async function decorate(block: HTMLElement): Promise<void> {
   );
   observer.observe(block);
 
-  document.addEventListener('visibilitychange', () => {
+  const visibilityChangeHandler = (): void => {
     if (document.hidden) {
       media.pause();
     } else {
       media.resume();
     }
-  });
+  };
+  document.addEventListener('visibilitychange', visibilityChangeHandler);
 
   const cursor = new CursorController(block, dom.cursorEl);
   cursor.mount();
+
+  // Cleanup on disconnect
+  const disconnectObserver = new MutationObserver(() => {
+    if (!block.isConnected) {
+      clearTimeout(impressionTimer);
+      cursor.destroy();
+      selectorUI.destroy();
+      media.destroy();
+      observer.disconnect();
+      ro.disconnect();
+      document.removeEventListener('visibilitychange', visibilityChangeHandler);
+      disconnectObserver.disconnect();
+    }
+  });
+  disconnectObserver.observe(document.body, { childList: true, subtree: true });
 }

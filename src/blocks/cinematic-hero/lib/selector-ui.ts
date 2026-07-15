@@ -15,6 +15,7 @@ export class SelectorUI {
   private selectCallbacks: Array<(index: number) => void> = [];
   private hoverTimer: ReturnType<typeof setTimeout> | null = null;
   private pendingAnchorAnimations: Animation[] = [];
+  private pendingOpacityAnimations: Animation[] = [];
   private introComplete = false;
 
   constructor(prefixEl: HTMLElement, suffixEl: HTMLElement, itemListEl: HTMLUListElement) {
@@ -150,17 +151,37 @@ export class SelectorUI {
     const prevBtn = lis[prev]?.querySelector<HTMLElement>('.cinematic-hero-item-btn');
     const nextBtn = lis[index]?.querySelector<HTMLElement>('.cinematic-hero-item-btn');
 
+    // Cancel pending opacity animations (overwrite — latest wins)
+    this.pendingOpacityAnimations.forEach((a) => a.cancel());
+    this.pendingOpacityAnimations = [];
+
     if (prevBtn && prev !== index) {
-      prevBtn.animate([{ opacity: 1 }, { opacity: 0.35 }], {
+      const prevOpacityAnim = prevBtn.animate([{ opacity: 1 }, { opacity: 0.35 }], {
         duration: animate ? OPACITY_MS : 0,
         fill: 'forwards',
       });
+      this.pendingOpacityAnimations.push(prevOpacityAnim);
+      prevOpacityAnim.finished
+        .then(() => {
+          prevBtn.style.opacity = '0.35';
+          prevOpacityAnim.cancel();
+          this.pendingOpacityAnimations = this.pendingOpacityAnimations.filter((a) => a !== prevOpacityAnim);
+        })
+        .catch(() => {});
     }
     if (nextBtn) {
-      nextBtn.animate([{ opacity: 0.35 }, { opacity: 1 }], {
+      const nextOpacityAnim = nextBtn.animate([{ opacity: 0.35 }, { opacity: 1 }], {
         duration: animate ? OPACITY_MS : 0,
         fill: 'forwards',
       });
+      this.pendingOpacityAnimations.push(nextOpacityAnim);
+      nextOpacityAnim.finished
+        .then(() => {
+          nextBtn.style.opacity = '1';
+          nextOpacityAnim.cancel();
+          this.pendingOpacityAnimations = this.pendingOpacityAnimations.filter((a) => a !== nextOpacityAnim);
+        })
+        .catch(() => {});
     }
 
     // Anchor movement
@@ -233,5 +254,6 @@ export class SelectorUI {
   destroy(): void {
     this.clearHoverTimer();
     this.pendingAnchorAnimations.forEach((a) => a.cancel());
+    this.pendingOpacityAnimations.forEach((a) => a.cancel());
   }
 }

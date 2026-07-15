@@ -396,6 +396,8 @@ export default async function decorate(block: HTMLElement): Promise<void> {
   // WAAPI feature detection — if unavailable, skip all animation
   if (typeof Element.prototype.animate !== 'function') {
     skipIntro(introElements);
+    selectorUI.measureRows();
+    selectorUI.activateItem(state.activeIndex[state.activeMode], false);
     selectorUI.setIntroComplete(true);
     state.introComplete = true;
     return;

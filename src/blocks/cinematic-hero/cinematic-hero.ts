@@ -400,19 +400,17 @@ export default async function decorate(block: HTMLElement): Promise<void> {
     selectorUI.activateItem(state.activeIndex[state.activeMode], false);
     selectorUI.setIntroComplete(true);
     state.introComplete = true;
-    return;
-  }
-
-  if (shouldSkipIntro()) {
+  } else if (shouldSkipIntro()) {
     skipIntro(introElements);
     selectorUI.measureRows();
     selectorUI.activateItem(state.activeIndex[state.activeMode], false);
     selectorUI.setIntroComplete(true);
     state.introComplete = true;
   } else {
-    runIntro(introElements).then(() => {
+    runIntro(introElements, () => {
       selectorUI.measureRows();
-      selectorUI.activateItem(state.activeIndex[state.activeMode], false);
+      selectorUI.activateItem(state.activeIndex[state.activeMode], true);
+    }).then(() => {
       selectorUI.setIntroComplete(true);
       state.introComplete = true;
 

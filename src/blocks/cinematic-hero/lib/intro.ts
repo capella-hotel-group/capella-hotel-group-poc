@@ -21,7 +21,7 @@ function delay(ms: number): Promise<void> {
  * The SelectorUI will handle the vertical anchor placement for item 0
  * after introComplete is set.
  */
-export async function runIntro(elements: IntroElements): Promise<void> {
+export async function runIntro(elements: IntroElements, onSplit?: () => void): Promise<void> {
   const { prefix, suffix, itemList, controls } = elements;
 
   // Initial state: UI invisible, prefix/suffix appear centered
@@ -72,6 +72,8 @@ export async function runIntro(elements: IntroElements): Promise<void> {
   prefixSplit.cancel();
   suffixSplit.cancel();
   itemsFadeIn.cancel();
+
+  onSplit?.();
 
   // 3.50s: controls fade in
   await delay(T_ITEMS_REVEAL - T_SENTENCE_SPLIT - 250);

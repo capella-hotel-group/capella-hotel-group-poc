@@ -1,6 +1,7 @@
 // src/blocks/cinematic-hero/cinematic-hero.ts
 import { moveInstrumentation } from '@/app/scripts';
 import { resolveDAMUrl } from '@/utils/env';
+import { CursorController } from './lib/cursor';
 import { runIntro, skipIntro } from './lib/intro';
 import { MediaManager } from './lib/media-manager';
 import { SelectorUI } from './lib/selector-ui';
@@ -428,4 +429,7 @@ export default async function decorate(block: HTMLElement): Promise<void> {
       media.resume();
     }
   });
+
+  const cursor = new CursorController(block, dom.cursorEl);
+  cursor.mount();
 }

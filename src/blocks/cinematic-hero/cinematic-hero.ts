@@ -1,9 +1,10 @@
 // src/blocks/cinematic-hero/cinematic-hero.ts
 import { moveInstrumentation } from '@/app/scripts';
 import { resolveDAMUrl } from '@/utils/env';
+import { runIntro, skipIntro } from './lib/intro';
 import { MediaManager } from './lib/media-manager';
 import { SelectorUI } from './lib/selector-ui';
-import type { HeroConfig, HeroItem, HeroMode, HeroState } from './lib/types';
+import type { HeroConfig, HeroItem, HeroMode, HeroState, IntroElements } from './lib/types';
 
 // ── DOM parsing ───────────────────────────────────────────────────────────────
 
@@ -223,6 +224,15 @@ export function buildDOM(
   };
 }
 
+function shouldSkipIntro(): boolean {
+  // Reduced motion preference
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return true;
+  // AEM Universal Editor context
+  if (document.documentElement.classList.contains('adobe-ue-edit')) return true;
+  if (window.self !== window.top) return true; // inside iframe (UE)
+  return false;
+}
+
 export default async function decorate(block: HTMLElement): Promise<void> {
   const rows = [...block.children] as HTMLElement[];
   if (rows.length < 2) return;
@@ -275,6 +285,28 @@ export default async function decorate(block: HTMLElement): Promise<void> {
       media.switchTo(item).catch(() => {});
     }
   });
+
+  const introElements: IntroElements = {
+    prefix: dom.prefixEl,
+    suffix: dom.suffixEl,
+    itemList: dom.itemListEl,
+    controls: dom.controlsEl,
+  };
+
+  if (shouldSkipIntro()) {
+    skipIntro(introElements);
+    selectorUI.measureRows();
+    selectorUI.activateItem(state.activeIndex[state.activeMode], false);
+    selectorUI.setIntroComplete(true);
+    state.introComplete = true;
+  } else {
+    runIntro(introElements).then(() => {
+      selectorUI.measureRows();
+      selectorUI.activateItem(state.activeIndex[state.activeMode], false);
+      selectorUI.setIntroComplete(true);
+      state.introComplete = true;
+    });
+  }
 
   // Sound toggle
   dom.soundBtn.addEventListener('click', () => {

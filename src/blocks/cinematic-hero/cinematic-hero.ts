@@ -2,6 +2,7 @@
 import { moveInstrumentation } from '@/app/scripts';
 import { resolveDAMUrl } from '@/utils/env';
 import { MediaManager } from './lib/media-manager';
+import { SelectorUI } from './lib/selector-ui';
 import type { HeroConfig, HeroItem, HeroMode, HeroState } from './lib/types';
 
 // ── DOM parsing ───────────────────────────────────────────────────────────────
@@ -249,6 +250,31 @@ export default async function decorate(block: HTMLElement): Promise<void> {
       // Silent: poster already displayed
     });
   }
+
+  const selectorUI = new SelectorUI(dom.prefixEl, dom.suffixEl, dom.itemListEl);
+  const modeItems = items.filter((i) => i.mode === state.activeMode);
+  selectorUI.renderItems(modeItems, state.activeIndex[state.activeMode]);
+
+  // Recalculate row offsets after fonts load and on resize
+  if (document.fonts) {
+    document.fonts.ready.then(() => selectorUI.measureRows());
+  } else {
+    selectorUI.measureRows();
+  }
+
+  const ro = new ResizeObserver(() => {
+    selectorUI.measureRows();
+  });
+  ro.observe(block);
+
+  // Wire item selection to media switch
+  selectorUI.onSelect((index) => {
+    state.activeIndex[state.activeMode] = index;
+    const item = items.filter((i) => i.mode === state.activeMode)[index];
+    if (item) {
+      media.switchTo(item).catch(() => {});
+    }
+  });
 
   // Sound toggle
   dom.soundBtn.addEventListener('click', () => {

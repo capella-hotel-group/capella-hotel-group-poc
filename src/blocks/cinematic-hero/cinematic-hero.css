@@ -249,3 +249,16 @@
         display: none;
     }
 }
+
+/* Touch devices — item tap to activate, second tap to navigate */
+@media (hover: none) {
+    .cinematic-hero-item-btn {
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+    }
+
+    .cinematic-hero-cursor {
+        display: none !important;
+    }
+}

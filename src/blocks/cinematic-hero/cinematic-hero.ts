@@ -393,6 +393,14 @@ export default async function decorate(block: HTMLElement): Promise<void> {
     controls: dom.controlsEl,
   };
 
+  // WAAPI feature detection — if unavailable, skip all animation
+  if (typeof Element.prototype.animate !== 'function') {
+    skipIntro(introElements);
+    selectorUI.setIntroComplete(true);
+    state.introComplete = true;
+    return;
+  }
+
   if (shouldSkipIntro()) {
     skipIntro(introElements);
     selectorUI.measureRows();
@@ -405,6 +413,16 @@ export default async function decorate(block: HTMLElement): Promise<void> {
       selectorUI.activateItem(state.activeIndex[state.activeMode], false);
       selectorUI.setIntroComplete(true);
       state.introComplete = true;
+
+      // Preload metadata for next item to reduce switching latency
+      const modeItemsForPreload = items.filter((i) => i.mode === state.activeMode);
+      const nextIdx = (state.activeIndex[state.activeMode] + 1) % modeItemsForPreload.length;
+      const nextItem = modeItemsForPreload[nextIdx];
+      if (nextItem) {
+        const preloadVid = document.createElement('video');
+        preloadVid.preload = 'metadata';
+        preloadVid.src = nextItem.videoUrl;
+      }
     });
   }
 

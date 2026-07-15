@@ -1,6 +1,7 @@
 // src/blocks/cinematic-hero/cinematic-hero.ts
 import { moveInstrumentation } from '@/app/scripts';
 import { resolveDAMUrl } from '@/utils/env';
+import { MediaManager } from './lib/media-manager';
 import type { HeroConfig, HeroItem, HeroMode, HeroState } from './lib/types';
 
 // ── DOM parsing ───────────────────────────────────────────────────────────────
@@ -238,4 +239,43 @@ export default async function decorate(block: HTMLElement): Promise<void> {
 
   const dom = buildDOM(config, items, state);
   block.replaceChildren(dom.root);
+
+  const media = new MediaManager(dom.videoA, dom.videoB, dom.posterEl);
+
+  // Load first item immediately
+  const firstItem = items.find((i) => i.mode === state.activeMode) ?? items[0];
+  if (firstItem) {
+    media.switchTo(firstItem).catch(() => {
+      // Silent: poster already displayed
+    });
+  }
+
+  // Sound toggle
+  dom.soundBtn.addEventListener('click', () => {
+    state.muted = !state.muted;
+    media.setMuted(state.muted);
+    dom.soundBtn.setAttribute('aria-pressed', String(!state.muted));
+    dom.soundBtn.setAttribute('aria-label', state.muted ? 'Unmute video' : 'Mute video');
+  });
+
+  // Pause/resume on visibility
+  const observer = new IntersectionObserver(
+    (entries) => {
+      if (entries[0].intersectionRatio >= 0.25) {
+        media.resume();
+      } else {
+        media.pause();
+      }
+    },
+    { threshold: [0, 0.25] },
+  );
+  observer.observe(block);
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      media.pause();
+    } else {
+      media.resume();
+    }
+  });
 }

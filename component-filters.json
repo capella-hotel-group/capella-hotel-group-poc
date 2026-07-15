@@ -87,6 +87,12 @@
     ]
   },
   {
+    "id": "cinematic-hero",
+    "components": [
+      "cinematic-hero-item"
+    ]
+  },
+  {
     "id": "columns",
     "components": [
       "column"

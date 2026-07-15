@@ -1,0 +1,14 @@
+/* src/blocks/cinematic-hero/cinematic-hero.css */
+.cinematic-hero-container .cinematic-hero-wrapper {
+    max-width: unset;
+    padding: 0;
+}
+
+.cinematic-hero {
+    position: relative;
+    width: 100%;
+    min-height: 100svh;
+    overflow: hidden;
+    background: #000;
+    contain: layout style;
+}

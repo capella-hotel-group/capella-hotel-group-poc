@@ -379,6 +379,181 @@
     ]
   },
   {
+    "id": "cinematic-hero",
+    "fields": [
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "prefix",
+        "label": "Prefix",
+        "value": "See"
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "suffix",
+        "label": "Suffix",
+        "value": "with new eyes"
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "experiencesLabel",
+        "label": "Experiences Label",
+        "value": "Experiences"
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "destinationsLabel",
+        "label": "Destinations Label",
+        "value": "Destinations"
+      }
+    ]
+  },
+  {
+    "id": "cinematic-hero-item",
+    "fields": [
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "label",
+        "label": "Label"
+      },
+      {
+        "component": "select",
+        "valueType": "string",
+        "name": "mode",
+        "label": "Mode",
+        "options": [
+          {
+            "name": "Experiences",
+            "value": "experiences"
+          },
+          {
+            "name": "Destinations",
+            "value": "destinations"
+          }
+        ]
+      },
+      {
+        "component": "aem-content",
+        "valueType": "string",
+        "name": "video",
+        "label": "Video"
+      },
+      {
+        "component": "reference",
+        "valueType": "string",
+        "name": "poster",
+        "label": "Poster Image",
+        "multi": false
+      },
+      {
+        "component": "aem-content",
+        "valueType": "string",
+        "name": "link",
+        "label": "Navigation Link"
+      },
+      {
+        "component": "select",
+        "valueType": "string",
+        "name": "focalDesktop",
+        "label": "Focal Position (Desktop)",
+        "value": "center",
+        "options": [
+          {
+            "name": "Center",
+            "value": "center"
+          },
+          {
+            "name": "Top",
+            "value": "top"
+          },
+          {
+            "name": "Bottom",
+            "value": "bottom"
+          },
+          {
+            "name": "Left",
+            "value": "left"
+          },
+          {
+            "name": "Right",
+            "value": "right"
+          },
+          {
+            "name": "Top Left",
+            "value": "top left"
+          },
+          {
+            "name": "Top Right",
+            "value": "top right"
+          },
+          {
+            "name": "Bottom Left",
+            "value": "bottom left"
+          },
+          {
+            "name": "Bottom Right",
+            "value": "bottom right"
+          }
+        ]
+      },
+      {
+        "component": "select",
+        "valueType": "string",
+        "name": "focalMobile",
+        "label": "Focal Position (Mobile)",
+        "value": "center",
+        "options": [
+          {
+            "name": "Center",
+            "value": "center"
+          },
+          {
+            "name": "Top",
+            "value": "top"
+          },
+          {
+            "name": "Bottom",
+            "value": "bottom"
+          },
+          {
+            "name": "Left",
+            "value": "left"
+          },
+          {
+            "name": "Right",
+            "value": "right"
+          },
+          {
+            "name": "Top Left",
+            "value": "top left"
+          },
+          {
+            "name": "Top Right",
+            "value": "top right"
+          },
+          {
+            "name": "Bottom Left",
+            "value": "bottom left"
+          },
+          {
+            "name": "Bottom Right",
+            "value": "bottom right"
+          }
+        ]
+      },
+      {
+        "component": "boolean",
+        "valueType": "boolean",
+        "name": "hasAudio",
+        "label": "Has Audio"
+      }
+    ]
+  },
+  {
     "id": "columns",
     "fields": [
       {

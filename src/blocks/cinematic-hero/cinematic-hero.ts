@@ -6,6 +6,78 @@ import { MediaManager } from './lib/media-manager';
 import { SelectorUI } from './lib/selector-ui';
 import type { HeroConfig, HeroItem, HeroMode, HeroState, IntroElements } from './lib/types';
 
+// ── Cursor controller ─────────────────────────────────────────────────────────
+
+const CURSOR_LERP = 0.12;
+
+class CursorController {
+  private container: HTMLElement;
+  private cursorEl: HTMLElement;
+  private rafId = 0;
+  private targetX = 0;
+  private targetY = 0;
+  private currentX = 0;
+  private currentY = 0;
+  private isActive = false;
+  private mounted = false;
+
+  constructor(container: HTMLElement, cursorEl: HTMLElement) {
+    this.container = container;
+    this.cursorEl = cursorEl;
+  }
+
+  mount(): void {
+    if (this.mounted) return;
+    if (!window.matchMedia('(pointer: fine)').matches) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    this.mounted = true;
+    this.cursorEl.style.display = 'block';
+    this.container.addEventListener('mouseenter', this.onEnter);
+    this.container.addEventListener('mouseleave', this.onLeave);
+    this.container.addEventListener('mousemove', this.onMove);
+  }
+
+  private onEnter = (): void => {
+    this.isActive = true;
+    this.cursorEl.style.opacity = '1';
+    this.tick();
+  };
+
+  private onLeave = (): void => {
+    this.isActive = false;
+    this.cursorEl.style.opacity = '0';
+    cancelAnimationFrame(this.rafId);
+    this.rafId = 0;
+  };
+
+  private onMove = (e: MouseEvent): void => {
+    const rect = this.container.getBoundingClientRect();
+    this.targetX = e.clientX - rect.left;
+    this.targetY = e.clientY - rect.top;
+  };
+
+  private tick = (): void => {
+    this.currentX += (this.targetX - this.currentX) * CURSOR_LERP;
+    this.currentY += (this.targetY - this.currentY) * CURSOR_LERP;
+    this.cursorEl.style.transform = `translate(${this.currentX}px, ${this.currentY}px)`;
+    if (this.isActive) {
+      this.rafId = requestAnimationFrame(this.tick);
+    }
+  };
+
+  destroy(): void {
+    this.isActive = false;
+    cancelAnimationFrame(this.rafId);
+    this.rafId = 0;
+    if (this.mounted) {
+      this.container.removeEventListener('mouseenter', this.onEnter);
+      this.container.removeEventListener('mouseleave', this.onLeave);
+      this.container.removeEventListener('mousemove', this.onMove);
+      this.mounted = false;
+    }
+  }
+}
+
 // ── DOM parsing ───────────────────────────────────────────────────────────────
 
 function parseConfig(configRow: HTMLElement): HeroConfig {
@@ -53,7 +125,7 @@ function parseItems(itemRows: HTMLElement[]): HeroItem[] {
 
 // ── DOM builder ───────────────────────────────────────────────────────────────
 
-export function buildDOM(
+function buildDOM(
   config: HeroConfig,
   items: HeroItem[],
   state: HeroState,
@@ -72,6 +144,7 @@ export function buildDOM(
   soundBtn: HTMLButtonElement;
   modeBtns: HTMLButtonElement[];
   indicatorEl: HTMLElement;
+  cursorEl: HTMLElement;
 } {
   const fragment = document.createDocumentFragment();
 
@@ -153,13 +226,13 @@ export function buildDOM(
   // Center column: mode switcher
   const modeEl = document.createElement('div');
   modeEl.className = 'cinematic-hero-mode';
-  modeEl.setAttribute('role', 'tablist');
+  modeEl.setAttribute('role', 'radiogroup');
   modeEl.setAttribute('aria-label', 'Content mode');
 
   const expBtn = document.createElement('button');
   expBtn.className = 'cinematic-hero-mode-btn';
   expBtn.type = 'button';
-  expBtn.setAttribute('role', 'tab');
+  expBtn.setAttribute('role', 'radio');
   expBtn.dataset.mode = 'experiences';
   expBtn.textContent = config.experiencesLabel;
 
@@ -174,7 +247,7 @@ export function buildDOM(
   const destBtn = document.createElement('button');
   destBtn.className = 'cinematic-hero-mode-btn';
   destBtn.type = 'button';
-  destBtn.setAttribute('role', 'tab');
+  destBtn.setAttribute('role', 'radio');
   destBtn.dataset.mode = 'destinations';
   destBtn.textContent = config.destinationsLabel;
 
@@ -182,7 +255,7 @@ export function buildDOM(
   const modeBtns = [expBtn, destBtn];
   modeBtns.forEach((btn) => {
     const isActive = btn.dataset.mode === state.activeMode;
-    btn.setAttribute('aria-selected', String(isActive));
+    btn.setAttribute('aria-checked', String(isActive));
     btn.classList.toggle('cinematic-hero-mode-btn--active', isActive);
   });
 
@@ -195,7 +268,10 @@ export function buildDOM(
 
   controlsEl.append(soundBtn, modeEl, controlsSpacerEl);
 
-  fragment.append(mediaEl, overlayEl, introPhraseEl, selectorEl, controlsEl);
+  const cursorEl = document.createElement('div');
+  cursorEl.className = 'cinematic-hero-cursor';
+  cursorEl.setAttribute('aria-hidden', 'true');
+  fragment.append(mediaEl, overlayEl, introPhraseEl, selectorEl, controlsEl, cursorEl);
 
   return {
     root: fragment,
@@ -212,6 +288,7 @@ export function buildDOM(
     soundBtn,
     modeBtns,
     indicatorEl,
+    cursorEl,
   };
 }
 
@@ -245,6 +322,9 @@ export default async function decorate(block: HTMLElement): Promise<void> {
 
   const dom = buildDOM(config, items, state);
   block.replaceChildren(dom.root);
+
+  const cursor = new CursorController(block, dom.cursorEl);
+  cursor.mount();
 
   // Set initial indicator position (experiences = left, destinations = right)
   dom.indicatorEl.style.transform = state.activeMode === 'destinations' ? 'translateX(50%)' : 'translateX(0%)';
@@ -306,69 +386,71 @@ export default async function decorate(block: HTMLElement): Promise<void> {
 
     modeLocked = true;
     const prevMode = state.activeMode;
+    try {
+      state.activeMode = newMode;
 
-    state.activeMode = newMode;
+      // 1. Update mode button states
+      dom.modeBtns.forEach((btn) => {
+        const isActive = btn.dataset.mode === newMode;
+        btn.setAttribute('aria-checked', String(isActive));
+        btn.classList.toggle('cinematic-hero-mode-btn--active', isActive);
+      });
 
-    // 1. Update mode button states
-    dom.modeBtns.forEach((btn) => {
-      const isActive = btn.dataset.mode === newMode;
-      btn.setAttribute('aria-selected', String(isActive));
-      btn.classList.toggle('cinematic-hero-mode-btn--active', isActive);
-    });
+      // 2. Slide indicator toward new mode
+      const indicatorTargetX = newMode === 'destinations' ? '50%' : '0%';
+      const indicatorAnim = dom.indicatorEl.animate(
+        [
+          { transform: `translateX(${newMode === 'destinations' ? '0%' : '50%'})` },
+          { transform: `translateX(${indicatorTargetX})` },
+        ],
+        { duration: 280, easing: 'ease-out', fill: 'forwards' },
+      );
+      indicatorAnim.finished
+        .then(() => {
+          dom.indicatorEl.style.transform = `translateX(${indicatorTargetX})`;
+          indicatorAnim.cancel();
+        })
+        .catch(() => {});
 
-    // 2. Slide indicator toward new mode
-    const indicatorTargetX = newMode === 'destinations' ? '50%' : '0%';
-    const indicatorAnim = dom.indicatorEl.animate(
-      [
-        { transform: `translateX(${newMode === 'destinations' ? '0%' : '50%'})` },
-        { transform: `translateX(${indicatorTargetX})` },
-      ],
-      { duration: 280, easing: 'ease-out', fill: 'forwards' },
-    );
-    indicatorAnim.finished
-      .then(() => {
-        dom.indicatorEl.style.transform = `translateX(${indicatorTargetX})`;
-        indicatorAnim.cancel();
-      })
-      .catch(() => {});
+      // 3. Fade out current item list
+      const fadeOutAnim = dom.itemListEl.animate([{ opacity: 1 }, { opacity: 0 }], {
+        duration: 180,
+        easing: 'linear',
+        fill: 'forwards',
+      });
+      await fadeOutAnim.finished.catch(() => {});
+      dom.itemListEl.style.opacity = '0';
+      fadeOutAnim.cancel();
 
-    // 3. Fade out current item list
-    const fadeOutAnim = dom.itemListEl.animate([{ opacity: 1 }, { opacity: 0 }], {
-      duration: 180,
-      easing: 'linear',
-      fill: 'forwards',
-    });
-    await fadeOutAnim.finished.catch(() => {});
-    dom.itemListEl.style.opacity = '0';
-    fadeOutAnim.cancel();
+      // 4. Swap list content
+      const newActiveIndex = Math.min(state.activeIndex[newMode], newModeItems.length - 1);
+      state.activeIndex[newMode] = newActiveIndex;
+      selectorUI.renderItems(newModeItems, newActiveIndex);
+      selectorUI.measureRows();
 
-    // 4. Swap list content
-    const newActiveIndex = Math.min(state.activeIndex[newMode], newModeItems.length - 1);
-    state.activeIndex[newMode] = newActiveIndex;
-    selectorUI.renderItems(newModeItems, newActiveIndex);
-    selectorUI.measureRows();
+      // 5. Move anchors to new active row (no animation — they'll fade in at correct position)
+      selectorUI.activateItem(newActiveIndex, false);
 
-    // 5. Move anchors to new active row (no animation — they'll fade in at correct position)
-    selectorUI.activateItem(newActiveIndex, false);
+      // 6. Fade in new list + update media in parallel
+      const newActiveItem = newModeItems[newActiveIndex];
+      if (newActiveItem) {
+        media.switchTo(newActiveItem).catch(() => {});
+      }
 
-    // 6. Fade in new list + update media in parallel
-    const newActiveItem = newModeItems[newActiveIndex];
-    if (newActiveItem) {
-      media.switchTo(newActiveItem).catch(() => {});
+      const fadeInAnim = dom.itemListEl.animate([{ opacity: 0 }, { opacity: 1 }], {
+        duration: 240,
+        easing: 'ease-out',
+        fill: 'forwards',
+      });
+      await fadeInAnim.finished.catch(() => {});
+      dom.itemListEl.style.opacity = '1';
+      fadeInAnim.cancel();
+
+      const newActiveItemForAnalytics = items.filter((i) => i.mode === newMode)[newActiveIndex];
+      emitModeChange(prevMode, newMode, newActiveItemForAnalytics?.label ?? '');
+    } finally {
+      modeLocked = false;
     }
-
-    const fadeInAnim = dom.itemListEl.animate([{ opacity: 0 }, { opacity: 1 }], {
-      duration: 240,
-      easing: 'ease-out',
-      fill: 'forwards',
-    });
-    await fadeInAnim.finished.catch(() => {});
-    dom.itemListEl.style.opacity = '1';
-    fadeInAnim.cancel();
-
-    const newActiveItemForAnalytics = items.filter((i) => i.mode === newMode)[newActiveIndex];
-    emitModeChange(prevMode, newMode, newActiveItemForAnalytics?.label ?? '');
-    modeLocked = false;
   }
 
   // Wire mode buttons
@@ -482,6 +564,7 @@ export default async function decorate(block: HTMLElement): Promise<void> {
   const disconnectObserver = new MutationObserver(() => {
     if (!block.isConnected) {
       clearTimeout(impressionTimer);
+      cursor.destroy();
       selectorUI.destroy();
       media.destroy();
       observer.disconnect();
@@ -490,5 +573,5 @@ export default async function decorate(block: HTMLElement): Promise<void> {
       disconnectObserver.disconnect();
     }
   });
-  disconnectObserver.observe(document.body, { childList: true, subtree: true });
+  disconnectObserver.observe(block.parentElement ?? document.body, { childList: true, subtree: false });
 }

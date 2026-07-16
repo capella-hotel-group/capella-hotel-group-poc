@@ -1,0 +1,1 @@
+node .husky/auto-install.mjs post-checkout "$1" "$2" "$3"

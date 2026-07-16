@@ -31,6 +31,8 @@ jobs:
           git config --local user.name "GitHub Action"
 
       - name: Commit built files
+        env:
+          HUSKY: "0"
         run: |
           git add blocks/ scripts/ styles/ chunks/ component-models.json component-definition.json component-filters.json
           if git diff --staged --quiet; then

@@ -86,10 +86,11 @@
           ]
         },
         {
-          "component": "aem-content",
+          "component": "reference",
           "valueType": "string",
           "name": "video",
-          "label": "Video"
+          "label": "Video",
+          "multi": false
         },
         {
           "component": "reference",

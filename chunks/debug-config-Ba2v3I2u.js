@@ -1,0 +1,1 @@
+var e={advance:void 0,showDecorLeft:void 0,showDecorRight:void 0,showForeground:void 0,wireframeDecorLeft:void 0,wireframeDecorRight:void 0,wireframeForeground:void 0,showVelocityVector:void 0,velocityVectorScale:void 0,velocityDecayRate:void 0,velocityDecayThreshold:void 0,fgPointerStrength:void 0,decorPointerInfluenceRadius:void 0,headlineInteraction:!0};export{e as t};

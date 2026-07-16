@@ -44,7 +44,9 @@
       "accordion-with-fragments",
       "tabs",
       "offer-carousel",
-      "offer-suggestions"
+      "offer-suggestions",
+      "tabs-with-blocks",
+      "cinematic-hero"
     ]
   },
   {
@@ -83,6 +85,12 @@
     "id": "cards",
     "components": [
       "card"
+    ]
+  },
+  {
+    "id": "cinematic-hero",
+    "components": [
+      "cinematic-hero-item"
     ]
   },
   {

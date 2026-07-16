@@ -22,11 +22,20 @@ function parseItems(itemRows: HTMLElement[]): HeroItem[] {
   return itemRows
     .map((row): HeroItem | null => {
       const cells = [...row.children] as HTMLElement[];
+      // Item rows are expected to follow the model with 8 cells.
+      if (cells.length < 8) return null;
+
       const label = cells[0]?.textContent?.trim() ?? '';
       const modeRaw = cells[1]?.textContent?.trim().toLowerCase() ?? '';
-      const mode: HeroMode = modeRaw === 'destinations' ? 'destinations' : 'experiences';
+      if (modeRaw !== 'experiences' && modeRaw !== 'destinations') return null;
+      const mode: HeroMode = modeRaw;
+
       const videoAnchor = cells[2]?.querySelector<HTMLAnchorElement>('a');
-      const videoUrl = resolveDAMUrl(videoAnchor?.href ?? cells[2]?.textContent?.trim() ?? '');
+      const rawVideo = (videoAnchor?.href ?? cells[2]?.textContent?.trim() ?? '').trim();
+      // Accept only real URLs or DAM-style paths. Plain text (e.g. "Experiences") is invalid.
+      const looksLikeVideoUrl = /^https?:\/\//i.test(rawVideo) || rawVideo.startsWith('/');
+      const videoUrl = looksLikeVideoUrl ? resolveDAMUrl(rawVideo) : '';
+
       const poster = cells[3]?.querySelector('picture') ?? null;
       const posterUrl = poster?.querySelector<HTMLImageElement>('img')?.src ?? '';
       const linkAnchor = cells[4]?.querySelector<HTMLAnchorElement>('a');

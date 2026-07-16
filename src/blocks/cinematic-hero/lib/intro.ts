@@ -28,6 +28,7 @@ export async function runIntro(elements: IntroElements, onBeforeSplit?: () => vo
   const { introPhrase, prefix, suffix, itemList, controls } = elements;
 
   // Initial state: everything hidden
+  introPhrase.style.display = '';
   introPhrase.style.opacity = '0';
   prefix.style.opacity = '0';
   suffix.style.opacity = '0';
@@ -76,6 +77,7 @@ export async function runIntro(elements: IntroElements, onBeforeSplit?: () => vo
   await Promise.all([phraseOut.finished, prefixIn.finished, suffixIn.finished, itemsIn.finished]).catch(() => {});
 
   introPhrase.style.opacity = '0';
+  introPhrase.style.display = 'none';
   prefix.style.opacity = '1';
   suffix.style.opacity = '1';
   itemList.style.opacity = '1';
@@ -109,6 +111,7 @@ export async function runIntro(elements: IntroElements, onBeforeSplit?: () => vo
 export function skipIntro(elements: IntroElements): void {
   const { introPhrase, prefix, suffix, itemList, controls } = elements;
   introPhrase.style.opacity = '0';
+  introPhrase.style.display = 'none';
   prefix.style.opacity = '1';
   suffix.style.opacity = '1';
   itemList.style.opacity = '1';

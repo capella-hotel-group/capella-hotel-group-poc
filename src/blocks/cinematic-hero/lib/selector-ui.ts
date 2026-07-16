@@ -4,7 +4,6 @@ import type { HeroItem } from './types';
 
 const ANCHOR_MS = 310;
 const OPACITY_MS = 190;
-const HOVER_DELAY_MS = 120;
 
 export class SelectorUI {
   private itemListEl: HTMLUListElement;
@@ -13,7 +12,6 @@ export class SelectorUI {
   private listHeight = 0;
   private activeIndex = 0;
   private selectCallbacks: Array<(index: number) => void> = [];
-  private hoverTimer: ReturnType<typeof setTimeout> | null = null;
   private pendingAnchorAnimations: Animation[] = [];
   private pendingOpacityAnimations: Animation[] = [];
   private introComplete = false;
@@ -57,10 +55,6 @@ export class SelectorUI {
       btn.textContent = item.label;
       if (item.link) btn.dataset.href = item.link;
 
-      // Pointer interaction
-      btn.addEventListener('pointerenter', () => this.handlePointerEnter(idx));
-      btn.addEventListener('pointerleave', () => this.handlePointerLeave());
-
       // Keyboard interaction
       btn.addEventListener('keydown', (e) => this.handleKeyDown(e, idx));
       btn.addEventListener('click', () => this.handleClick(idx));
@@ -68,19 +62,6 @@ export class SelectorUI {
       li.append(btn);
       this.itemListEl.append(li);
     });
-  }
-
-  private handlePointerEnter(index: number): void {
-    if (!this.introComplete) return;
-    this.clearHoverTimer();
-    this.hoverTimer = setTimeout(() => {
-      this.activateItem(index, true);
-      this.emitSelect(index);
-    }, HOVER_DELAY_MS);
-  }
-
-  private handlePointerLeave(): void {
-    this.clearHoverTimer();
   }
 
   private handleKeyDown(e: KeyboardEvent, currentIndex: number): void {
@@ -113,7 +94,6 @@ export class SelectorUI {
 
   private handleClick(index: number): void {
     if (!this.introComplete) return;
-    this.clearHoverTimer();
     const item = this.items[index];
     if (index === this.activeIndex && item?.link) {
       window.location.href = item.link;
@@ -121,13 +101,6 @@ export class SelectorUI {
     }
     this.activateItem(index, true);
     this.emitSelect(index);
-  }
-
-  private clearHoverTimer(): void {
-    if (this.hoverTimer !== null) {
-      clearTimeout(this.hoverTimer);
-      this.hoverTimer = null;
-    }
   }
 
   /**
@@ -247,7 +220,6 @@ export class SelectorUI {
   }
 
   destroy(): void {
-    this.clearHoverTimer();
     this.pendingAnchorAnimations.forEach((a) => a.cancel());
     this.pendingOpacityAnimations.forEach((a) => a.cancel());
   }

@@ -1,7 +1,57 @@
 // src/blocks/cinematic-hero/lib/media-manager.ts
 import type { HeroItem } from './types';
 
-const CROSSFADE_MS = 360;
+const CROSSFADE_MS = 620;
+const FIRST_FRAME_TIMEOUT_MS = 500;
+
+function waitForMediaReady(video: HTMLVideoElement): Promise<void> {
+  if (video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
+    return Promise.resolve();
+  }
+
+  return new Promise<void>((resolve, reject) => {
+    const ac = new AbortController();
+    const { signal } = ac;
+    video.addEventListener(
+      'loadeddata',
+      () => {
+        ac.abort();
+        resolve();
+      },
+      { signal },
+    );
+    video.addEventListener(
+      'error',
+      () => {
+        ac.abort();
+        reject(new Error('video-load-error'));
+      },
+      { signal },
+    );
+  });
+}
+
+function waitForFirstFrame(video: HTMLVideoElement): Promise<void> {
+  if (typeof video.requestVideoFrameCallback !== 'function') {
+    return Promise.resolve();
+  }
+
+  return new Promise<void>((resolve) => {
+    let settled = false;
+    const timer = window.setTimeout(() => {
+      if (settled) return;
+      settled = true;
+      resolve();
+    }, FIRST_FRAME_TIMEOUT_MS);
+
+    video.requestVideoFrameCallback(() => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      resolve();
+    });
+  });
+}
 
 export class MediaManager {
   private videoA: HTMLVideoElement;
@@ -20,6 +70,8 @@ export class MediaManager {
     // Start both fully transparent; active layer will be faded in on first switchTo
     videoA.style.opacity = '0';
     videoB.style.opacity = '0';
+    videoA.preload = 'auto';
+    videoB.preload = 'auto';
   }
 
   get activeVideo(): HTMLVideoElement {
@@ -70,32 +122,17 @@ export class MediaManager {
     incoming.muted = this.muted;
     incoming.style.objectPosition = this.getFocalPosition(item);
 
-    // Wait until browser has first frame
-    await new Promise<void>((resolve, reject) => {
-      const ac = new AbortController();
-      const { signal } = ac;
-      incoming.addEventListener(
-        'loadeddata',
-        () => {
-          ac.abort();
-          resolve();
-        },
-        { signal },
-      );
-      incoming.addEventListener(
-        'error',
-        () => {
-          ac.abort();
-          reject(new Error(`Video load error: ${item.videoUrl}`));
-        },
-        { signal },
-      );
-      incoming.load();
-    }).catch((err: unknown) => {
-      const msg = err instanceof Error ? err.message : 'load-error';
-      this.onError(item, msg);
-      // Video failed — poster already updated, skip crossfade
-    });
+    // Wait until browser has media data. If it fails, keep current video visible.
+    incoming.load();
+    const loadFailed = await waitForMediaReady(incoming)
+      .then(() => false)
+      .catch((err: unknown) => {
+        const msg = err instanceof Error ? err.message : 'load-error';
+        this.onError(item, msg);
+        return true;
+      });
+
+    if (loadFailed) return;
 
     // Stale request guard: another switchTo() was called while we were loading
     if (this.sequenceId !== mySeq) return;
@@ -105,15 +142,18 @@ export class MediaManager {
       // Autoplay blocked — poster visible already
     });
 
+    // Ensure at least one decoded frame is available before we begin the fade.
+    await waitForFirstFrame(incoming);
+
     // Crossfade: incoming fades in, outgoing fades out simultaneously
     const fadeIn = incoming.animate([{ opacity: '0' }, { opacity: '1' }], {
       duration: CROSSFADE_MS,
-      easing: 'linear',
+      easing: 'ease-in-out',
       fill: 'forwards',
     });
     const fadeOut = outgoing.animate([{ opacity: '1' }, { opacity: '0' }], {
       duration: CROSSFADE_MS,
-      easing: 'linear',
+      easing: 'ease-in-out',
       fill: 'forwards',
     });
 
@@ -132,8 +172,7 @@ export class MediaManager {
 
     // Cleanup outgoing
     outgoing.pause();
-    outgoing.removeAttribute('src');
-    outgoing.load();
+    outgoing.currentTime = 0;
 
     // Swap active layer
     this.activeLayer = this.activeLayer === 'a' ? 'b' : 'a';

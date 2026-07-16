@@ -217,6 +217,12 @@
     color: #fff;
 }
 
+.cinematic-hero-mode-btn--disabled,
+.cinematic-hero-mode-btn:disabled {
+    opacity: 0.28;
+    pointer-events: none;
+}
+
 .cinematic-hero-mode-btn:focus-visible {
     outline: 2px solid #fff;
     outline-offset: 3px;

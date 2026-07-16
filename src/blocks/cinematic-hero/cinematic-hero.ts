@@ -232,8 +232,12 @@ export default async function decorate(block: HTMLElement): Promise<void> {
   const items = parseItems(rows.slice(1));
   if (items.length === 0) return;
 
+  const hasExperiences = items.some((i) => i.mode === 'experiences');
+  const hasDestinations = items.some((i) => i.mode === 'destinations');
+  const initialMode: HeroMode = hasExperiences ? 'experiences' : 'destinations';
+
   const state: HeroState = {
-    activeMode: 'experiences',
+    activeMode: initialMode,
     activeIndex: { experiences: 0, destinations: 0 },
     introComplete: false,
     muted: true,
@@ -259,6 +263,15 @@ export default async function decorate(block: HTMLElement): Promise<void> {
   const selectorUI = new SelectorUI(dom.itemListEl);
   const modeItems = items.filter((i) => i.mode === state.activeMode);
   selectorUI.renderItems(modeItems, state.activeIndex[state.activeMode]);
+
+  // Disable mode tabs that have no data to avoid blank selector states.
+  dom.modeBtns.forEach((btn) => {
+    const mode = btn.dataset.mode as HeroMode;
+    const hasItems = mode === 'experiences' ? hasExperiences : hasDestinations;
+    btn.disabled = !hasItems;
+    btn.setAttribute('aria-disabled', String(!hasItems));
+    btn.classList.toggle('cinematic-hero-mode-btn--disabled', !hasItems);
+  });
 
   // Recalculate row offsets after fonts load and on resize
   if (document.fonts) {
@@ -287,6 +300,10 @@ export default async function decorate(block: HTMLElement): Promise<void> {
 
   async function switchMode(newMode: HeroMode): Promise<void> {
     if (modeLocked || newMode === state.activeMode) return;
+
+    const newModeItems = items.filter((i) => i.mode === newMode);
+    if (newModeItems.length === 0) return;
+
     modeLocked = true;
     const prevMode = state.activeMode;
 
@@ -326,8 +343,8 @@ export default async function decorate(block: HTMLElement): Promise<void> {
     fadeOutAnim.cancel();
 
     // 4. Swap list content
-    const newModeItems = items.filter((i) => i.mode === newMode);
-    const newActiveIndex = state.activeIndex[newMode];
+    const newActiveIndex = Math.min(state.activeIndex[newMode], newModeItems.length - 1);
+    state.activeIndex[newMode] = newActiveIndex;
     selectorUI.renderItems(newModeItems, newActiveIndex);
     selectorUI.measureRows();
 
@@ -397,14 +414,18 @@ export default async function decorate(block: HTMLElement): Promise<void> {
     selectorUI.setIntroComplete(true);
     state.introComplete = true;
   } else {
-    runIntro(introElements, () => {
-      // Called just before selector fades in — position prefix/suffix at item 0
-      // but do NOT change item opacities (they'll animate after selector is visible)
-      selectorUI.measureRows();
-      selectorUI.positionForItem(state.activeIndex[state.activeMode]);
-    }).then(() => {
-      // Selector is now visible — animate item 0 brightening up (the "active phase")
-      selectorUI.activateItem(state.activeIndex[state.activeMode], true);
+    runIntro(
+      introElements,
+      () => {
+        // Position list so active item is centered before split starts
+        selectorUI.measureRows();
+        selectorUI.positionForItem(state.activeIndex[state.activeMode]);
+      },
+      () => {
+        // Fade in active item while See/with... are splitting apart
+        selectorUI.activateItem(state.activeIndex[state.activeMode], true);
+      },
+    ).then(() => {
       selectorUI.setIntroComplete(true);
       state.introComplete = true;
 

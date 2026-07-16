@@ -3,6 +3,7 @@ import type { HeroItem } from './types';
 
 const CROSSFADE_MS = 620;
 const FIRST_FRAME_TIMEOUT_MS = 500;
+const LOAD_TIMEOUT_MS = 8000;
 
 function waitForMediaReady(video: HTMLVideoElement): Promise<void> {
   if (video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
@@ -12,9 +13,16 @@ function waitForMediaReady(video: HTMLVideoElement): Promise<void> {
   return new Promise<void>((resolve, reject) => {
     const ac = new AbortController();
     const { signal } = ac;
+
+    const timer = window.setTimeout(() => {
+      ac.abort();
+      reject(new Error('video-load-timeout'));
+    }, LOAD_TIMEOUT_MS);
+
     video.addEventListener(
       'loadeddata',
       () => {
+        clearTimeout(timer);
         ac.abort();
         resolve();
       },
@@ -23,6 +31,7 @@ function waitForMediaReady(video: HTMLVideoElement): Promise<void> {
     video.addEventListener(
       'error',
       () => {
+        clearTimeout(timer);
         ac.abort();
         reject(new Error('video-load-error'));
       },
@@ -61,6 +70,8 @@ export class MediaManager {
   private sequenceId = 0;
   private muted = true;
   private onError: (item: HeroItem, errorType: string) => void = () => {};
+  private pendingFadeIn: Animation | null = null;
+  private pendingFadeOut: Animation | null = null;
 
   constructor(videoA: HTMLVideoElement, videoB: HTMLVideoElement, posterEl: HTMLElement) {
     this.videoA = videoA;
@@ -113,6 +124,20 @@ export class MediaManager {
     const incoming = this.inactiveVideo;
     const outgoing = this.activeVideo;
 
+    // If the active layer is already playing this URL, avoid redundant reload/fade.
+    const activeSrc = this.normalizeUrl(outgoing.currentSrc || outgoing.src);
+    const requestedSrc = this.normalizeUrl(item.videoUrl);
+    if (activeSrc && requestedSrc && activeSrc === requestedSrc) {
+      outgoing.style.objectPosition = this.getFocalPosition(item);
+      return;
+    }
+
+    // Cancel any in-flight fade animations so a new switch starts from a clean state.
+    this.pendingFadeIn?.cancel();
+    this.pendingFadeOut?.cancel();
+    this.pendingFadeIn = null;
+    this.pendingFadeOut = null;
+
     // Update poster fallback immediately
     this.posterEl.style.backgroundImage = `url(${item.posterUrl})`;
     this.posterEl.style.backgroundPosition = this.getFocalPosition(item);
@@ -156,6 +181,8 @@ export class MediaManager {
       easing: 'ease-in-out',
       fill: 'forwards',
     });
+    this.pendingFadeIn = fadeIn;
+    this.pendingFadeOut = fadeOut;
 
     await Promise.all([fadeIn.finished, fadeOut.finished]).catch(() => {
       // Animation interrupted (e.g. rapid switching) — that's fine
@@ -169,10 +196,13 @@ export class MediaManager {
     outgoing.style.opacity = '0';
     fadeIn.cancel();
     fadeOut.cancel();
+    this.pendingFadeIn = null;
+    this.pendingFadeOut = null;
 
-    // Cleanup outgoing
+    // Cleanup outgoing — clear src to free decode memory for the old video
     outgoing.pause();
-    outgoing.currentTime = 0;
+    outgoing.removeAttribute('src');
+    outgoing.load();
 
     // Swap active layer
     this.activeLayer = this.activeLayer === 'a' ? 'b' : 'a';
@@ -183,8 +213,22 @@ export class MediaManager {
     return isMobile ? item.focalMobile : item.focalDesktop;
   }
 
+  private normalizeUrl(url: string): string {
+    if (!url) return '';
+    try {
+      const parsed = new URL(url, window.location.origin);
+      return `${parsed.origin}${parsed.pathname}${parsed.search}`;
+    } catch {
+      return url;
+    }
+  }
+
   destroy(): void {
     this.sequenceId = Number.MAX_SAFE_INTEGER; // invalidate any pending switchTo
+    this.pendingFadeIn?.cancel();
+    this.pendingFadeOut?.cancel();
+    this.pendingFadeIn = null;
+    this.pendingFadeOut = null;
     this.videoA.pause();
     this.videoB.pause();
     this.videoA.removeAttribute('src');

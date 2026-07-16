@@ -140,8 +140,6 @@ export class SelectorUI {
 
     this.itemListEl.style.transform = `translateY(${translateY}px)`;
   }
-
-  /** Slide the item list so item[index] is centered, and update opacity states. */
   activateItem(index: number, animate: boolean): void {
     const prev = this.activeIndex;
     this.activeIndex = index;
@@ -197,6 +195,7 @@ export class SelectorUI {
     this.pendingAnchorAnimations = [];
 
     const currentTranslateY = this.getCurrentTranslateY(this.itemListEl);
+    this.itemListEl.classList.add('cinematic-hero-items--animating');
     const listAnim = this.itemListEl.animate(
       [{ transform: `translateY(${currentTranslateY}px)` }, { transform: `translateY(${targetTranslateY}px)` }],
       { duration: animate ? ANCHOR_MS : 0, easing: 'ease-out', fill: 'forwards' },
@@ -207,9 +206,11 @@ export class SelectorUI {
     listAnim.finished
       .then(() => {
         this.itemListEl.style.transform = `translateY(${targetTranslateY}px)`;
+        this.itemListEl.classList.remove('cinematic-hero-items--animating');
         listAnim.cancel();
       })
       .catch(() => {
+        this.itemListEl.classList.remove('cinematic-hero-items--animating');
         /* cancelled by next activation */
       });
   }

@@ -100,6 +100,9 @@
     padding: 0;
     pointer-events: auto;
     text-align: center;
+}
+
+.cinematic-hero-items--animating {
     will-change: transform;
 }
 

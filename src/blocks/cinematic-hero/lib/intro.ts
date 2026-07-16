@@ -151,7 +151,9 @@ export function skipIntro(elements: IntroElements): void {
   introPhrase.style.opacity = '0';
   introPhrase.style.display = 'none';
   prefix.style.opacity = '1';
+  prefix.style.transform = '';
   suffix.style.opacity = '1';
+  suffix.style.transform = '';
   itemList.style.opacity = '1';
   controls.style.opacity = '1';
 }

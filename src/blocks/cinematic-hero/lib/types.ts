@@ -30,6 +30,7 @@ export interface HeroState {
 }
 
 export interface IntroElements {
+  introPhrase: HTMLElement;
   prefix: HTMLElement;
   suffix: HTMLElement;
   itemList: HTMLElement;

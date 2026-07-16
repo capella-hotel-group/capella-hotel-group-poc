@@ -1,4 +1,5 @@
 // src/blocks/cinematic-hero/lib/selector-ui.ts
+import { moveInstrumentation } from '@/app/scripts';
 import type { HeroItem } from './types';
 
 const ANCHOR_MS = 310;
@@ -6,11 +7,10 @@ const OPACITY_MS = 190;
 const HOVER_DELAY_MS = 120;
 
 export class SelectorUI {
-  private prefixEl: HTMLElement;
-  private suffixEl: HTMLElement;
   private itemListEl: HTMLUListElement;
   private items: HeroItem[] = [];
   private rowOffsets: number[] = [];
+  private listHeight = 0;
   private activeIndex = 0;
   private selectCallbacks: Array<(index: number) => void> = [];
   private hoverTimer: ReturnType<typeof setTimeout> | null = null;
@@ -18,9 +18,7 @@ export class SelectorUI {
   private pendingOpacityAnimations: Animation[] = [];
   private introComplete = false;
 
-  constructor(prefixEl: HTMLElement, suffixEl: HTMLElement, itemListEl: HTMLUListElement) {
-    this.prefixEl = prefixEl;
-    this.suffixEl = suffixEl;
+  constructor(itemListEl: HTMLUListElement) {
     this.itemListEl = itemListEl;
   }
 
@@ -48,11 +46,16 @@ export class SelectorUI {
       li.setAttribute('role', 'option');
       li.setAttribute('aria-selected', idx === activeIndex ? 'true' : 'false');
       li.dataset.index = String(idx);
+      li.dataset.mode = item.mode;
+
+      // Carry Universal Editor instrumentation from the authored row
+      moveInstrumentation(item.sourceRow, li);
 
       const btn = document.createElement('button');
       btn.className = 'cinematic-hero-item-btn';
       btn.type = 'button';
       btn.textContent = item.label;
+      if (item.link) btn.dataset.href = item.link;
 
       // Pointer interaction
       btn.addEventListener('pointerenter', () => this.handlePointerEnter(idx));
@@ -127,16 +130,45 @@ export class SelectorUI {
     }
   }
 
-  /** Cache the Y offset (relative to item list) of each row. Call after font load and on resize. */
+  /**
+   * Cache the Y offset (center of each row, relative to the list top) and the
+   * total list height. Call after font load and on resize.
+   */
   measureRows(): void {
-    const listTop = this.itemListEl.getBoundingClientRect().top;
+    const listRect = this.itemListEl.getBoundingClientRect();
+    this.listHeight = listRect.height;
     this.rowOffsets = [...this.itemListEl.children].map((li) => {
       const rect = li.getBoundingClientRect();
-      return rect.top + rect.height / 2 - listTop;
+      return rect.top + rect.height / 2 - listRect.top;
     });
   }
 
-  /** Move prefix/suffix to align with the given item row, and update opacity states. */
+  /**
+   * Vertical translate (px) that brings item[index] to the list's vertical
+   * center — which coincides with the fixed, centered prefix/suffix.
+   */
+  private translateForIndex(index: number): number | null {
+    if (this.rowOffsets.length === 0) this.measureRows();
+    const rowCenter = this.rowOffsets[index];
+    if (rowCenter === undefined) return null;
+    return this.listHeight / 2 - rowCenter;
+  }
+
+  /**
+   * Position the item list so item[index] is centered, without touching opacity.
+   * Used during intro: selector is invisible so we pre-position before fade-in.
+   */
+  positionForItem(index: number): void {
+    const translateY = this.translateForIndex(index);
+    if (translateY === null) return;
+
+    this.pendingAnchorAnimations.forEach((a) => a.cancel());
+    this.pendingAnchorAnimations = [];
+
+    this.itemListEl.style.transform = `translateY(${translateY}px)`;
+  }
+
+  /** Slide the item list so item[index] is centered, and update opacity states. */
   activateItem(index: number, animate: boolean): void {
     const prev = this.activeIndex;
     this.activeIndex = index;
@@ -184,65 +216,28 @@ export class SelectorUI {
         .catch(() => {});
     }
 
-    // Anchor movement
-    if (this.rowOffsets.length === 0) this.measureRows();
-    const targetOffset = this.rowOffsets[index];
-    if (targetOffset === undefined) return;
+    // Slide the item list so the active row lands on the fixed center line
+    const targetTranslateY = this.translateForIndex(index);
+    if (targetTranslateY === null) return;
 
-    // Cancel pending anchor animations (overwrite — latest wins)
     this.pendingAnchorAnimations.forEach((a) => a.cancel());
     this.pendingAnchorAnimations = [];
 
-    const listRect = this.itemListEl.getBoundingClientRect();
-    const prefixRect = this.prefixEl.getBoundingClientRect();
-    const suffixRect = this.suffixEl.getBoundingClientRect();
-
-    // Target Y: align midpoint of prefix/suffix with item row midpoint
-    const listTop = listRect.top;
-    const prefixMidY = prefixRect.top + prefixRect.height / 2;
-    const suffixMidY = suffixRect.top + suffixRect.height / 2;
-
-    const targetY = listTop + targetOffset;
-    const prefixDelta = targetY - prefixMidY;
-    const suffixDelta = targetY - suffixMidY;
-
-    const prefixCurrentY = this.getCurrentTranslateY(this.prefixEl);
-    const suffixCurrentY = this.getCurrentTranslateY(this.suffixEl);
-
-    const prefixAnim = this.prefixEl.animate(
-      [
-        { transform: `translateY(${prefixCurrentY}px)` },
-        { transform: `translateY(${prefixCurrentY + prefixDelta}px)` },
-      ],
-      { duration: animate ? ANCHOR_MS : 0, easing: 'ease-out', fill: 'forwards' },
-    );
-    const suffixAnim = this.suffixEl.animate(
-      [
-        { transform: `translateY(${suffixCurrentY}px)` },
-        { transform: `translateY(${suffixCurrentY + suffixDelta}px)` },
-      ],
+    const currentTranslateY = this.getCurrentTranslateY(this.itemListEl);
+    const listAnim = this.itemListEl.animate(
+      [{ transform: `translateY(${currentTranslateY}px)` }, { transform: `translateY(${targetTranslateY}px)` }],
       { duration: animate ? ANCHOR_MS : 0, easing: 'ease-out', fill: 'forwards' },
     );
 
-    this.pendingAnchorAnimations = [prefixAnim, suffixAnim];
+    this.pendingAnchorAnimations = [listAnim];
 
-    // Commit on finish
-    prefixAnim.finished
+    listAnim.finished
       .then(() => {
-        this.prefixEl.style.transform = `translateY(${prefixCurrentY + prefixDelta}px)`;
-        prefixAnim.cancel();
+        this.itemListEl.style.transform = `translateY(${targetTranslateY}px)`;
+        listAnim.cancel();
       })
       .catch(() => {
         /* cancelled by next activation */
-      });
-
-    suffixAnim.finished
-      .then(() => {
-        this.suffixEl.style.transform = `translateY(${suffixCurrentY + suffixDelta}px)`;
-        suffixAnim.cancel();
-      })
-      .catch(() => {
-        /* cancelled */
       });
   }
 

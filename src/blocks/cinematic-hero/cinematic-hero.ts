@@ -1,8 +1,6 @@
 // src/blocks/cinematic-hero/cinematic-hero.ts
-import { moveInstrumentation } from '@/app/scripts';
 import { resolveDAMUrl } from '@/utils/env';
 import { emitHeroImpression, emitItemSelect, emitMediaError, emitModeChange, emitSoundToggle } from './lib/analytics';
-import { CursorController } from './lib/cursor';
 import { runIntro, skipIntro } from './lib/intro';
 import { MediaManager } from './lib/media-manager';
 import { SelectorUI } from './lib/selector-ui';
@@ -46,29 +44,6 @@ function parseItems(itemRows: HTMLElement[]): HeroItem[] {
 
 // ── DOM builder ───────────────────────────────────────────────────────────────
 
-function buildItemEl(item: HeroItem, index: number): HTMLLIElement {
-  const li = document.createElement('li');
-  li.className = 'cinematic-hero-item';
-  li.setAttribute('role', 'option');
-  li.setAttribute('aria-selected', index === 0 ? 'true' : 'false');
-  li.dataset.index = String(index);
-  li.dataset.mode = item.mode;
-
-  moveInstrumentation(item.sourceRow, li);
-
-  const btn = document.createElement('button');
-  btn.className = 'cinematic-hero-item-btn';
-  btn.type = 'button';
-  btn.textContent = item.label;
-  li.append(btn);
-
-  if (item.link) {
-    btn.dataset.href = item.link;
-  }
-
-  return li;
-}
-
 export function buildDOM(
   config: HeroConfig,
   items: HeroItem[],
@@ -80,6 +55,7 @@ export function buildDOM(
   videoA: HTMLVideoElement;
   videoB: HTMLVideoElement;
   overlayEl: HTMLElement;
+  introPhraseEl: HTMLElement;
   prefixEl: HTMLElement;
   suffixEl: HTMLElement;
   itemListEl: HTMLUListElement;
@@ -87,7 +63,6 @@ export function buildDOM(
   soundBtn: HTMLButtonElement;
   modeBtns: HTMLButtonElement[];
   indicatorEl: HTMLElement;
-  cursorEl: HTMLElement;
 } {
   const fragment = document.createDocumentFragment();
 
@@ -124,6 +99,12 @@ export function buildDOM(
   overlayEl.className = 'cinematic-hero-overlay';
   overlayEl.setAttribute('aria-hidden', 'true');
 
+  // ── Intro phrase (single centered sentence, visible during intro only) ────
+  const introPhraseEl = document.createElement('div');
+  introPhraseEl.className = 'cinematic-hero-intro-phrase';
+  introPhraseEl.setAttribute('aria-hidden', 'true');
+  introPhraseEl.textContent = `${config.prefix} ${config.suffix}`;
+
   // ── Selector UI ───────────────────────────────────────────────────────────
   const selectorEl = document.createElement('div');
   selectorEl.className = 'cinematic-hero-selector';
@@ -138,11 +119,8 @@ export function buildDOM(
   itemListEl.className = 'cinematic-hero-items';
   itemListEl.setAttribute('role', 'listbox');
   itemListEl.setAttribute('aria-label', 'Select content');
-
-  const modeItems = items.filter((i) => i.mode === state.activeMode);
-  modeItems.forEach((item, idx) => {
-    itemListEl.append(buildItemEl(item, idx));
-  });
+  // Items are rendered by SelectorUI.renderItems() (single source of truth,
+  // carries UE instrumentation and wires pointer/keyboard listeners).
 
   const suffixEl = document.createElement('div');
   suffixEl.className = 'cinematic-hero-suffix';
@@ -163,6 +141,7 @@ export function buildDOM(
   const hasAnyAudio = items.some((i) => i.hasAudio);
   if (!hasAnyAudio) soundBtn.hidden = true;
 
+  // Center column: mode switcher
   const modeEl = document.createElement('div');
   modeEl.className = 'cinematic-hero-mode';
   modeEl.setAttribute('role', 'tablist');
@@ -199,14 +178,15 @@ export function buildDOM(
   });
 
   modeEl.append(expBtn, trackEl, destBtn);
-  controlsEl.append(soundBtn, modeEl);
 
-  // ── Custom cursor ─────────────────────────────────────────────────────────
-  const cursorEl = document.createElement('div');
-  cursorEl.className = 'cinematic-hero-cursor';
-  cursorEl.setAttribute('aria-hidden', 'true');
+  // Right spacer — keeps mode switcher visually centered
+  const controlsSpacerEl = document.createElement('div');
+  controlsSpacerEl.className = 'cinematic-hero-controls-spacer';
+  controlsSpacerEl.setAttribute('aria-hidden', 'true');
 
-  fragment.append(mediaEl, overlayEl, selectorEl, controlsEl, cursorEl);
+  controlsEl.append(soundBtn, modeEl, controlsSpacerEl);
+
+  fragment.append(mediaEl, overlayEl, introPhraseEl, selectorEl, controlsEl);
 
   return {
     root: fragment,
@@ -215,6 +195,7 @@ export function buildDOM(
     videoA,
     videoB,
     overlayEl,
+    introPhraseEl,
     prefixEl,
     suffixEl,
     itemListEl,
@@ -222,7 +203,6 @@ export function buildDOM(
     soundBtn,
     modeBtns,
     indicatorEl,
-    cursorEl,
   };
 }
 
@@ -267,7 +247,7 @@ export default async function decorate(block: HTMLElement): Promise<void> {
     });
   }
 
-  const selectorUI = new SelectorUI(dom.prefixEl, dom.suffixEl, dom.itemListEl);
+  const selectorUI = new SelectorUI(dom.itemListEl);
   const modeItems = items.filter((i) => i.mode === state.activeMode);
   selectorUI.renderItems(modeItems, state.activeIndex[state.activeMode]);
 
@@ -387,6 +367,7 @@ export default async function decorate(block: HTMLElement): Promise<void> {
   });
 
   const introElements: IntroElements = {
+    introPhrase: dom.introPhraseEl,
     prefix: dom.prefixEl,
     suffix: dom.suffixEl,
     itemList: dom.itemListEl,
@@ -408,9 +389,13 @@ export default async function decorate(block: HTMLElement): Promise<void> {
     state.introComplete = true;
   } else {
     runIntro(introElements, () => {
+      // Called just before selector fades in — position prefix/suffix at item 0
+      // but do NOT change item opacities (they'll animate after selector is visible)
       selectorUI.measureRows();
-      selectorUI.activateItem(state.activeIndex[state.activeMode], true);
+      selectorUI.positionForItem(state.activeIndex[state.activeMode]);
     }).then(() => {
+      // Selector is now visible — animate item 0 brightening up (the "active phase")
+      selectorUI.activateItem(state.activeIndex[state.activeMode], true);
       selectorUI.setIntroComplete(true);
       state.introComplete = true;
 
@@ -463,14 +448,10 @@ export default async function decorate(block: HTMLElement): Promise<void> {
   };
   document.addEventListener('visibilitychange', visibilityChangeHandler);
 
-  const cursor = new CursorController(block, dom.cursorEl);
-  cursor.mount();
-
   // Cleanup on disconnect
   const disconnectObserver = new MutationObserver(() => {
     if (!block.isConnected) {
       clearTimeout(impressionTimer);
-      cursor.destroy();
       selectorUI.destroy();
       media.destroy();
       observer.disconnect();

@@ -1,4 +1,4 @@
-# Capella Hotel Group — AEM Edge Delivery Services PoC
+# Capella Hotel Group — AEM Edge Delivery Services PoC 
 
 This repository is a team-evolved derivative of the Adobe [`aem-boilerplate-xwalk`](https://github.com/adobe-rnd/aem-boilerplate-xwalk) template, purpose-built to maximize final-output quality and developer experience. On top of the standard WYSIWYG-authoring stack it layers a Vite + Rollup build pipeline, a TypeScript-strict `src/`-first development model, and a Spec-Driven Development (SDD) workflow — enabling modern frontend patterns without compromising any AEM Edge Delivery Services runtime contract.
 

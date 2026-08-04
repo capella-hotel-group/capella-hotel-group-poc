@@ -21,6 +21,11 @@
     max-height: 1080px;
 }
 
+.adobe-ue-edit .hero-video-media,
+.adobe-ue-edit .hero-video-video {
+    max-height: 1080px;
+}
+
 /* ── Media layer ─────────────────────────────────────────────────────── */
 .hero-video-media {
     position: absolute;

@@ -3,7 +3,11 @@ import { loadSections } from '@/app/aem';
 
 const FADE_ATTR = 'data-soft-nav';
 const FADE_OUT_CLASS = 'mode-toggle-fade-out';
-const FADE_DURATION_MS = 320;
+const FADE_IN_START_CLASS = 'mode-toggle-fade-in-start';
+// Safety-net timeout only — real completion is signalled by `transitionend`, which respects
+// each block's own `--soft-nav-duration` override. Kept generous so per-block customization
+// (e.g. a 500ms transition) never gets cut short if transitionend somehow doesn't fire.
+const FADE_DURATION_MS = 800;
 // Only this exact wrapper node (added by decorateBlock's `${blockName}-wrapper` convention)
 // stays mounted across a swap. Its section may hold other page-specific content (e.g. a hero
 // banner or video) that should still update, so we preserve the node itself, not its section.
@@ -137,17 +141,18 @@ async function navigate(url: string, { push }: { push: boolean }): Promise<void>
       graftParent.insertBefore(preservedNode, graftParent.children[graftIndex] ?? null);
     }
 
-    // Pre-fade the incoming content so it's invisible right up until insertion, then reveal it.
+    // Pre-fade the incoming content so it's invisible (and slightly scaled up) right up until
+    // insertion, then reveal it with a zoom-in + fade — the preserved node never gets this class.
     const newContentTargets = collectFadeTargets(newMain, preservedNode);
     newContentTargets.forEach((el) => {
       el.setAttribute(FADE_ATTR, '');
-      el.classList.add(FADE_OUT_CLASS);
+      el.classList.add(FADE_IN_START_CLASS);
     });
 
     currentMain.replaceChildren(...newMain.children);
 
     newContentTargets.forEach((el) => el.getBoundingClientRect()); // force reflow
-    newContentTargets.forEach((el) => el.classList.remove(FADE_OUT_CLASS));
+    newContentTargets.forEach((el) => el.classList.remove(FADE_IN_START_CLASS));
 
     document.title = doc.title;
     if (push) window.history.pushState({}, '', url);

@@ -84,18 +84,19 @@ function waitForFadeOut(sections: HTMLElement[]): Promise<void> {
 }
 
 /**
- * Splits a main element's content into fade targets: whole sections that don't host the
- * preserved node, plus (one level deep) the sibling blocks inside whichever section does.
+ * Splits an element's content into fade targets: every descendant subtree that does NOT contain
+ * the preserved node fades as one unit; whichever branch does contain it is recursed into, so the
+ * preserved node is excluded at whatever depth it actually lives (e.g. nested inside hero-video).
  */
-function collectFadeTargets(main: HTMLElement, preservedNode: HTMLElement | null): HTMLElement[] {
+function collectFadeTargets(root: HTMLElement, preservedNode: HTMLElement | null): HTMLElement[] {
+  if (!preservedNode) return [...root.children] as HTMLElement[];
   const targets: HTMLElement[] = [];
-  [...main.children].forEach((section) => {
-    if (preservedNode && section.contains(preservedNode)) {
-      [...section.children].forEach((child) => {
-        if (child !== preservedNode) targets.push(child as HTMLElement);
-      });
+  [...root.children].forEach((child) => {
+    if (child === preservedNode) return;
+    if (child.contains(preservedNode)) {
+      targets.push(...collectFadeTargets(child as HTMLElement, preservedNode));
     } else {
-      targets.push(section as HTMLElement);
+      targets.push(child as HTMLElement);
     }
   });
   return targets;
@@ -137,7 +138,12 @@ async function navigate(url: string, { push }: { push: boolean }): Promise<void>
 
     await waitForFadeOut(fadeTargets);
 
-    if (preservedNode && graftParent) {
+    // Prefer grafting into the incoming page's own hero-video (matches the initial-load
+    // placement in mode-toggle.ts's attachToHeroVideo), falling back to the flat section slot.
+    const heroVideoInNew = newMain.querySelector<HTMLElement>('.hero-video');
+    if (preservedNode && heroVideoInNew) {
+      heroVideoInNew.append(preservedNode);
+    } else if (preservedNode && graftParent) {
       graftParent.insertBefore(preservedNode, graftParent.children[graftIndex] ?? null);
     }
 

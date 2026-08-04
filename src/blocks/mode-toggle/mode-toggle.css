@@ -1,9 +1,28 @@
 /* mode-toggle block */
 
+/* When mode-toggle lives inside hero-video (grafted there by attachToHeroVideo/soft-nav.ts so it
+   tracks hero-video's own 100svh box, not the shared section's full height, which may include
+   other stacked content), position it as an overlay pinned to hero-video's bottom-center.
+   .hero-video is already `position: relative`. */
+.hero-video .mode-toggle-wrapper {
+    position: absolute;
+    left: 50%;
+    bottom: calc(2.5rem + env(safe-area-inset-bottom));
+    transform: translateX(-50%);
+    z-index: 3;
+}
+
+@media (width < 768px) {
+    .hero-video .mode-toggle-wrapper {
+        bottom: calc(1.75rem + env(safe-area-inset-bottom));
+    }
+}
+
 .mode-toggle-inner {
     display: flex;
     align-items: center;
     gap: 0.75rem;
+    color: #fff;
 }
 
 .mode-toggle-btn {
@@ -12,7 +31,7 @@
     letter-spacing: 0.1em;
     text-transform: uppercase;
     text-decoration: none;
-    color: var(--text-color);
+    color: inherit;
     opacity: 0.45;
     background: none;
     border: none;
@@ -61,32 +80,32 @@
     }
 }
 
-/* Soft-navigation fade+zoom: applied to whichever content is swapping (whole sections, or just
+/* Soft-navigation fade-in-up: applied to whichever content is swapping (whole sections, or just
    the sibling blocks next to the toggle inside a shared section). The preserved
-   .mode-toggle-wrapper node never receives this attribute, so it never dips/scales during a swap.
+   .mode-toggle-wrapper node never receives this attribute, so it never moves/fades during a swap.
    Params are CSS custom properties so any block can override them for its own instance —
-   e.g. `.hero-video-wrapper[data-soft-nav] { --soft-nav-duration: 500ms; --soft-nav-scale-out: 0.9; }` */
+   e.g. `.hero-video-wrapper[data-soft-nav] { --soft-nav-duration: 550ms; --soft-nav-translate-in: 28px; }` */
 [data-soft-nav] {
-    --soft-nav-duration: 320ms;
-    --soft-nav-scale-out: 0.98;
-    --soft-nav-scale-in: 1.02;
+    --soft-nav-duration: 420ms;
+    --soft-nav-easing: cubic-bezier(0.22, 1, 0.36, 1);
+    --soft-nav-translate-out: -16px;
+    --soft-nav-translate-in: 22px;
     transition:
-        opacity var(--soft-nav-duration) ease,
-        transform var(--soft-nav-duration) ease;
-    transform: scale(1);
-    transform-origin: center;
+        opacity var(--soft-nav-duration) var(--soft-nav-easing),
+        transform var(--soft-nav-duration) var(--soft-nav-easing);
+    transform: translateY(0);
 }
 
-/* Outgoing content: shrinks slightly while fading out */
+/* Outgoing content: drifts up slightly while fading out */
 [data-soft-nav].mode-toggle-fade-out {
     opacity: 0;
-    transform: scale(var(--soft-nav-scale-out));
+    transform: translateY(var(--soft-nav-translate-out));
 }
 
-/* Incoming content: starts slightly enlarged and invisible, then settles to scale(1) */
+/* Incoming content: starts lower and invisible, then eases up into place (fade-in-up) */
 [data-soft-nav].mode-toggle-fade-in-start {
     opacity: 0;
-    transform: scale(var(--soft-nav-scale-in));
+    transform: translateY(var(--soft-nav-translate-in));
 }
 
 @media (prefers-reduced-motion: reduce) {

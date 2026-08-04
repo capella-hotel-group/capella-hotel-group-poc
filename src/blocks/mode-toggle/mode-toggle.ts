@@ -1,6 +1,31 @@
 import { moveInstrumentation } from '@/app/scripts';
 import { initSoftNav } from './soft-nav';
 
+/**
+ * If a Hero Video block lives in the same section, move this block's wrapper inside it once it
+ * finishes loading — so the toggle positions relative to hero-video's own 100svh box (via CSS)
+ * instead of the shared section, whose height also includes any other stacked content.
+ * Runs unawaited (fire-and-forget): loadSections() processes blocks sequentially, and mode-toggle
+ * typically appears before hero-video in the section, so awaiting here would deadlock.
+ */
+function attachToHeroVideo(wrapper: HTMLElement, block: HTMLElement): void {
+  const heroVideo = block.closest('.section')?.querySelector<HTMLElement>('.hero-video');
+  if (!heroVideo) return;
+
+  const move = (): void => heroVideo.append(wrapper);
+  if (heroVideo.dataset.blockStatus === 'loaded') {
+    move();
+    return;
+  }
+  const observer = new MutationObserver(() => {
+    if (heroVideo.dataset.blockStatus === 'loaded') {
+      observer.disconnect();
+      move();
+    }
+  });
+  observer.observe(heroVideo, { attributes: true, attributeFilter: ['data-block-status'] });
+}
+
 export default async function decorate(block: HTMLElement): Promise<void> {
   const rows = [...block.children] as HTMLElement[];
 
@@ -50,4 +75,7 @@ export default async function decorate(block: HTMLElement): Promise<void> {
   block.replaceChildren(inner);
 
   initSoftNav([destLink, expLink]);
+
+  const wrapper = block.parentElement;
+  if (wrapper) attachToHeroVideo(wrapper, block);
 }

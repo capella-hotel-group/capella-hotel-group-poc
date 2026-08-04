@@ -67,6 +67,16 @@ export class MediaManager {
   private onError: (item: HeroVideoItem, errorType: string) => void = () => {};
   private pendingFadeIn: Animation | null = null;
   private pendingFadeOut: Animation | null = null;
+  // When autoplay is blocked, we register a one-shot listener that retries playback on the first
+  // real user gesture. Tracked so we don't stack duplicate listeners.
+  private gestureRetryBound = false;
+  private readonly gestureRetry = (): void => {
+    this.gestureRetryBound = false;
+    ['pointerdown', 'keydown', 'touchstart', 'wheel'].forEach((evt) =>
+      window.removeEventListener(evt, this.gestureRetry),
+    );
+    this.resume();
+  };
 
   constructor(videoA: HTMLVideoElement, videoB: HTMLVideoElement, posterEl: HTMLElement) {
     this.videoA = videoA;
@@ -113,11 +123,30 @@ export class MediaManager {
     // and needs to play. Iterating both layers avoids racing with the swap.
     [this.videoA, this.videoB].forEach((v) => {
       if (v.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA && parseFloat(v.style.opacity || '0') > 0 && v.paused) {
-        v.play().catch(() => {
-          // Autoplay rejected — poster remains visible
-        });
+        this.playSafely(v);
       }
     });
+  }
+
+  /**
+   * Play a video, re-asserting muted first (muted playback is exempt from autoplay blocking in
+   * all modern browsers). If the browser still rejects the play() promise, arm a one-shot retry
+   * on the next user gesture so playback recovers as soon as the visitor interacts.
+   */
+  private playSafely(video: HTMLVideoElement): void {
+    video.muted = this.muted;
+    const p = video.play();
+    if (p && typeof p.catch === 'function') {
+      p.catch(() => this.armGestureRetry());
+    }
+  }
+
+  private armGestureRetry(): void {
+    if (this.gestureRetryBound) return;
+    this.gestureRetryBound = true;
+    ['pointerdown', 'keydown', 'touchstart', 'wheel'].forEach((evt) =>
+      window.addEventListener(evt, this.gestureRetry, { once: true, passive: true }),
+    );
   }
 
   /** Switch to a new item's video with opacity crossfade. */
@@ -191,9 +220,7 @@ export class MediaManager {
     if (this.sequenceId !== mySeq) return;
 
     // Start playback before fade
-    incoming.play().catch(() => {
-      // Autoplay blocked — poster visible already
-    });
+    this.playSafely(incoming);
 
     // Ensure at least one decoded frame is available before we begin the fade.
     await waitForFirstFrame(incoming);
@@ -276,9 +303,7 @@ export class MediaManager {
     // layer's playback that was started earlier. Re-play here so a spurious mid-flight pause
     // doesn't leave the video stalled at opacity 1 but paused.
     if (incoming.paused) {
-      incoming.play().catch(() => {
-        // Autoplay blocked — poster remains as fallback
-      });
+      this.playSafely(incoming);
     }
   }
 
@@ -303,6 +328,12 @@ export class MediaManager {
     this.pendingFadeOut?.cancel();
     this.pendingFadeIn = null;
     this.pendingFadeOut = null;
+    if (this.gestureRetryBound) {
+      this.gestureRetryBound = false;
+      ['pointerdown', 'keydown', 'touchstart', 'wheel'].forEach((evt) =>
+        window.removeEventListener(evt, this.gestureRetry),
+      );
+    }
     this.videoA.pause();
     this.videoB.pause();
     this.videoA.removeAttribute('src');

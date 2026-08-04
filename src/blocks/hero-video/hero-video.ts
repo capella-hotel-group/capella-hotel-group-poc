@@ -1,6 +1,6 @@
 // src/blocks/hero-video/hero-video.ts
 import { resolveDAMUrl } from '@/utils/env';
-import { emitHeroImpression, emitItemSelect, emitMediaError, emitSoundToggle } from './lib/analytics';
+import { emitHeroImpression, emitItemSelect, emitMediaError } from './lib/analytics';
 import { runIntro, skipIntro } from './lib/intro';
 import { MediaManager } from './lib/media-manager';
 import { SelectorUI } from './lib/selector-ui';
@@ -152,6 +152,11 @@ function buildDOM(config: HeroVideoConfig): {
   const videoA = document.createElement('video');
   videoA.className = 'hero-video-video hero-video-video--a';
   videoA.muted = true;
+  // The `muted` and `autoplay` HTML attributes (not just the JS properties) are what Chrome's
+  // autoplay policy inspects to classify a video as autoplay-safe. Without them, muted playback
+  // started from an async context (e.g. after a soft-nav fetch) can be blocked until a gesture.
+  videoA.setAttribute('muted', '');
+  videoA.setAttribute('autoplay', '');
   videoA.playsInline = true;
   videoA.loop = true;
   videoA.setAttribute('aria-hidden', 'true');
@@ -159,6 +164,8 @@ function buildDOM(config: HeroVideoConfig): {
   const videoB = document.createElement('video');
   videoB.className = 'hero-video-video hero-video-video--b';
   videoB.muted = true;
+  videoB.setAttribute('muted', '');
+  videoB.setAttribute('autoplay', '');
   videoB.playsInline = true;
   videoB.loop = true;
   videoB.setAttribute('aria-hidden', 'true');
@@ -252,9 +259,6 @@ export default async function decorate(block: HTMLElement): Promise<void> {
   const items = parseItems(rows.slice(1));
   if (items.length === 0) return;
 
-  // Hide the sound button entirely when no item carries audio.
-  const hasAnyAudio = items.some((i) => i.hasAudio);
-
   const state: HeroVideoState = {
     activeIndex: 0,
     introComplete: false,
@@ -263,7 +267,8 @@ export default async function decorate(block: HTMLElement): Promise<void> {
 
   const dom = buildDOM(config);
   block.replaceChildren(dom.root);
-  dom.soundBtn.hidden = !hasAnyAudio;
+  // Videos are always muted — the sound/unmute control is intentionally removed.
+  dom.soundBtn.hidden = true;
 
   const cursor = new CursorController(block, dom.cursorEl);
   cursor.mount();
@@ -381,14 +386,7 @@ export default async function decorate(block: HTMLElement): Promise<void> {
     });
   }
 
-  // Sound toggle
-  dom.soundBtn.addEventListener('click', () => {
-    state.muted = !state.muted;
-    media.setMuted(state.muted);
-    dom.soundBtn.setAttribute('aria-pressed', String(!state.muted));
-    dom.soundBtn.setAttribute('aria-label', state.muted ? 'Unmute video' : 'Mute video');
-    emitSoundToggle(state.muted);
-  });
+  // Sound toggle removed — videos stay permanently muted.
 
   // Impression: emit after block is visible for > 2s
   const impressionTimer = setTimeout(() => {

@@ -1,0 +1,277 @@
+/* src/blocks/hero-video/hero-video.css */
+
+.hero-video-container .hero-video-wrapper {
+    max-width: unset;
+    padding: 0;
+}
+
+/* ── Root ────────────────────────────────────────────────────────────── */
+.hero-video {
+    position: relative;
+    width: 100%;
+    min-height: 100svh;
+    overflow: hidden;
+    background: #000;
+    contain: layout style;
+    isolation: isolate;
+}
+
+/* Authoring-only fix */
+.adobe-ue-edit .hero-video {
+    max-height: 1080px;
+}
+
+/* ── Media layer ─────────────────────────────────────────────────────── */
+.hero-video-media {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+}
+
+.hero-video-poster {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.hero-video-video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    will-change: opacity;
+}
+
+/* ── Contrast overlay ────────────────────────────────────────────────── */
+.hero-video-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background:
+        radial-gradient(ellipse at center, transparent 20%, rgba(0 0 0 / 0.5) 100%),
+        linear-gradient(to bottom, rgba(0 0 0 / 0.25) 0%, transparent 35%);
+    pointer-events: none;
+}
+
+/* ── Intro phrase ────────────────────────────────────────────────────── */
+.hero-video-intro-phrase {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 3;
+    font-family: var(--heading-font-family);
+    font-size: clamp(1.75rem, 3.5vw, 3.75rem);
+    font-weight: 300;
+    color: #fff;
+    white-space: nowrap;
+    letter-spacing: 0.05em;
+    pointer-events: none;
+    will-change: opacity;
+}
+
+/* ── Selector UI ─────────────────────────────────────────────────────── */
+.hero-video-selector {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0 2.5rem;
+    pointer-events: none;
+}
+
+.hero-video-prefix,
+.hero-video-suffix {
+    font-family: var(--heading-font-family);
+    font-size: clamp(1.75rem, 3.5vw, 3.75rem);
+    font-weight: 300;
+    color: #fff;
+    white-space: nowrap;
+    letter-spacing: 0.05em;
+    pointer-events: none;
+    line-height: 1.3;
+}
+
+.hero-video-items {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    pointer-events: auto;
+    text-align: center;
+}
+
+.hero-video-items--animating {
+    will-change: transform;
+}
+
+.hero-video-item {
+    display: block;
+}
+
+.hero-video-item-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    width: 100%;
+    background: none;
+    border: none;
+    padding: 0.55rem 0;
+    font-family: var(--heading-font-family);
+    font-size: clamp(1.75rem, 3.5vw, 3.75rem);
+    font-weight: 300;
+    color: #fff;
+    opacity: 0.35;
+    cursor: pointer;
+    text-align: center;
+    line-height: 1.3;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+    will-change: opacity;
+    transition: none;
+    justify-content: center;
+}
+
+.hero-video-item-btn:focus-visible {
+    outline: 2px solid rgba(255 255 255 / 0.7);
+    outline-offset: 4px;
+    border-radius: 2px;
+}
+
+/* Arrow affordance — only shown next to the active item (link click target) */
+.hero-video-arrow {
+    width: 0.9em;
+    height: 0.9em;
+    border-top: 2px solid currentcolor;
+    border-right: 2px solid currentcolor;
+    transform: rotate(45deg);
+    display: none;
+}
+
+.hero-video-item[aria-selected='true'] .hero-video-arrow {
+    display: inline-block;
+}
+
+/* ── Bottom controls ─────────────────────────────────────────────────── */
+.hero-video-controls {
+    position: absolute;
+    bottom: calc(2.5rem + env(safe-area-inset-bottom));
+    left: 2.5rem;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+}
+
+/* ── Sound button ────────────────────────────────────────────────────── */
+.hero-video-sound {
+    background: none;
+    border: 1px solid rgba(255 255 255 / 0.4);
+    width: 2.5rem;
+    height: 2.5rem;
+    cursor: pointer;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    padding: 0;
+}
+
+.hero-video-sound:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 3px;
+}
+
+/* Speaker icons via mask — muted state shows slash */
+.hero-video-sound::before {
+    content: '';
+    display: block;
+    width: 1.1rem;
+    height: 1.1rem;
+    background: currentcolor;
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z'/%3E%3C/svg%3E");
+    mask-repeat: no-repeat;
+    mask-position: center;
+    mask-size: contain;
+}
+
+.hero-video-sound[aria-pressed='true']::before {
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M16.5 12A4.5 4.5 0 0 0 14 7.97v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06a8.99 8.99 0 0 0 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z'/%3E%3C/svg%3E");
+}
+
+/* ── Custom cursor ───────────────────────────────────────────────────── */
+.hero-video-cursor {
+    position: absolute;
+    top: -14px;
+    left: -14px;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(255 255 255 / 0.8);
+    background: rgba(255 255 255 / 0.12);
+    pointer-events: none;
+    z-index: 4;
+    display: none;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    will-change: transform;
+}
+
+/* ── Reduced motion ──────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+    .hero-video-prefix,
+    .hero-video-suffix,
+    .hero-video-intro-phrase,
+    .hero-video-item-btn,
+    .hero-video-cursor {
+        will-change: auto;
+        transition: none !important;
+    }
+}
+
+/* ── Mobile ──────────────────────────────────────────────────────────── */
+@media (width < 768px) {
+    .hero-video-intro-phrase {
+        font-size: clamp(1.4rem, 5vw, 2rem);
+        white-space: normal;
+        text-align: center;
+        width: 80%;
+    }
+
+    .hero-video-selector {
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 0;
+        padding: 0 1.5rem;
+    }
+
+    .hero-video-prefix,
+    .hero-video-suffix {
+        font-size: clamp(1.4rem, 5vw, 2rem);
+    }
+
+    .hero-video-item-btn {
+        font-size: clamp(1.4rem, 5vw, 2rem);
+        padding: 0.4rem 0;
+    }
+
+    .hero-video-controls {
+        padding: 0 1.5rem;
+        bottom: calc(1.75rem + env(safe-area-inset-bottom));
+        left: 0;
+        justify-content: flex-start;
+    }
+}
+
+/* Touch devices — larger tap targets */
+@media (hover: none) {
+    .hero-video-item-btn {
+        min-height: 48px;
+    }
+}

@@ -234,10 +234,13 @@ function buildDOM(config: HeroVideoConfig): {
   };
 }
 
-function shouldSkipIntro(): boolean {
+function shouldSkipIntro(block: HTMLElement): boolean {
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return true;
   if (document.documentElement.classList.contains('adobe-ue-edit')) return true;
   if (window.self !== window.top) return true; // inside iframe (UE)
+  // Mode-toggle soft-nav flagged this instance as a mid-navigation swap — skip the 3.7s
+  // landing intro so the transition feels like a video crossfade, not a page relaunch.
+  if (block.hasAttribute('data-soft-nav-swap')) return true;
   return false;
 }
 
@@ -318,7 +321,7 @@ export default async function decorate(block: HTMLElement): Promise<void> {
     selectorUI.activateItem(state.activeIndex, false);
     selectorUI.setIntroComplete(true);
     state.introComplete = true;
-  } else if (shouldSkipIntro()) {
+  } else if (shouldSkipIntro(block)) {
     skipIntro(introElements);
     selectorUI.measureRows();
     selectorUI.activateItem(state.activeIndex, false);

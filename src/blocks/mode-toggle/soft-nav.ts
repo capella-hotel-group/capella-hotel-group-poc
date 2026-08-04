@@ -134,6 +134,14 @@ async function navigate(url: string, { push }: { push: boolean }): Promise<void>
     const graftIndex = graftParent ? [...graftParent.children].indexOf(incomingDup as Element) : -1;
     incomingDup?.remove();
 
+    // Signal to blocks that they're being mounted mid-navigation, so they can skip landing-page
+    // intro sequences that would otherwise replay on every mode swap (e.g. hero-video's 3.7s
+    // "See with new eyes" phrase + split-layout entrance). Blocks read this before running
+    // their decorate() logic during loadSections().
+    newMain.querySelectorAll<HTMLElement>('.hero-video').forEach((el) => {
+      el.dataset.softNavSwap = '';
+    });
+
     await loadSections(newMain);
 
     await waitForFadeOut(fadeTargets);

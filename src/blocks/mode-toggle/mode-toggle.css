@@ -80,32 +80,44 @@
     }
 }
 
-/* Soft-navigation fade-in-up: applied to whichever content is swapping (whole sections, or just
+/* Soft-navigation fade+zoom: applied to whichever content is swapping (whole sections, or just
    the sibling blocks next to the toggle inside a shared section). The preserved
-   .mode-toggle-wrapper node never receives this attribute, so it never moves/fades during a swap.
-   Params are CSS custom properties so any block can override them for its own instance —
-   e.g. `.hero-video-wrapper[data-soft-nav] { --soft-nav-duration: 550ms; --soft-nav-translate-in: 28px; }` */
+   .mode-toggle-wrapper node never receives this attribute, so it never dips/scales during a swap.
+   Params are CSS custom properties so any block can override them for its own instance (see the
+   hero-video override below, which slows/smooths it into a cinematic scene-change feel). */
 [data-soft-nav] {
-    --soft-nav-duration: 420ms;
-    --soft-nav-easing: cubic-bezier(0.22, 1, 0.36, 1);
-    --soft-nav-translate-out: -16px;
-    --soft-nav-translate-in: 22px;
+    --soft-nav-duration: 320ms;
+    --soft-nav-easing: ease;
+    --soft-nav-scale-out: 0.98;
+    --soft-nav-scale-in: 1.02;
     transition:
         opacity var(--soft-nav-duration) var(--soft-nav-easing),
         transform var(--soft-nav-duration) var(--soft-nav-easing);
-    transform: translateY(0);
+    transform: scale(1);
+    transform-origin: center;
 }
 
-/* Outgoing content: drifts up slightly while fading out */
+/* Outgoing content: shrinks slightly while fading out */
 [data-soft-nav].mode-toggle-fade-out {
     opacity: 0;
-    transform: translateY(var(--soft-nav-translate-out));
+    transform: scale(var(--soft-nav-scale-out));
 }
 
-/* Incoming content: starts lower and invisible, then eases up into place (fade-in-up) */
+/* Incoming content: starts slightly enlarged and invisible, then settles to scale(1) */
 [data-soft-nav].mode-toggle-fade-in-start {
     opacity: 0;
-    transform: translateY(var(--soft-nav-translate-in));
+    transform: scale(var(--soft-nav-scale-in));
+}
+
+/* hero-video's own content (media/overlay/selector/controls, direct children of .hero-video):
+   slower duration matching MediaManager's own video crossfade (620ms), and both outgoing/incoming
+   anchor to the same 1.02 scale (settling to 1.0) for a unified continuous zoom-out feel, like a
+   cinematic scene-change rather than a generic UI transition. */
+.hero-video > [data-soft-nav] {
+    --soft-nav-duration: 620ms;
+    --soft-nav-easing: cubic-bezier(0.22, 1, 0.36, 1);
+    --soft-nav-scale-out: 1.02;
+    --soft-nav-scale-in: 1.02;
 }
 
 @media (prefers-reduced-motion: reduce) {

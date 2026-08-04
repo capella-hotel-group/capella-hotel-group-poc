@@ -122,7 +122,8 @@
         "offer-carousel",
         "offer-suggestions",
         "tabs-with-blocks",
-        "cinematic-hero"
+        "cinematic-hero",
+        "mode-toggle"
       ]
     }
   ]

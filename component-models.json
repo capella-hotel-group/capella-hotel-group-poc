@@ -1062,6 +1062,35 @@
     ]
   },
   {
+    "id": "mode-toggle",
+    "fields": [
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "destinationLabel",
+        "label": "Destination Label",
+        "value": "Destinations"
+      },
+      {
+        "component": "aem-content",
+        "name": "destinationUrl",
+        "label": "Destination Page"
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "experienceLabel",
+        "label": "Experience Label",
+        "value": "Experiences"
+      },
+      {
+        "component": "aem-content",
+        "name": "experienceUrl",
+        "label": "Experience Page"
+      }
+    ]
+  },
+  {
     "id": "offer-carousel",
     "fields": []
   },

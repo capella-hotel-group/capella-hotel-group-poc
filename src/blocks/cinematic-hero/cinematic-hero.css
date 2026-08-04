@@ -16,6 +16,11 @@
     isolation: isolate;
 }
 
+/* Authoring-only fix */
+.adobe-ue-edit .cinematic-hero {
+    max-height: 1080px;
+}
+
 /* ── Media layer ─────────────────────────────────────────────────────── */
 .cinematic-hero-media {
     position: absolute;

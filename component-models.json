@@ -161,6 +161,25 @@
             "value": "lg"
           }
         ]
+      },
+      {
+        "component": "select",
+        "name": "mode",
+        "label": "Mode",
+        "options": [
+          {
+            "name": "All (always visible)",
+            "value": ""
+          },
+          {
+            "name": "Experiences",
+            "value": "experiences"
+          },
+          {
+            "name": "Destinations",
+            "value": "destinations"
+          }
+        ]
       }
     ]
   },

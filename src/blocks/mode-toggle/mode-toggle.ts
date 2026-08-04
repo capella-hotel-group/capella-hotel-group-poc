@@ -1,4 +1,5 @@
 import { moveInstrumentation } from '@/app/scripts';
+import { initSoftNav } from './soft-nav';
 
 export default async function decorate(block: HTMLElement): Promise<void> {
   const rows = [...block.children] as HTMLElement[];
@@ -19,13 +20,16 @@ export default async function decorate(block: HTMLElement): Promise<void> {
   inner.className = 'mode-toggle-inner';
   inner.setAttribute('role', 'group');
   inner.setAttribute('aria-label', 'Site mode');
+  // Persisted so soft-nav can recompute active state without re-reading the (detached) source rows.
+  inner.dataset.destinationHref = destHref;
+  inner.dataset.experienceHref = expHref;
 
-  const destBtn = document.createElement('button');
-  destBtn.type = 'button';
-  destBtn.className = `mode-toggle-btn${!isExperience ? ' mode-toggle-btn--active' : ''}`;
-  destBtn.textContent = destLabel;
-  destBtn.setAttribute('aria-pressed', String(!isExperience));
-  moveInstrumentation(rows[0], destBtn);
+  const destLink = document.createElement('a');
+  destLink.href = destHref;
+  destLink.className = `mode-toggle-btn mode-toggle-btn--dest${!isExperience ? ' mode-toggle-btn--active' : ''}`;
+  destLink.textContent = destLabel;
+  if (!isExperience) destLink.setAttribute('aria-current', 'page');
+  moveInstrumentation(rows[0], destLink);
 
   const track = document.createElement('div');
   track.className = 'mode-toggle-track';
@@ -35,23 +39,15 @@ export default async function decorate(block: HTMLElement): Promise<void> {
   indicator.style.transform = isExperience ? 'translateX(100%)' : 'translateX(0%)';
   track.append(indicator);
 
-  const expBtn = document.createElement('button');
-  expBtn.type = 'button';
-  expBtn.className = `mode-toggle-btn${isExperience ? ' mode-toggle-btn--active' : ''}`;
-  expBtn.textContent = expLabel;
-  expBtn.setAttribute('aria-pressed', String(isExperience));
-  moveInstrumentation(rows[2], expBtn);
+  const expLink = document.createElement('a');
+  expLink.href = expHref;
+  expLink.className = `mode-toggle-btn mode-toggle-btn--exp${isExperience ? ' mode-toggle-btn--active' : ''}`;
+  expLink.textContent = expLabel;
+  if (isExperience) expLink.setAttribute('aria-current', 'page');
+  moveInstrumentation(rows[2], expLink);
 
-  destBtn.addEventListener('click', () => {
-    if (isExperience) window.location.href = destHref;
-  });
-  expBtn.addEventListener('click', () => {
-    if (!isExperience) window.location.href = expHref;
-  });
-  track.addEventListener('click', () => {
-    window.location.href = isExperience ? destHref : expHref;
-  });
-
-  inner.append(destBtn, track, expBtn);
+  inner.append(destLink, track, expLink);
   block.replaceChildren(inner);
+
+  initSoftNav([destLink, expLink]);
 }

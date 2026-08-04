@@ -11,12 +11,14 @@
     font-size: 0.75rem;
     letter-spacing: 0.1em;
     text-transform: uppercase;
+    text-decoration: none;
     color: var(--text-color);
     opacity: 0.45;
     background: none;
     border: none;
     cursor: pointer;
     padding: 0.25rem 0;
+    display: inline-block;
 }
 
 .mode-toggle-btn--active {
@@ -36,7 +38,7 @@
     height: 1.1rem;
     position: relative;
     overflow: hidden;
-    cursor: pointer;
+    pointer-events: none;
     opacity: 0.6;
 }
 
@@ -55,6 +57,23 @@
 @media (prefers-reduced-motion: reduce) {
     .mode-toggle-indicator {
         will-change: auto;
+        transition: none;
+    }
+}
+
+/* Soft-navigation fade: applied to whichever content is swapping (whole sections, or just the
+   sibling blocks next to the toggle inside a shared section). The preserved .mode-toggle-wrapper
+   node never receives this attribute, so it never dips in opacity during a swap. */
+[data-soft-nav] {
+    transition: opacity 320ms ease;
+}
+
+[data-soft-nav].mode-toggle-fade-out {
+    opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    [data-soft-nav] {
         transition: none;
     }
 }

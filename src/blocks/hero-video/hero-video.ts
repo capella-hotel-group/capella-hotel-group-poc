@@ -82,9 +82,13 @@ class CursorController {
 
 function parseConfig(configRow: HTMLElement): HeroVideoConfig {
   const cells = [...configRow.children] as HTMLElement[];
+  const rawTransition = cells[2]?.textContent?.trim().toLowerCase();
+  const transition: HeroVideoConfig['transition'] =
+    rawTransition === 'slide' || rawTransition === 'cut' ? rawTransition : 'crossfade';
   return {
     prefix: cells[0]?.textContent?.trim() || 'See',
     suffix: cells[1]?.textContent?.trim() || 'with new eyes',
+    transition,
   };
 }
 
@@ -262,6 +266,7 @@ export default async function decorate(block: HTMLElement): Promise<void> {
   cursor.mount();
 
   const media = new MediaManager(dom.videoA, dom.videoB, dom.posterEl);
+  media.setTransition(config.transition);
   media.setErrorHandler((item, errorType) => emitMediaError(item.label, item.videoUrl, errorType));
 
   // Load first item immediately

@@ -49,6 +49,18 @@
           "name": "suffix",
           "label": "Suffix",
           "value": "with new eyes"
+        },
+        {
+          "component": "select",
+          "valueType": "string",
+          "name": "transition",
+          "label": "Transition Style",
+          "value": "crossfade",
+          "options": [
+            { "name": "Crossfade", "value": "crossfade" },
+            { "name": "Slide", "value": "slide" },
+            { "name": "Cut", "value": "cut" }
+          ]
         }
       ]
     },

@@ -62,6 +62,8 @@ function waitForFirstFrame(video: HTMLVideoElement): Promise<void> {
   });
 }
 
+export type TransitionStyle = 'crossfade' | 'slide' | 'cut';
+
 export class MediaManager {
   private videoA: HTMLVideoElement;
   private videoB: HTMLVideoElement;
@@ -69,6 +71,7 @@ export class MediaManager {
   private activeLayer: 'a' | 'b' = 'a';
   private sequenceId = 0;
   private muted = true;
+  private transition: TransitionStyle = 'crossfade';
   private onError: (item: HeroVideoItem, errorType: string) => void = () => {};
   private pendingFadeIn: Animation | null = null;
   private pendingFadeOut: Animation | null = null;
@@ -95,6 +98,10 @@ export class MediaManager {
 
   setErrorHandler(cb: (item: HeroVideoItem, errorType: string) => void): void {
     this.onError = cb;
+  }
+
+  setTransition(style: TransitionStyle): void {
+    this.transition = style;
   }
 
   setMuted(muted: boolean): void {
@@ -146,6 +153,7 @@ export class MediaManager {
     incoming.src = item.videoUrl;
     incoming.muted = this.muted;
     incoming.style.objectPosition = this.getFocalPosition(item);
+    incoming.style.transform = '';
 
     // Wait until browser has media data. If it fails, keep current video visible.
     incoming.load();
@@ -170,39 +178,71 @@ export class MediaManager {
     // Ensure at least one decoded frame is available before we begin the fade.
     await waitForFirstFrame(incoming);
 
-    // Crossfade: incoming fades in, outgoing fades out simultaneously
-    const fadeIn = incoming.animate([{ opacity: '0' }, { opacity: '1' }], {
-      duration: CROSSFADE_MS,
-      easing: 'ease-in-out',
-      fill: 'forwards',
-    });
-    const fadeOut = outgoing.animate([{ opacity: '1' }, { opacity: '0' }], {
-      duration: CROSSFADE_MS,
-      easing: 'ease-in-out',
-      fill: 'forwards',
-    });
-    this.pendingFadeIn = fadeIn;
-    this.pendingFadeOut = fadeOut;
+    if (this.transition === 'cut') {
+      incoming.style.opacity = '1';
+      outgoing.style.opacity = '0';
+    } else if (this.transition === 'slide') {
+      incoming.style.transform = 'translateX(100%)';
+      incoming.style.opacity = '1';
+      outgoing.style.transform = 'translateX(0%)';
+      const slideIn = incoming.animate([{ transform: 'translateX(100%)' }, { transform: 'translateX(0%)' }], {
+        duration: CROSSFADE_MS,
+        easing: 'ease-in-out',
+        fill: 'forwards',
+      });
+      const slideOut = outgoing.animate([{ transform: 'translateX(0%)' }, { transform: 'translateX(-100%)' }], {
+        duration: CROSSFADE_MS,
+        easing: 'ease-in-out',
+        fill: 'forwards',
+      });
+      this.pendingFadeIn = slideIn;
+      this.pendingFadeOut = slideOut;
 
-    await Promise.all([fadeIn.finished, fadeOut.finished]).catch(() => {
-      // Animation interrupted (e.g. rapid switching) — that's fine
-    });
+      await Promise.all([slideIn.finished, slideOut.finished]).catch(() => {
+        // Animation interrupted (e.g. rapid switching) — that's fine
+      });
 
-    // Guard again after await
-    if (this.sequenceId !== mySeq) return;
+      if (this.sequenceId !== mySeq) return;
 
-    // Commit final opacity via style (remove fill: forwards)
-    incoming.style.opacity = '1';
-    outgoing.style.opacity = '0';
-    fadeIn.cancel();
-    fadeOut.cancel();
+      incoming.style.transform = 'translateX(0%)';
+      outgoing.style.opacity = '0';
+      slideIn.cancel();
+      slideOut.cancel();
+    } else {
+      // Crossfade (default): incoming fades in, outgoing fades out simultaneously
+      const fadeIn = incoming.animate([{ opacity: '0' }, { opacity: '1' }], {
+        duration: CROSSFADE_MS,
+        easing: 'ease-in-out',
+        fill: 'forwards',
+      });
+      const fadeOut = outgoing.animate([{ opacity: '1' }, { opacity: '0' }], {
+        duration: CROSSFADE_MS,
+        easing: 'ease-in-out',
+        fill: 'forwards',
+      });
+      this.pendingFadeIn = fadeIn;
+      this.pendingFadeOut = fadeOut;
+
+      await Promise.all([fadeIn.finished, fadeOut.finished]).catch(() => {
+        // Animation interrupted (e.g. rapid switching) — that's fine
+      });
+
+      if (this.sequenceId !== mySeq) return;
+
+      incoming.style.opacity = '1';
+      outgoing.style.opacity = '0';
+      fadeIn.cancel();
+      fadeOut.cancel();
+    }
+
     this.pendingFadeIn = null;
     this.pendingFadeOut = null;
 
-    // Cleanup outgoing — clear src to free decode memory for the old video
+    // Cleanup outgoing — clear src to free decode memory for the old video, reset transform
     outgoing.pause();
     outgoing.removeAttribute('src');
     outgoing.load();
+    outgoing.style.transform = '';
 
     // Swap active layer
     this.activeLayer = this.activeLayer === 'a' ? 'b' : 'a';

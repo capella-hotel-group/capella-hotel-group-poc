@@ -1,8 +1,11 @@
 // src/blocks/hero-video/lib/types.ts
 
+export type TransitionStyle = 'crossfade' | 'slide' | 'cut';
+
 export interface HeroVideoConfig {
   prefix: string;
   suffix: string;
+  transition: TransitionStyle;
 }
 
 export interface HeroVideoItem {

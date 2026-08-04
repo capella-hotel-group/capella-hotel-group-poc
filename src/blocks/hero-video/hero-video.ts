@@ -272,12 +272,34 @@ export default async function decorate(block: HTMLElement): Promise<void> {
   media.setTransition(config.transition);
   media.setErrorHandler((item, errorType) => emitMediaError(item.label, item.videoUrl, errorType));
 
-  // Load first item immediately
+  // Load first item — deferred until the block is connected AND the outgoing block's teardown
+  // has had a chance to fully drain. On mode-toggle soft-nav, the outgoing MediaManager's
+  // destroy() runs from a MutationObserver microtask right after replaceChildren() attaches the
+  // new block; if switchTo() fires in the same task, Chromium immediately errors the incoming
+  // video's fetch (both videos requesting the same URL race against Chromium's media pipeline).
+  // Waiting one macrotask (setTimeout 0) after seeing isConnected lets the outgoing teardown
+  // complete before we set src on the incoming layer.
   const firstItem = items[state.activeIndex];
   if (firstItem) {
-    media.switchTo(firstItem).catch(() => {
-      // Silent: poster already displayed
-    });
+    const startFirstLoad = (): void => {
+      media.switchTo(firstItem).catch(() => {
+        // Silent: poster already displayed
+      });
+    };
+    const scheduleStart = (): void => {
+      // Two-stage defer: microtask (queueMicrotask) + macrotask (setTimeout 0). Microtask lets
+      // any outgoing MutationObserver callback fire first, macrotask lets any load-abort settle.
+      queueMicrotask(() => setTimeout(startFirstLoad, 0));
+    };
+    if (block.isConnected) {
+      scheduleStart();
+    } else {
+      const waitForAttach = (): void => {
+        if (block.isConnected) scheduleStart();
+        else requestAnimationFrame(waitForAttach);
+      };
+      requestAnimationFrame(waitForAttach);
+    }
   }
 
   const selectorUI = new SelectorUI(dom.itemListEl);
@@ -292,6 +314,11 @@ export default async function decorate(block: HTMLElement): Promise<void> {
 
   const ro = new ResizeObserver(() => {
     selectorUI.measureRows();
+    // Re-snap the list transform to the current active item once real dimensions become
+    // available. Critical for the soft-nav skipIntro path, where decorate() runs on a detached
+    // block and the first measureRows() returns zero — leaving item 0 highlighted but the list
+    // untranslated (so it looks like a middle item is centered instead of the first).
+    if (state.introComplete) selectorUI.positionForItem(state.activeIndex);
   });
   ro.observe(block);
 
@@ -369,16 +396,23 @@ export default async function decorate(block: HTMLElement): Promise<void> {
     emitHeroImpression(block.id || 'hero-video', item?.label ?? '');
   }, 2000);
 
-  // Pause/resume on visibility
+  // Pause/resume on visibility. Threshold 0 (only pause when the block is entirely out of the
+  // viewport) instead of a partial threshold — during soft-nav mount the block briefly reports a
+  // reduced intersection ratio while its scale/opacity transition runs, which would spuriously
+  // pause the fresh video before it gets a chance to be seen. Additionally, gate the very first
+  // pause with `hasBeenVisible` so the initial IntersectionObserver callback (fired right after
+  // observe() while the block is still being laid out post-adoption) can't stop the video.
+  let hasBeenVisible = false;
   const observer = new IntersectionObserver(
     (entries) => {
-      if (entries[0].intersectionRatio >= 0.25) {
+      if (entries[0].isIntersecting) {
+        hasBeenVisible = true;
         media.resume();
-      } else {
+      } else if (hasBeenVisible) {
         media.pause();
       }
     },
-    { threshold: [0, 0.25] },
+    { threshold: 0 },
   );
   observer.observe(block);
 

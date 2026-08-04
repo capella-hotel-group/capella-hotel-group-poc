@@ -11,32 +11,24 @@ function waitForMediaReady(video: HTMLVideoElement): Promise<void> {
   }
 
   return new Promise<void>((resolve, reject) => {
-    const ac = new AbortController();
-    const { signal } = ac;
+    let timer = 0;
+    let pollId = 0;
 
-    const timer = window.setTimeout(() => {
-      ac.abort();
-      reject(new Error('video-load-timeout'));
-    }, LOAD_TIMEOUT_MS);
+    const finish = (ok: boolean): void => {
+      window.clearInterval(pollId);
+      window.clearTimeout(timer);
+      if (ok) resolve();
+      else reject(new Error('video-load-timeout'));
+    };
 
-    video.addEventListener(
-      'loadeddata',
-      () => {
-        clearTimeout(timer);
-        ac.abort();
-        resolve();
-      },
-      { signal },
-    );
-    video.addEventListener(
-      'error',
-      () => {
-        clearTimeout(timer);
-        ac.abort();
-        reject(new Error('video-load-error'));
-      },
-      { signal },
-    );
+    timer = window.setTimeout(() => finish(false), LOAD_TIMEOUT_MS);
+
+    // Poll readyState only — we deliberately ignore the `error` event because Chromium fires
+    // spurious transient errors during document adoption on soft-nav swaps, even when the
+    // resource ultimately loads. If the load truly fails, the 8s timeout catches it.
+    pollId = window.setInterval(() => {
+      if (video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) finish(true);
+    }, 50);
   });
 }
 
@@ -116,11 +108,16 @@ export class MediaManager {
   }
 
   resume(): void {
-    if (parseFloat(this.activeVideo.style.opacity ?? '0') > 0) {
-      this.activeVideo.play().catch(() => {
-        // Autoplay rejected — poster remains visible
-      });
-    }
+    // Play whichever layer has a loaded resource and isn't fully faded out — during a
+    // switchTo() crossfade, activeLayer hasn't swapped yet but the incoming layer is visible
+    // and needs to play. Iterating both layers avoids racing with the swap.
+    [this.videoA, this.videoB].forEach((v) => {
+      if (v.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA && parseFloat(v.style.opacity || '0') > 0 && v.paused) {
+        v.play().catch(() => {
+          // Autoplay rejected — poster remains visible
+        });
+      }
+    });
   }
 
   /** Switch to a new item's video with opacity crossfade. */
@@ -165,7 +162,30 @@ export class MediaManager {
         return true;
       });
 
-    if (loadFailed) return;
+    if (loadFailed) {
+      // True load failure (persistent video.error). Fade the outgoing video out to reveal the
+      // new item's poster underneath. Leave outgoing.src loaded so re-selecting the previous
+      // item can resume cheaply, and don't swap activeLayer so future dedup still references
+      // the last successfully-playing item.
+      if (this.sequenceId !== mySeq) return;
+
+      const startOpacity = outgoing.style.opacity || '1';
+      if (startOpacity !== '0') {
+        const fade = outgoing.animate([{ opacity: startOpacity }, { opacity: '0' }], {
+          duration: CROSSFADE_MS,
+          easing: 'ease-in-out',
+          fill: 'forwards',
+        });
+        this.pendingFadeOut = fade;
+        await fade.finished.catch(() => {});
+        if (this.sequenceId !== mySeq) return;
+        this.pendingFadeOut = null;
+        fade.cancel();
+      }
+      outgoing.style.opacity = '0';
+      outgoing.pause();
+      return;
+    }
 
     // Stale request guard: another switchTo() was called while we were loading
     if (this.sequenceId !== mySeq) return;
@@ -209,13 +229,16 @@ export class MediaManager {
       slideIn.cancel();
       slideOut.cancel();
     } else {
-      // Crossfade (default): incoming fades in, outgoing fades out simultaneously
+      // Crossfade (default): incoming fades in, outgoing fades out simultaneously.
+      // fadeOut starts from outgoing's current opacity so that a click after a previous load
+      // failure (which left outgoing at 0) doesn't flash the paused frame back to full opacity.
+      const outgoingStartOpacity = outgoing.style.opacity || '1';
       const fadeIn = incoming.animate([{ opacity: '0' }, { opacity: '1' }], {
         duration: CROSSFADE_MS,
         easing: 'ease-in-out',
         fill: 'forwards',
       });
-      const fadeOut = outgoing.animate([{ opacity: '1' }, { opacity: '0' }], {
+      const fadeOut = outgoing.animate([{ opacity: outgoingStartOpacity }, { opacity: '0' }], {
         duration: CROSSFADE_MS,
         easing: 'ease-in-out',
         fill: 'forwards',
@@ -246,6 +269,17 @@ export class MediaManager {
 
     // Swap active layer
     this.activeLayer = this.activeLayer === 'a' ? 'b' : 'a';
+
+    // Ensure the newly-active video is playing. During soft-nav mount, IntersectionObserver
+    // callbacks can fire mid-crossfade — resume() no-ops if it runs before this swap because
+    // activeVideo still points to the outgoing layer, and pause() can interrupt the incoming
+    // layer's playback that was started earlier. Re-play here so a spurious mid-flight pause
+    // doesn't leave the video stalled at opacity 1 but paused.
+    if (incoming.paused) {
+      incoming.play().catch(() => {
+        // Autoplay blocked — poster remains as fallback
+      });
+    }
   }
 
   private getFocalPosition(item: HeroVideoItem): string {

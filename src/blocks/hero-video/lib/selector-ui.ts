@@ -52,6 +52,10 @@ export class SelectorUI {
       btn.className = 'hero-video-item-btn';
       btn.type = 'button';
       btn.textContent = item.label;
+      // Set opacity via inline style so the active item is highlighted even if activateItem's
+      // WAAPI opacity animation misfires (which happens when decorate() runs on a detached block
+      // during mode-toggle soft-nav — `fill: forwards` doesn't retain after DOM adoption).
+      btn.style.opacity = idx === activeIndex ? '1' : '0.35';
       if (item.link) btn.dataset.href = item.link;
 
       // Arrow affordance — visible only for the active item (see CSS), shown when it has a link.
@@ -166,7 +170,8 @@ export class SelectorUI {
     this.pendingOpacityAnimations = [];
 
     if (prevBtn && prev !== index) {
-      const prevOpacityAnim = prevBtn.animate([{ opacity: 1 }, { opacity: 0.35 }], {
+      const prevStart = getComputedStyle(prevBtn).opacity || '1';
+      const prevOpacityAnim = prevBtn.animate([{ opacity: prevStart }, { opacity: 0.35 }], {
         duration: animate ? OPACITY_MS : 0,
         fill: 'forwards',
       });
@@ -180,7 +185,8 @@ export class SelectorUI {
         .catch(() => {});
     }
     if (nextBtn) {
-      const nextOpacityAnim = nextBtn.animate([{ opacity: 0.35 }, { opacity: 1 }], {
+      const nextStart = getComputedStyle(nextBtn).opacity || '0.35';
+      const nextOpacityAnim = nextBtn.animate([{ opacity: nextStart }, { opacity: 1 }], {
         duration: animate ? OPACITY_MS : 0,
         fill: 'forwards',
       });

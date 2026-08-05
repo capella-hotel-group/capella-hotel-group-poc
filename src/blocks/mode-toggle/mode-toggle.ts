@@ -58,7 +58,9 @@ export default async function decorate(block: HTMLElement): Promise<void> {
 
   const track = document.createElement('div');
   track.className = 'mode-toggle-track';
-  track.setAttribute('aria-hidden', 'true');
+  track.setAttribute('role', 'button');
+  track.setAttribute('tabindex', '0');
+  track.setAttribute('aria-label', 'Toggle site mode');
   const indicator = document.createElement('div');
   indicator.className = 'mode-toggle-indicator';
   indicator.style.transform = isExperience ? 'translateX(100%)' : 'translateX(0%)';
@@ -70,6 +72,20 @@ export default async function decorate(block: HTMLElement): Promise<void> {
   expLink.textContent = expLabel;
   if (isExperience) expLink.setAttribute('aria-current', 'page');
   moveInstrumentation(rows[2], expLink);
+
+  // Clicking/pressing the track switches to whichever side isn't currently active, reusing
+  // the same link (and its soft-nav click handler) so behavior stays in sync with the labels.
+  const toggleViaTrack = (): void => {
+    const target = expLink.classList.contains('mode-toggle-btn--active') ? destLink : expLink;
+    target.click();
+  };
+  track.addEventListener('click', toggleViaTrack);
+  track.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      toggleViaTrack();
+    }
+  });
 
   inner.append(destLink, track, expLink);
   block.replaceChildren(inner);

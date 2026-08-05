@@ -129,6 +129,20 @@ export class MediaManager {
   }
 
   /**
+   * Mimics a manual click: forces the active layer visible and re-attempts play(), bypassing
+   * both switchTo()'s same-URL dedupe (which skips replaying) and resume()'s opacity gate (which
+   * no-ops if the crossfade left opacity at 0). Safety net for soft-nav mounts where play()
+   * itself never rejects, but the video is left loaded-yet-paused/invisible.
+   */
+  ensureActivePlaying(): void {
+    const v = this.activeVideo;
+    if (v.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA && v.paused) {
+      v.style.opacity = '1';
+      this.playSafely(v);
+    }
+  }
+
+  /**
    * Play a video, re-asserting muted first (muted playback is exempt from autoplay blocking in
    * all modern browsers). If the browser still rejects the play() promise, arm a one-shot retry
    * on the next user gesture so playback recovers as soon as the visitor interacts.

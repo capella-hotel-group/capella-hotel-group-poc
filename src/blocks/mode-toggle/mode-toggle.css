@@ -57,8 +57,13 @@
     height: 1.1rem;
     position: relative;
     overflow: hidden;
-    pointer-events: none;
+    cursor: pointer;
     opacity: 0.6;
+}
+
+.mode-toggle-track:focus-visible {
+    outline: 2px solid currentcolor;
+    outline-offset: 3px;
 }
 
 .mode-toggle-indicator {

@@ -289,6 +289,10 @@ export default async function decorate(block: HTMLElement): Promise<void> {
     const startFirstLoad = (): void => {
       // TEMP diagnostic: log instead of swallowing so autoplay/load failures are visible.
       media.switchTo(firstItem).catch((err: unknown) => console.warn('[hero-video] first switchTo failed', err));
+      // Self-healing "auto-click": on soft-nav mounts play() sometimes succeeds silently (no
+      // rejection logged) but the crossfade leaves the video paused/invisible. Re-check shortly
+      // after mount settles and force it visible+playing, same effect as a manual click.
+      setTimeout(() => media.ensureActivePlaying(), 500);
     };
     const scheduleStart = (): void => {
       // Two-stage defer: microtask (queueMicrotask) + macrotask (setTimeout 0). Microtask lets

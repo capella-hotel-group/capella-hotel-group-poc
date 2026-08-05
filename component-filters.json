@@ -47,7 +47,6 @@
       "offer-carousel",
       "offer-suggestions",
       "tabs-with-blocks",
-      "cinematic-hero",
       "mode-toggle"
     ]
   },
@@ -87,12 +86,6 @@
     "id": "cards",
     "components": [
       "card"
-    ]
-  },
-  {
-    "id": "cinematic-hero",
-    "components": [
-      "cinematic-hero-item"
     ]
   },
   {

@@ -573,5 +573,7 @@ export default async function decorate(block: HTMLElement): Promise<void> {
       disconnectObserver.disconnect();
     }
   });
-  disconnectObserver.observe(block.parentElement ?? document.body, { childList: true, subtree: false });
+  // Must observe with `subtree: true` on a node that's never itself replaced (document.body).
+  // See hero-video.ts for why observing `block.parentElement` directly misses ancestor-level swaps.
+  disconnectObserver.observe(document.body, { childList: true, subtree: true });
 }

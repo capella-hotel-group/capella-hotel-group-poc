@@ -436,5 +436,10 @@ export default async function decorate(block: HTMLElement): Promise<void> {
       disconnectObserver.disconnect();
     }
   });
-  disconnectObserver.observe(block.parentElement ?? document.body, { childList: true, subtree: false });
+  // Must observe with `subtree: true` on a node that's never itself replaced (document.body).
+  // Mode-toggle's soft-nav swaps whole `.section` subtrees via `main.replaceChildren(...)`, which
+  // only emits a childList mutation on `main` — observing `block.parentElement` directly (one or
+  // two levels below the swapped section) would never see that mutation and cleanup would leak
+  // (old video never paused/released, IntersectionObserver/visibilitychange listeners pile up).
+  disconnectObserver.observe(document.body, { childList: true, subtree: true });
 }

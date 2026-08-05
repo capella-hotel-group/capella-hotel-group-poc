@@ -287,9 +287,8 @@ export default async function decorate(block: HTMLElement): Promise<void> {
   const firstItem = items[state.activeIndex];
   if (firstItem) {
     const startFirstLoad = (): void => {
-      media.switchTo(firstItem).catch(() => {
-        // Silent: poster already displayed
-      });
+      // TEMP diagnostic: log instead of swallowing so autoplay/load failures are visible.
+      media.switchTo(firstItem).catch((err: unknown) => console.warn('[hero-video] first switchTo failed', err));
     };
     const scheduleStart = (): void => {
       // Two-stage defer: microtask (queueMicrotask) + macrotask (setTimeout 0). Microtask lets
@@ -333,7 +332,8 @@ export default async function decorate(block: HTMLElement): Promise<void> {
     state.activeIndex = index;
     const item = items[index];
     if (item) {
-      media.switchTo(item).catch(() => {});
+      // TEMP diagnostic: log instead of swallowing so autoplay/load failures are visible.
+      media.switchTo(item).catch((err: unknown) => console.warn('[hero-video] switchTo failed', err));
       emitItemSelect(prevItem?.label ?? '', item.label, 'pointer');
     }
   });

@@ -4,6 +4,7 @@ import type { HeroVideoItem } from './types';
 const CROSSFADE_MS = 620;
 const FIRST_FRAME_TIMEOUT_MS = 500;
 const LOAD_TIMEOUT_MS = 8000;
+const ERROR_RETRY_GRACE_MS = 400;
 
 function waitForMediaReady(video: HTMLVideoElement): Promise<void> {
   if (video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
@@ -13,6 +14,8 @@ function waitForMediaReady(video: HTMLVideoElement): Promise<void> {
   return new Promise<void>((resolve, reject) => {
     let timer = 0;
     let pollId = 0;
+    let retried = false;
+    let errorSeenAt = 0;
 
     const finish = (ok: boolean): void => {
       window.clearInterval(pollId);
@@ -23,11 +26,24 @@ function waitForMediaReady(video: HTMLVideoElement): Promise<void> {
 
     timer = window.setTimeout(() => finish(false), LOAD_TIMEOUT_MS);
 
-    // Poll readyState only — we deliberately ignore the `error` event because Chromium fires
-    // spurious transient errors during document adoption on soft-nav swaps, even when the
-    // resource ultimately loads. If the load truly fails, the 8s timeout catches it.
+    // Poll readyState. Chromium sometimes aborts a fresh video's initial byte-range probe under
+    // network contention (e.g. right after page mount, competing with fonts/JS), which sets
+    // `video.error` — a terminal state per the HTML spec that readyState will never advance past
+    // without a new `.load()`. Give it a short grace window in case it's a transient recovery,
+    // then retry the load once ourselves before falling back to the full timeout.
     pollId = window.setInterval(() => {
-      if (video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) finish(true);
+      if (video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
+        finish(true);
+        return;
+      }
+      if (video.error && !retried) {
+        if (!errorSeenAt) {
+          errorSeenAt = Date.now();
+        } else if (Date.now() - errorSeenAt >= ERROR_RETRY_GRACE_MS) {
+          retried = true;
+          video.load();
+        }
+      }
     }, 50);
   });
 }

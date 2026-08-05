@@ -277,17 +277,19 @@ export default async function decorate(block: HTMLElement): Promise<void> {
   media.setTransition(config.transition);
   media.setErrorHandler((item, errorType) => emitMediaError(item.label, item.videoUrl, errorType));
 
-  // Load first item — deferred until the block is connected AND the outgoing block's teardown
-  // has had a chance to fully drain. On mode-toggle soft-nav, the outgoing MediaManager's
-  // destroy() runs from a MutationObserver microtask right after replaceChildren() attaches the
-  // new block; if switchTo() fires in the same task, Chromium immediately errors the incoming
-  // video's fetch (both videos requesting the same URL race against Chromium's media pipeline).
-  // Waiting one macrotask (setTimeout 0) after seeing isConnected lets the outgoing teardown
-  // complete before we set src on the incoming layer.
+  // Load first item — deferred until the block is attached to a *live, rendered* document.
+  // `Node.isConnected` only means "rooted in some Document", which is true even for a block
+  // still living inside mode-toggle soft-nav's `DOMParser().parseFromString()` scratch document
+  // (that document is never inserted into the browsing context). Starting video playback there
+  // makes Chrome's media pipeline reject the load outright with a permanent
+  // "MEDIA_ELEMENT_ERROR: Media load rejected by URL safety check" — the video never recovers
+  // once it's later grafted into the real page. A Document only gets a `defaultView` once it's
+  // associated with a browsing context, so checking that (in addition to isConnected) reliably
+  // tells apart the scratch document from the real one.
+  const isLiveConnected = (node: Element): boolean => node.isConnected && node.ownerDocument.defaultView !== null;
   const firstItem = items[state.activeIndex];
   if (firstItem) {
     const startFirstLoad = (): void => {
-      // TEMP diagnostic: log instead of swallowing so autoplay/load failures are visible.
       media.switchTo(firstItem).catch((err: unknown) => console.warn('[hero-video] first switchTo failed', err));
       // Self-healing "auto-click": on soft-nav mounts play() sometimes succeeds silently (no
       // rejection logged) but the crossfade leaves the video paused/invisible. Re-check shortly
@@ -299,11 +301,11 @@ export default async function decorate(block: HTMLElement): Promise<void> {
       // any outgoing MutationObserver callback fire first, macrotask lets any load-abort settle.
       queueMicrotask(() => setTimeout(startFirstLoad, 0));
     };
-    if (block.isConnected) {
+    if (isLiveConnected(block)) {
       scheduleStart();
     } else {
       const waitForAttach = (): void => {
-        if (block.isConnected) scheduleStart();
+        if (isLiveConnected(block)) scheduleStart();
         else requestAnimationFrame(waitForAttach);
       };
       requestAnimationFrame(waitForAttach);

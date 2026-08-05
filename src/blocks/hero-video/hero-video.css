@@ -187,6 +187,11 @@
     padding: 0;
 }
 
+/* The button's `display: flex` overrides the UA `hidden` rule, so restore hiding explicitly. */
+.hero-video-sound[hidden] {
+    display: none;
+}
+
 .hero-video-sound:focus-visible {
     outline: 2px solid #fff;
     outline-offset: 3px;

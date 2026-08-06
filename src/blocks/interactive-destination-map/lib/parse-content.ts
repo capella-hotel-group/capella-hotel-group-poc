@@ -25,48 +25,27 @@ function cellHighlights(cell: HTMLElement | undefined): string[] {
   return text ? [text] : [];
 }
 
-/** Reads a single-field block-level config row (one cell per row, in field-declaration order). */
-function configRowText(row: HTMLElement | undefined): string {
-  return cellText(row?.querySelector<HTMLElement>(':scope > div') ?? undefined);
+function cellHtml(cell: HTMLElement | undefined): string {
+  return cell?.innerHTML ?? '';
 }
 
-function configRowNumber(row: HTMLElement | undefined, fallback: number): number {
-  const parsed = Number.parseFloat(configRowText(row));
-  return Number.isFinite(parsed) ? parsed : fallback;
-}
-
-function configRowRichText(row: HTMLElement | undefined): string {
-  return row?.querySelector<HTMLElement>(':scope > div')?.innerHTML ?? '';
-}
-
-const MAP_CONFIG_FIELD_COUNT = 10;
 const LAYER_FIELD_COUNT = 16;
 const HOTSPOT_FIELD_COUNT = 21;
 
-function parseMapConfig(rows: HTMLElement[]): MapConfig {
-  const [
-    heading,
-    intro,
-    defaultLayerId,
-    defaultFocalX,
-    defaultFocalY,
-    defaultZoom,
-    minZoom,
-    maxZoom,
-    a11y,
-    analyticsId,
-  ] = rows;
+/** Block-level fields render as a single row with one cell per field, in field-declaration order. */
+function parseMapConfig(configRow: HTMLElement | undefined): MapConfig {
+  const cells = [...(configRow?.children ?? [])] as HTMLElement[];
   return {
-    heading: configRowText(heading),
-    intro: configRowRichText(intro),
-    defaultLayerId: configRowText(defaultLayerId),
-    defaultFocalX: configRowNumber(defaultFocalX, 50),
-    defaultFocalY: configRowNumber(defaultFocalY, 50),
-    defaultZoom: configRowNumber(defaultZoom, 1),
-    minZoom: configRowNumber(minZoom, 1),
-    maxZoom: configRowNumber(maxZoom, 3),
-    a11yInstructions: configRowRichText(a11y),
-    analyticsComponentId: configRowText(analyticsId),
+    heading: cellText(cells[0]),
+    intro: cellHtml(cells[1]),
+    defaultLayerId: cellText(cells[2]),
+    defaultFocalX: cellNumber(cells[3], 50),
+    defaultFocalY: cellNumber(cells[4], 50),
+    defaultZoom: cellNumber(cells[5], 1),
+    minZoom: cellNumber(cells[6], 1),
+    maxZoom: cellNumber(cells[7], 3),
+    a11yInstructions: cellHtml(cells[8]),
+    analyticsComponentId: cellText(cells[9]),
   };
 }
 
@@ -137,10 +116,9 @@ function isHotspotRow(row: HTMLElement): boolean {
  */
 export function parseMapContent(block: HTMLElement): MapContent {
   const rows = [...block.children] as HTMLElement[];
-  const configRows = rows.slice(0, MAP_CONFIG_FIELD_COUNT);
-  const itemRows = rows.slice(MAP_CONFIG_FIELD_COUNT);
+  const [configRow, ...itemRows] = rows;
 
-  const config = parseMapConfig(configRows);
+  const config = parseMapConfig(configRow);
   const layers: LayerConfig[] = [];
   const hotspots: HotspotConfig[] = [];
 

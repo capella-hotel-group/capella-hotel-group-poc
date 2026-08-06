@@ -1,6 +1,6 @@
 import type { LayerConfig, Transform, ViewportSize, WorldPoint } from './types';
 
-function clampNumber(value: number, min: number, max: number): number {
+export function clampNumber(value: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, value));
 }
 

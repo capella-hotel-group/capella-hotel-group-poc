@@ -25,6 +25,7 @@ import {
   type MapStateDefaults,
 } from './lib/state';
 import {
+  clampNumber,
   computeDefaultTransform,
   getFocalPercentAtViewportPoint,
   localToWorld,
@@ -312,6 +313,27 @@ export default async function enhance(ctx: EnhanceContext): Promise<void> {
     emitLayerChange(config.analyticsComponentId, fromLayerId, targetLayerId, trigger);
   }
 
+  // ── Same-layer zoom-in on select (Target Zoom set, no Target Layer) ──────────
+  function focusHotspot(hotspot: HotspotConfig): void {
+    const layer = layerById.get(hotspot.layerId);
+    const stage = stages.get(hotspot.layerId);
+    if (!layer || !stage || hotspot.targetZoom == null) return;
+
+    const viewportSize = getViewportSize();
+    const contentSize = getStageContentSize(stage);
+    const focalXPercent = hotspot.targetFocalX ?? hotspot.xPercent;
+    const focalYPercent = hotspot.targetFocalY ?? hotspot.yPercent;
+    const zoom = clampNumber(hotspot.targetZoom, layer.minZoom, layer.maxZoom);
+    const target = computeDefaultTransform(contentSize, viewportSize, focalXPercent, focalYPercent, zoom);
+
+    stage.style.transitionDuration = `${reducedMotion() ? 0 : TRANSITION_MS}ms`;
+    applyTransformToStage(stage, target);
+    setTransform(state, target);
+    updateControls();
+    zoomEmitter(hotspot.layerId, target.scale);
+    checkZoomThresholds();
+  }
+
   // ── Hotspot selection & popup ────────────────────────────────────────────────
   async function selectHotspot(
     hotspot: HotspotConfig,
@@ -339,6 +361,7 @@ export default async function enhance(ctx: EnhanceContext): Promise<void> {
       return;
     }
 
+    focusHotspot(hotspot);
     setDialogTrigger(state, trigger);
     popup.open(hotspot, trigger);
     emitPopupOpen(config.analyticsComponentId, state.activeLayerId, hotspot.hotspotId);

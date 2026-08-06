@@ -792,6 +792,351 @@
     ]
   },
   {
+    "id": "interactive-destination-map",
+    "fields": [
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "heading",
+        "label": "Heading"
+      },
+      {
+        "component": "richtext",
+        "valueType": "string",
+        "name": "intro",
+        "label": "Introduction"
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "defaultLayerId",
+        "label": "Default Layer ID",
+        "description": "Must match the Layer ID of one of the Map Layer items below"
+      },
+      {
+        "component": "number",
+        "valueType": "number",
+        "name": "defaultFocalX",
+        "label": "Default Focal X",
+        "value": 50
+      },
+      {
+        "component": "number",
+        "valueType": "number",
+        "name": "defaultFocalY",
+        "label": "Default Focal Y",
+        "value": 50
+      },
+      {
+        "component": "number",
+        "valueType": "number",
+        "name": "defaultZoom",
+        "label": "Default Zoom",
+        "value": 1
+      },
+      {
+        "component": "number",
+        "valueType": "number",
+        "name": "minZoom",
+        "label": "Minimum Zoom",
+        "value": 1
+      },
+      {
+        "component": "number",
+        "valueType": "number",
+        "name": "maxZoom",
+        "label": "Maximum Zoom",
+        "value": 3
+      },
+      {
+        "component": "richtext",
+        "valueType": "string",
+        "name": "a11yInstructions",
+        "label": "Accessibility Instructions",
+        "description": "Visible instructions explaining how to pan, zoom and select destinations"
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "analyticsComponentId",
+        "label": "Analytics Component ID"
+      }
+    ]
+  },
+  {
+    "id": "map-layer",
+    "fields": [
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "layerId",
+        "label": "Layer ID",
+        "description": "Stable unique identifier, e.g. resort-overview"
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "title",
+        "label": "Title"
+      },
+      {
+        "component": "reference",
+        "valueType": "string",
+        "name": "desktopImage",
+        "label": "Desktop Image",
+        "multi": false
+      },
+      {
+        "component": "reference",
+        "valueType": "string",
+        "name": "mobileImage",
+        "label": "Mobile Image (optional)",
+        "multi": false
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "parentLayerId",
+        "label": "Parent Layer ID (optional)",
+        "description": "Leave blank for a root-level layer"
+      },
+      {
+        "component": "number",
+        "valueType": "number",
+        "name": "worldLeft",
+        "label": "World Bounds Left",
+        "value": 0
+      },
+      {
+        "component": "number",
+        "valueType": "number",
+        "name": "worldTop",
+        "label": "World Bounds Top",
+        "value": 0
+      },
+      {
+        "component": "number",
+        "valueType": "number",
+        "name": "worldRight",
+        "label": "World Bounds Right",
+        "value": 1000
+      },
+      {
+        "component": "number",
+        "valueType": "number",
+        "name": "worldBottom",
+        "label": "World Bounds Bottom",
+        "value": 1000
+      },
+      {
+        "component": "number",
+        "valueType": "number",
+        "name": "defaultFocalX",
+        "label": "Default Focal X",
+        "value": 50
+      },
+      {
+        "component": "number",
+        "valueType": "number",
+        "name": "defaultFocalY",
+        "label": "Default Focal Y",
+        "value": 50
+      },
+      {
+        "component": "number",
+        "valueType": "number",
+        "name": "defaultZoom",
+        "label": "Default Zoom",
+        "value": 1
+      },
+      {
+        "component": "number",
+        "valueType": "number",
+        "name": "minZoom",
+        "label": "Minimum Zoom",
+        "value": 1
+      },
+      {
+        "component": "number",
+        "valueType": "number",
+        "name": "maxZoom",
+        "label": "Maximum Zoom",
+        "value": 3
+      },
+      {
+        "component": "number",
+        "valueType": "number",
+        "name": "enterChildZoomThreshold",
+        "label": "Enter Child Zoom Threshold"
+      },
+      {
+        "component": "number",
+        "valueType": "number",
+        "name": "exitChildZoomThreshold",
+        "label": "Exit Child Zoom Threshold"
+      }
+    ]
+  },
+  {
+    "id": "map-hotspot",
+    "fields": [
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "hotspotId",
+        "label": "Hotspot ID",
+        "description": "Stable unique identifier"
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "layerId",
+        "label": "Layer ID",
+        "description": "Must match the Layer ID this hotspot appears on"
+      },
+      {
+        "component": "number",
+        "valueType": "number",
+        "name": "xPercent",
+        "label": "Position X (%)"
+      },
+      {
+        "component": "number",
+        "valueType": "number",
+        "name": "yPercent",
+        "label": "Position Y (%)"
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "label",
+        "label": "Accessible Marker Label"
+      },
+      {
+        "component": "select",
+        "valueType": "string",
+        "name": "markerStyle",
+        "label": "Marker Style",
+        "value": "default",
+        "options": [
+          {
+            "name": "Default",
+            "value": "default"
+          },
+          {
+            "name": "Food & Drink",
+            "value": "food"
+          },
+          {
+            "name": "Beach",
+            "value": "beach"
+          },
+          {
+            "name": "Activity",
+            "value": "activity"
+          },
+          {
+            "name": "Viewpoint",
+            "value": "viewpoint"
+          }
+        ]
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "category",
+        "label": "Category (optional)"
+      },
+      {
+        "component": "reference",
+        "valueType": "string",
+        "name": "thumbnail",
+        "label": "Thumbnail (optional)",
+        "multi": false
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "title",
+        "label": "Title"
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "description",
+        "label": "Description"
+      },
+      {
+        "component": "richtext",
+        "valueType": "string",
+        "name": "detail",
+        "label": "Rich-text Detail (optional)"
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "location",
+        "label": "Location (optional)"
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "hours",
+        "label": "Opening Hours (optional)"
+      },
+      {
+        "component": "richtext",
+        "valueType": "string",
+        "name": "highlights",
+        "label": "Highlights (optional)",
+        "description": "Author as a bullet list"
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "ctaText",
+        "label": "CTA Text (optional)"
+      },
+      {
+        "component": "aem-content",
+        "valueType": "string",
+        "name": "cta",
+        "label": "CTA Link (optional)"
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "targetLayerId",
+        "label": "Target Layer ID (optional)",
+        "description": "Drill down to this layer when the hotspot is activated"
+      },
+      {
+        "component": "number",
+        "valueType": "number",
+        "name": "targetFocalX",
+        "label": "Target Focal X (optional)"
+      },
+      {
+        "component": "number",
+        "valueType": "number",
+        "name": "targetFocalY",
+        "label": "Target Focal Y (optional)"
+      },
+      {
+        "component": "number",
+        "valueType": "number",
+        "name": "targetZoom",
+        "label": "Target Zoom (optional)"
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "analyticsId",
+        "label": "Analytics ID (optional)"
+      }
+    ]
+  },
+  {
     "id": "layout-2-image",
     "fields": [
       {

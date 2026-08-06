@@ -123,7 +123,8 @@
         "offer-carousel",
         "offer-suggestions",
         "tabs-with-blocks",
-        "mode-toggle"
+        "mode-toggle",
+        "interactive-destination-map"
       ]
     }
   ]

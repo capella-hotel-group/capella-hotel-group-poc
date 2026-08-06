@@ -47,7 +47,8 @@
       "offer-carousel",
       "offer-suggestions",
       "tabs-with-blocks",
-      "mode-toggle"
+      "mode-toggle",
+      "interactive-destination-map"
     ]
   },
   {
@@ -120,6 +121,13 @@
     "components": [
       "hover-effect-logo",
       "hover-effect-item"
+    ]
+  },
+  {
+    "id": "interactive-destination-map",
+    "components": [
+      "map-layer",
+      "map-hotspot"
     ]
   },
   {

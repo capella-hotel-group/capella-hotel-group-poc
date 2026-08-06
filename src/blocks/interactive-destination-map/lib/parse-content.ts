@@ -29,23 +29,39 @@ function cellHtml(cell: HTMLElement | undefined): string {
   return cell?.innerHTML ?? '';
 }
 
+/** Block-level fields each render as their own row, with a single cell holding the value. */
+function configCell(row: HTMLElement | undefined): HTMLElement | undefined {
+  return row?.children[0] as HTMLElement | undefined;
+}
+
+const MAP_CONFIG_FIELD_COUNT = 10;
 const LAYER_FIELD_COUNT = 16;
 const HOTSPOT_FIELD_COUNT = 21;
 
-/** Block-level fields render as a single row with one cell per field, in field-declaration order. */
-function parseMapConfig(configRow: HTMLElement | undefined): MapConfig {
-  const cells = [...(configRow?.children ?? [])] as HTMLElement[];
+function parseMapConfig(rows: HTMLElement[]): MapConfig {
+  const [
+    heading,
+    intro,
+    defaultLayerId,
+    defaultFocalX,
+    defaultFocalY,
+    defaultZoom,
+    minZoom,
+    maxZoom,
+    a11y,
+    analyticsId,
+  ] = rows;
   return {
-    heading: cellText(cells[0]),
-    intro: cellHtml(cells[1]),
-    defaultLayerId: cellText(cells[2]),
-    defaultFocalX: cellNumber(cells[3], 50),
-    defaultFocalY: cellNumber(cells[4], 50),
-    defaultZoom: cellNumber(cells[5], 1),
-    minZoom: cellNumber(cells[6], 1),
-    maxZoom: cellNumber(cells[7], 3),
-    a11yInstructions: cellHtml(cells[8]),
-    analyticsComponentId: cellText(cells[9]),
+    heading: cellText(configCell(heading)),
+    intro: cellHtml(configCell(intro)),
+    defaultLayerId: cellText(configCell(defaultLayerId)),
+    defaultFocalX: cellNumber(configCell(defaultFocalX), 50),
+    defaultFocalY: cellNumber(configCell(defaultFocalY), 50),
+    defaultZoom: cellNumber(configCell(defaultZoom), 1),
+    minZoom: cellNumber(configCell(minZoom), 1),
+    maxZoom: cellNumber(configCell(maxZoom), 3),
+    a11yInstructions: cellHtml(configCell(a11y)),
+    analyticsComponentId: cellText(configCell(analyticsId)),
   };
 }
 
@@ -116,9 +132,10 @@ function isHotspotRow(row: HTMLElement): boolean {
  */
 export function parseMapContent(block: HTMLElement): MapContent {
   const rows = [...block.children] as HTMLElement[];
-  const [configRow, ...itemRows] = rows;
+  const configRows = rows.slice(0, MAP_CONFIG_FIELD_COUNT);
+  const itemRows = rows.slice(MAP_CONFIG_FIELD_COUNT);
 
-  const config = parseMapConfig(configRow);
+  const config = parseMapConfig(configRows);
   const layers: LayerConfig[] = [];
   const hotspots: HotspotConfig[] = [];
 

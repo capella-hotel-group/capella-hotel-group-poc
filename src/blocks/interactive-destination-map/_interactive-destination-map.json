@@ -57,8 +57,8 @@
           "component": "text",
           "valueType": "string",
           "name": "defaultLayerId",
-          "label": "Default Layer ID",
-          "description": "Must match the Layer ID of one of the Map Layer items below"
+          "label": "Default Layer ID (text, not an image)",
+          "description": "Type the exact Layer ID text of one of the Map Layer items below (e.g. resort-overview). This is not an asset picker."
         },
         { "component": "number", "valueType": "number", "name": "defaultFocalX", "label": "Default Focal X", "value": 50 },
         { "component": "number", "valueType": "number", "name": "defaultFocalY", "label": "Default Focal Y", "value": 50 },

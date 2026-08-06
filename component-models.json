@@ -810,8 +810,8 @@
         "component": "text",
         "valueType": "string",
         "name": "defaultLayerId",
-        "label": "Default Layer ID",
-        "description": "Must match the Layer ID of one of the Map Layer items below"
+        "label": "Default Layer ID (text, not an image)",
+        "description": "Type the exact Layer ID text of one of the Map Layer items below (e.g. resort-overview). This is not an asset picker."
       },
       {
         "component": "number",

@@ -206,7 +206,9 @@ function schedulePremiumLoad(ctx: EnhanceContext): void {
 
 export default async function decorate(block: HTMLElement): Promise<void> {
   const rawContent = parseMapContent(block);
-  const { safeContent } = validateMapContent(rawContent);
-  const ctx = renderStandardMode(block, safeContent);
+  // In the editor, render every authored item as-is so newly added, still-empty layers/hotspots
+  // stay visible and clickable — validation would otherwise drop them before authors can edit them.
+  const content = isUniversalEditor() ? rawContent : validateMapContent(rawContent).safeContent;
+  const ctx = renderStandardMode(block, content);
   if (ctx) schedulePremiumLoad(ctx);
 }

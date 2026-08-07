@@ -90,9 +90,11 @@ function parseLayerRow(row: HTMLElement): LayerConfig {
 
 function parseHotspotRow(row: HTMLElement): HotspotConfig {
   const cells = [...row.children] as HTMLElement[];
-  const targetFocalX = cells[17] ? cellNumber(cells[17], NaN) : NaN;
-  const targetFocalY = cells[18] ? cellNumber(cells[18], NaN) : NaN;
-  const targetZoom = cells[19] ? cellNumber(cells[19], NaN) : NaN;
+  // ctaText (model field 14) and cta/ctaLink (model field 15) are merged into
+  // one HTML cell by AEM — both are read from cells[14], shifting subsequent indices.
+  const targetFocalX = cells[16] ? cellNumber(cells[16], NaN) : NaN;
+  const targetFocalY = cells[17] ? cellNumber(cells[17], NaN) : NaN;
+  const targetZoom = cells[18] ? cellNumber(cells[18], NaN) : NaN;
   return {
     hotspotId: cellText(cells[0]),
     layerId: cellText(cells[1]),
@@ -109,8 +111,8 @@ function parseHotspotRow(row: HTMLElement): HotspotConfig {
     hours: cellText(cells[12]),
     highlights: cellHighlights(cells[13]),
     ctaText: cellText(cells[14]),
-    ctaLink: cellLink(cells[15]),
-    targetLayerId: cellText(cells[16]),
+    ctaLink: cellLink(cells[14]),
+    targetLayerId: cellText(cells[15]),
     targetFocalX: Number.isFinite(targetFocalX) ? targetFocalX : null,
     targetFocalY: Number.isFinite(targetFocalY) ? targetFocalY : null,
     targetZoom: Number.isFinite(targetZoom) ? targetZoom : null,

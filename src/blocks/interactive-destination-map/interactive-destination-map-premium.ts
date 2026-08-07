@@ -405,7 +405,11 @@ export default async function enhance(ctx: EnhanceContext): Promise<void> {
       }
     }
 
-    if (layer.parentLayerId && state.scale <= layer.exitChildZoomThreshold) {
+    if (
+      layer.parentLayerId &&
+      Number.isFinite(layer.exitChildZoomThreshold) &&
+      state.scale <= layer.exitChildZoomThreshold
+    ) {
       void changeLayer(layer.parentLayerId, 'zoom');
     }
   }

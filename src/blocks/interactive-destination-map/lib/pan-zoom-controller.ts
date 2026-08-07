@@ -38,6 +38,8 @@ export function attachPanZoom(viewport: HTMLElement, handlers: PanZoomHandlers):
   }
 
   function onPointerDown(event: PointerEvent): void {
+    // Let marker buttons handle their own click; capturing the pointer here breaks their native click.
+    if ((event.target as HTMLElement)?.closest('.interactive-destination-map-marker')) return;
     viewport.setPointerCapture(event.pointerId);
     pointers.set(event.pointerId, viewportPoint(event.clientX, event.clientY));
     dragIntentEstablished = false;

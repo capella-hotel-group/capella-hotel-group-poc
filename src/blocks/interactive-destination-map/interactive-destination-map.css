@@ -297,12 +297,14 @@
 /* ── Popup dialog ───────────────────────────────────────────────────────────── */
 
 .interactive-destination-map-dialog {
+    width: min(420px, calc(100vw - 32px));
     max-width: min(480px, calc(100vw - 32px));
     max-height: calc(100vh - 64px);
     padding: 24px;
     overflow-y: auto;
     border: 0;
     border-radius: 8px;
+    box-shadow: 0 20px 60px rgb(0 0 0 / 25%);
 }
 
 .interactive-destination-map-dialog::backdrop {
@@ -316,12 +318,19 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 44px;
-    height: 44px;
+    width: 40px;
+    height: 40px;
     padding: 0;
-    background: none;
+    background: rgb(255 255 255 / 90%);
     border: 0;
+    border-radius: 50%;
+    box-shadow: 0 1px 4px rgb(0 0 0 / 15%);
     cursor: pointer;
+    transition: background-color 0.15s ease;
+}
+
+.interactive-destination-map-dialog-close:hover {
+    background: var(--light-color);
 }
 
 .interactive-destination-map-dialog-close:focus-visible {
@@ -349,6 +358,8 @@
 
 .interactive-destination-map-dialog-title {
     margin: 0 0 4px;
+    /* Reserve room so long titles never run under the floating close button. */
+    padding-inline-end: 32px;
 }
 
 .interactive-destination-map-dialog-category {

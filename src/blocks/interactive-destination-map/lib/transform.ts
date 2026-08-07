@@ -36,10 +36,21 @@ export function getFocalPercentAtViewportPoint(
   };
 }
 
-/** Clamps a transform so the scaled content can never be moved fully outside the viewport. */
+/** Minimum uniform scale at which a layer's real image fully covers the viewport on both axes (no gaps). */
+export function coverScale(content: ViewportSize, viewport: ViewportSize): number {
+  if (content.width === 0 || content.height === 0) return 1;
+  return Math.max(viewport.width / content.width, viewport.height / content.height);
+}
+
+/**
+ * Clamps a transform so the layer can never be zoomed out past a full, centered cover of the
+ * viewport (no background gaps) nor panned to reveal space beyond its (uniformly scaled, never
+ * distorted) edges.
+ */
 export function clampTransform(transform: Transform, content: ViewportSize, viewport: ViewportSize): Transform {
-  const scaledWidth = content.width * transform.scale;
-  const scaledHeight = content.height * transform.scale;
+  const scale = Math.max(transform.scale, coverScale(content, viewport));
+  const scaledWidth = content.width * scale;
+  const scaledHeight = content.height * scale;
 
   const translateX =
     scaledWidth <= viewport.width
@@ -51,7 +62,7 @@ export function clampTransform(transform: Transform, content: ViewportSize, view
       ? (viewport.height - scaledHeight) / 2
       : clampNumber(transform.translateY, viewport.height - scaledHeight, 0);
 
-  return { translateX, translateY, scale: transform.scale };
+  return { translateX, translateY, scale };
 }
 
 /** Computes (and clamps) the transform that centers a given layer-local focal point at a given zoom level. */

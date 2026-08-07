@@ -55,7 +55,6 @@ export interface HotspotConfig {
   targetFocalX: number | null;
   targetFocalY: number | null;
   targetZoom: number | null;
-  analyticsId: string;
   sourceRow: HTMLElement;
 }
 

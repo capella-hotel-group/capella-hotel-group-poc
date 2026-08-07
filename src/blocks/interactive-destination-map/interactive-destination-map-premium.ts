@@ -27,6 +27,7 @@ import {
 import {
   clampNumber,
   computeDefaultTransform,
+  coverScale,
   getFocalPercentAtViewportPoint,
   localToWorld,
   resizeRecalculate,
@@ -51,6 +52,8 @@ interface ChangeLayerOptions {
 
 const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)';
 const TRANSITION_MS = 450;
+/** Fallback zoom-in step applied to the current scale when a hotspot has no authored Target Zoom. */
+const DEFAULT_HOTSPOT_ZOOM_FACTOR = 1.6;
 
 function reducedMotion(): boolean {
   return typeof window.matchMedia === 'function' && window.matchMedia(REDUCED_MOTION_QUERY).matches;
@@ -174,8 +177,12 @@ export default async function enhance(ctx: EnhanceContext): Promise<void> {
 
   function updateControls(): void {
     const layer = layerById.get(state.activeLayerId);
+    const stage = layer ? stages.get(layer.layerId) : undefined;
+    const effectiveMinZoom = layer
+      ? Math.max(layer.minZoom, stage ? coverScale(getStageContentSize(stage), getViewportSize()) : layer.minZoom)
+      : 0;
     zoomInButton.toggleAttribute('disabled', !layer || state.scale >= layer.maxZoom);
-    zoomOutButton.toggleAttribute('disabled', !layer || state.scale <= layer.minZoom);
+    zoomOutButton.toggleAttribute('disabled', !layer || state.scale <= effectiveMinZoom);
     backButton.hidden = state.navigationHistory.length === 0;
   }
 
@@ -317,13 +324,17 @@ export default async function enhance(ctx: EnhanceContext): Promise<void> {
   function focusHotspot(hotspot: HotspotConfig): void {
     const layer = layerById.get(hotspot.layerId);
     const stage = stages.get(hotspot.layerId);
-    if (!layer || !stage || hotspot.targetZoom == null) return;
+    if (!layer || !stage) return;
 
     const viewportSize = getViewportSize();
     const contentSize = getStageContentSize(stage);
     const focalXPercent = hotspot.targetFocalX ?? hotspot.xPercent;
     const focalYPercent = hotspot.targetFocalY ?? hotspot.yPercent;
-    const zoom = clampNumber(hotspot.targetZoom, layer.minZoom, layer.maxZoom);
+    const zoom = clampNumber(
+      hotspot.targetZoom ?? state.scale * DEFAULT_HOTSPOT_ZOOM_FACTOR,
+      layer.minZoom,
+      layer.maxZoom,
+    );
     const target = computeDefaultTransform(contentSize, viewportSize, focalXPercent, focalYPercent, zoom);
 
     stage.style.transitionDuration = `${reducedMotion() ? 0 : TRANSITION_MS}ms`;

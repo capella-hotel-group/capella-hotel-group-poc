@@ -114,7 +114,6 @@ function parseHotspotRow(row: HTMLElement): HotspotConfig {
     targetFocalX: Number.isFinite(targetFocalX) ? targetFocalX : null,
     targetFocalY: Number.isFinite(targetFocalY) ? targetFocalY : null,
     targetZoom: Number.isFinite(targetZoom) ? targetZoom : null,
-    analyticsId: cellText(cells[20]),
     sourceRow: row,
   };
 }

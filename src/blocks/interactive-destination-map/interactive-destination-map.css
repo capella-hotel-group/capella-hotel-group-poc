@@ -30,12 +30,20 @@
     border: 0;
 }
 
+/* Registered so the marker counter-scale can track the eased zoom transition instead of snapping. */
+@property --idm-scale {
+    syntax: '<number>';
+    inherits: true;
+    initial-value: 1;
+}
+
 /* ── Viewport (Standard Mode picture / Premium Mode interactive stage) ─────── */
 
 .interactive-destination-map-viewport {
     position: relative;
     overflow: hidden;
-    aspect-ratio: 16 / 9;
+    aspect-ratio: 3 / 4;
+    max-width: 50vw;
     background: var(--light-color);
     border-radius: 4px;
 }
@@ -85,7 +93,8 @@
     position: absolute;
     top: 0;
     left: 0;
-    width: 100%;
+    /* Sized to the image's real dimensions (not stretched to the viewport); pan/zoom scales from there. */
+    width: max-content;
     transform-origin: 0 0;
     transform: translate3d(var(--idm-x, 0px), var(--idm-y, 0px), 0) scale(var(--idm-scale, 1));
     opacity: 0;
@@ -103,8 +112,6 @@
 .interactive-destination-map-stage-layer picture,
 .interactive-destination-map-stage-layer img {
     display: block;
-    width: 100%;
-    height: auto;
     pointer-events: none;
     user-select: none;
 }
@@ -395,12 +402,6 @@
 
 .interactive-destination-map-dialog-cta:hover {
     background: var(--link-hover-color);
-}
-
-@media (width >= 900px) {
-    .interactive-destination-map-viewport {
-        aspect-ratio: 21 / 9;
-    }
 }
 
 @media (prefers-reduced-motion: reduce) {

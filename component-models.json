@@ -1127,12 +1127,6 @@
         "valueType": "number",
         "name": "targetZoom",
         "label": "Target Zoom (optional)"
-      },
-      {
-        "component": "text",
-        "valueType": "string",
-        "name": "analyticsId",
-        "label": "Analytics ID (optional)"
       }
     ]
   },

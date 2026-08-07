@@ -199,8 +199,7 @@
         },
         { "component": "number", "valueType": "number", "name": "targetFocalX", "label": "Target Focal X (optional)" },
         { "component": "number", "valueType": "number", "name": "targetFocalY", "label": "Target Focal Y (optional)" },
-        { "component": "number", "valueType": "number", "name": "targetZoom", "label": "Target Zoom (optional)" },
-        { "component": "text", "valueType": "string", "name": "analyticsId", "label": "Analytics ID (optional)" }
+        { "component": "number", "valueType": "number", "name": "targetZoom", "label": "Target Zoom (optional)" }
       ]
     }
   ],

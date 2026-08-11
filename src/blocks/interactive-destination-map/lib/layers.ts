@@ -47,10 +47,14 @@ export function createHotspotMarkerButton(hotspot: HotspotConfig): HTMLButtonEle
   button.setAttribute('aria-pressed', 'false');
   button.dataset.hotspotId = hotspot.hotspotId;
 
-  const glyph = document.createElement('span');
-  glyph.className = 'interactive-destination-map-marker-glyph';
-  glyph.setAttribute('aria-hidden', 'true');
-  button.append(glyph);
+  const icon = document.createElement('img');
+  icon.className = 'interactive-destination-map-marker-icon';
+  icon.src = `${window.hlx.codeBasePath}/icons/${hotspot.markerStyle}.svg`;
+  icon.alt = '';
+  icon.width = 20;
+  icon.height = 20;
+  icon.loading = 'lazy';
+  button.append(icon);
 
   return button;
 }

@@ -1,1 +1,4 @@
+#!/bin/sh
+export PATH="/usr/local/bin:/opt/homebrew/bin:$PATH"
+[ -s "$HOME/.nvm/nvm.sh" ] && . "$HOME/.nvm/nvm.sh"
 node .husky/pre-commit.mjs

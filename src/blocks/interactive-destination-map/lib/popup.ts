@@ -1,22 +1,9 @@
-import DOMPurify from 'dompurify';
 import type { HotspotConfig } from './types';
 
 export interface PopupController {
   dialog: HTMLDialogElement;
   open(hotspot: HotspotConfig, trigger: HTMLElement): void;
   close(): void;
-}
-
-function buildMetaRow(term: string, value: string): HTMLElement | null {
-  if (!value.trim()) return null;
-  const wrapper = document.createElement('div');
-  wrapper.className = 'interactive-destination-map-dialog-meta-row';
-  const dt = document.createElement('dt');
-  dt.textContent = term;
-  const dd = document.createElement('dd');
-  dd.textContent = value;
-  wrapper.append(dt, dd);
-  return wrapper;
 }
 
 /**
@@ -73,6 +60,7 @@ export function createPopupController(
 
     const thumbWrap = document.createElement('div');
     thumbWrap.className = 'interactive-destination-map-dialog-thumb';
+
     if (hotspot.thumbnail?.src) {
       const img = document.createElement('img');
       img.loading = 'lazy';
@@ -80,61 +68,53 @@ export function createPopupController(
       img.addEventListener('error', () => thumbWrap.classList.add('interactive-destination-map-dialog-thumb--error'));
       img.src = hotspot.thumbnail.src;
       thumbWrap.append(img);
-      body.append(thumbWrap);
     }
+
+    const overlay = document.createElement('div');
+    overlay.className = 'interactive-destination-map-dialog-thumb-overlay';
+    thumbWrap.append(overlay);
 
     const title = document.createElement('h3');
     title.id = titleId;
     title.className = 'interactive-destination-map-dialog-title';
     title.textContent = hotspot.title || hotspot.label;
-    body.append(title);
+    thumbWrap.append(title);
+
+    body.append(thumbWrap);
+
+    const contentSection = document.createElement('div');
+    contentSection.className = 'interactive-destination-map-dialog-content';
 
     if (hotspot.category.trim()) {
       const category = document.createElement('p');
       category.className = 'interactive-destination-map-dialog-category';
       category.textContent = hotspot.category;
-      body.append(category);
+      contentSection.append(category);
     }
+
+    const contentMain = document.createElement('div');
+    contentMain.className = 'interactive-destination-map-dialog-content-main';
 
     const desc = document.createElement('p');
     desc.id = descId;
     desc.className = 'interactive-destination-map-dialog-description';
     desc.textContent = hotspot.description;
-    body.append(desc);
-
-    if (hotspot.detail.trim()) {
-      const detail = document.createElement('div');
-      detail.className = 'interactive-destination-map-dialog-detail';
-      detail.innerHTML = DOMPurify.sanitize(hotspot.detail);
-      body.append(detail);
-    }
-
-    const meta = document.createElement('dl');
-    meta.className = 'interactive-destination-map-dialog-meta';
-    [buildMetaRow('Location', hotspot.location), buildMetaRow('Hours', hotspot.hours)]
-      .filter((row): row is HTMLElement => row !== null)
-      .forEach((row) => meta.append(row));
-    if (meta.children.length > 0) body.append(meta);
-
-    if (hotspot.highlights.length > 0) {
-      const list = document.createElement('ul');
-      list.className = 'interactive-destination-map-dialog-highlights';
-      hotspot.highlights.forEach((item) => {
-        const li = document.createElement('li');
-        li.textContent = item;
-        list.append(li);
-      });
-      body.append(list);
-    }
+    contentMain.append(desc);
 
     if (hotspot.ctaText.trim() && hotspot.ctaLink.trim()) {
+      const actions = document.createElement('div');
+      actions.className = 'interactive-destination-map-dialog-actions';
       const cta = document.createElement('a');
-      cta.className = 'interactive-destination-map-dialog-cta';
+      cta.className = 'interactive-destination-map-dialog-action-link';
       cta.href = hotspot.ctaLink;
       cta.textContent = hotspot.ctaText;
       cta.addEventListener('click', () => onCtaClick(hotspot));
-      body.append(cta);
+      actions.append(cta);
+      contentMain.append(actions);
     }
+
+    contentSection.append(contentMain);
+    body.append(contentSection);
   }
 
   function open(hotspot: HotspotConfig, trigger: HTMLElement): void {

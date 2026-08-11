@@ -1,21 +1,49 @@
+.interactive-destination-map-container {
+    position: relative;
+}
+
 .interactive-destination-map-root {
     display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    gap: 0;
+}
+
+.interactive-destination-map-sidebar {
+    display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 32px;
+    flex: 0 0 auto;
+    width: 30%;
+    padding-block: 40px;
+    padding-inline-start: 24px;
+    justify-content: center;
 }
 
 .interactive-destination-map-heading {
+    font-family: var(--heading-font-family);
+    font-size: var(--heading-font-size-xl);
+    font-weight: normal;
+    text-transform: uppercase;
+    line-height: 1;
+    padding-inline-start: 32px;
     margin: 0;
 }
 
-.interactive-destination-map-intro,
-.interactive-destination-map-instructions {
-    color: var(--dark-color);
+.interactive-destination-map-intro {
+    font-family: var(--heading-font-family);
+    font-size: var(--body-font-size-s);
+    font-weight: normal;
+    color: var(--text-color);
+    padding-inline-start: 32px;
     margin: 0;
 }
 
 .interactive-destination-map-instructions {
     font-size: var(--body-font-size-xs);
+    color: var(--dark-color);
+    padding-inline-start: 32px;
+    margin: 0;
 }
 
 .interactive-destination-map-live-region {
@@ -42,10 +70,11 @@
 .interactive-destination-map-viewport {
     position: relative;
     overflow: hidden;
-    aspect-ratio: 3 / 4;
-    max-width: 50vw;
+    aspect-ratio: 1152 / 1024;
+    max-height: 1024px;
+    flex: 1 1 auto;
+    min-width: 0;
     background: var(--light-color);
-    border-radius: 4px;
 }
 
 .interactive-destination-map-viewport picture,
@@ -154,29 +183,11 @@
     background: var(--link-color);
 }
 
-.interactive-destination-map-marker-glyph {
-    width: 10px;
-    height: 10px;
-    background: currentColor;
-    border-radius: 50%;
-}
-
-/* Colour-independent marker shapes per category */
-.interactive-destination-map-marker--food {
-    border-radius: 6px;
-}
-
-.interactive-destination-map-marker--beach .interactive-destination-map-marker-glyph {
-    border-radius: 0;
-    transform: rotate(45deg);
-}
-
-.interactive-destination-map-marker--activity {
-    clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
-}
-
-.interactive-destination-map-marker--viewpoint {
-    clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+.interactive-destination-map-marker-icon {
+    display: block;
+    width: 20px;
+    height: 20px;
+    pointer-events: none;
 }
 
 /* ── Controls ───────────────────────────────────────────────────────────────── */
@@ -235,6 +246,10 @@
     padding: 0;
     margin: 0;
     list-style: none;
+}
+
+.interactive-destination-map-list {
+    display: none;
 }
 
 .interactive-destination-map-list-item,
@@ -297,40 +312,51 @@
 /* ── Popup dialog ───────────────────────────────────────────────────────────── */
 
 .interactive-destination-map-dialog {
-    width: min(420px, calc(100vw - 32px));
-    max-width: min(480px, calc(100vw - 32px));
-    max-height: calc(100vh - 64px);
-    padding: 24px;
+    position: absolute;
+    inset-block-start: 50%;
+    inset-inline-end: 0;
+    transform: translateY(-50%);
+    margin: 0 0 0 auto;
+    width: 100%;
+    max-width: 512px;
+    min-width: 0;
+    max-height: calc(100vh - 40px);
+    padding: 0;
     overflow-y: auto;
     border: 0;
-    border-radius: 8px;
-    box-shadow: 0 20px 60px rgb(0 0 0 / 25%);
+    right: 120px;
+    border-radius: 0;
+    box-shadow: none;
+    background: #e0d3d1;
 }
 
 .interactive-destination-map-dialog::backdrop {
-    background: rgb(0 0 0 / 50%);
+    background: transparent;
 }
 
 .interactive-destination-map-dialog-close {
     position: absolute;
-    inset-block-start: 12px;
-    inset-inline-end: 12px;
+    inset-block-start: 8px;
+    inset-inline-end: 8px;
+    top: 0;
+    right: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 40px;
-    height: 40px;
+    width: 32px;
+    height: 32px;
     padding: 0;
-    background: rgb(255 255 255 / 90%);
+    background: transparent;
     border: 0;
-    border-radius: 50%;
-    box-shadow: 0 1px 4px rgb(0 0 0 / 15%);
     cursor: pointer;
-    transition: background-color 0.15s ease;
+    z-index: 1;
 }
 
-.interactive-destination-map-dialog-close:hover {
-    background: var(--light-color);
+.interactive-destination-map-dialog-close img {
+    display: block;
+    width: 20px;
+    height: 20px;
+    pointer-events: none;
 }
 
 .interactive-destination-map-dialog-close:focus-visible {
@@ -338,18 +364,35 @@
     outline-offset: 2px;
 }
 
+.interactive-destination-map-dialog-body {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 32px;
+}
+
 .interactive-destination-map-dialog-thumb {
-    aspect-ratio: 16 / 9;
-    margin-block-end: 16px;
+    position: relative;
+    aspect-ratio: 1 / 1;
     overflow: hidden;
-    background: var(--light-color);
-    border-radius: 4px;
+    background: var(--text-color);
+    margin: 0;
 }
 
 .interactive-destination-map-dialog-thumb img {
+    position: absolute;
+    inset: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
+}
+
+.interactive-destination-map-dialog-thumb-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgb(0 0 0 / 40%);
+    pointer-events: none;
+    z-index: 0;
 }
 
 .interactive-destination-map-dialog-thumb--error img {
@@ -357,32 +400,47 @@
 }
 
 .interactive-destination-map-dialog-title {
-    margin: 0 0 4px;
-    /* Reserve room so long titles never run under the floating close button. */
-    padding-inline-end: 32px;
+    position: absolute;
+    inset-block-start: 20px;
+    inset-inline: 20px;
+    margin: 0;
+    font-family: var(--heading-font-family);
+    font-size: var(--heading-font-size-s);
+    font-weight: normal;
+    text-transform: uppercase;
+    line-height: 1.15;
+    color: white;
+    z-index: 1;
 }
 
 .interactive-destination-map-dialog-category {
-    margin: 0 0 8px;
-    font-size: var(--body-font-size-xs);
+    margin: 0;
+    font-family: var(--body-font-family);
+    font-size: var(--body-font-size-s);
+    font-weight: normal;
     text-transform: uppercase;
-    letter-spacing: var(--letter-spacing);
-    color: var(--dark-color);
+    color: var(--text-color);
 }
 
 .interactive-destination-map-dialog-description {
-    margin: 0 0 12px;
+    margin: 0;
+    font-size: var(--body-font-size-s);
+    color: var(--text-color);
 }
 
-.interactive-destination-map-dialog-detail {
-    margin: 0 0 12px;
+.interactive-destination-map-dialog-content {
+    display: flex;
+    flex-direction: row;
+    gap: 16px;
+    align-items: flex-start;
 }
 
-.interactive-destination-map-dialog-meta {
+.interactive-destination-map-dialog-content-main {
+    flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 4px;
-    margin: 0 0 12px;
+    gap: 16px;
+    min-width: 0;
 }
 
 .interactive-destination-map-dialog-meta-row {
@@ -403,20 +461,68 @@
     padding-inline-start: 20px;
 }
 
+.interactive-destination-map-dialog-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.interactive-destination-map-dialog-action-link {
+    font-family: var(--body-font-family);
+    font-size: var(--body-font-size-xs);
+    font-weight: 300;
+    text-transform: uppercase;
+    text-decoration: underline;
+    color: var(--text-color);
+}
+
+.interactive-destination-map-dialog-action-link:hover {
+    color: var(--dark-color);
+}
+
+.interactive-destination-map-dialog-action-divider {
+    width: 1px;
+    height: 18px;
+    background: var(--dark-color);
+    flex-shrink: 0;
+}
+
 .interactive-destination-map-dialog-cta {
-    display: inline-block;
-    padding: 10px 20px;
-    color: var(--background-color);
-    background: var(--link-color);
-    border-radius: 4px;
+    font-family: var(--body-font-family);
+    font-size: var(--body-font-size-xs);
+    font-weight: 300;
+    text-transform: uppercase;
+    text-decoration: underline;
+    color: var(--text-color);
 }
 
 .interactive-destination-map-dialog-cta:hover {
-    background: var(--link-hover-color);
+    color: var(--dark-color);
+}
+
+@keyframes idm-dialog-open {
+    from {
+        transform: translateY(-50%) scale(0.4);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(-50%) scale(1);
+        opacity: 1;
+    }
+}
+
+.interactive-destination-map-dialog[open] {
+    animation: idm-dialog-open 0.3s cubic-bezier(0.34, 1.4, 0.64, 1) both;
+    transform-origin: right center;
 }
 
 @media (prefers-reduced-motion: reduce) {
     .interactive-destination-map-stage-layer {
         transition-duration: 0.01ms !important;
+    }
+
+    .interactive-destination-map-dialog[open] {
+        animation: none;
     }
 }

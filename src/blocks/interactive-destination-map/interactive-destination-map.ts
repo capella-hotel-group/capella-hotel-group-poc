@@ -99,18 +99,21 @@ function renderStandardMode(block: HTMLElement, content: MapContent): EnhanceCon
   const root = document.createElement('div');
   root.className = 'interactive-destination-map-root';
 
+  const sidebar = document.createElement('div');
+  sidebar.className = 'interactive-destination-map-sidebar';
+
   const heading = document.createElement('h2');
   heading.className = 'interactive-destination-map-heading';
   heading.textContent = content.config.heading;
   instrumentFromRow(headingRow, heading);
-  root.append(heading);
+  sidebar.append(heading);
 
   if (content.config.intro.trim()) {
     const intro = document.createElement('div');
     intro.className = 'interactive-destination-map-intro';
     intro.innerHTML = DOMPurify.sanitize(content.config.intro);
     instrumentFromRow(introRow, intro);
-    root.append(intro);
+    sidebar.append(intro);
   }
 
   if (content.config.a11yInstructions.trim()) {
@@ -118,14 +121,16 @@ function renderStandardMode(block: HTMLElement, content: MapContent): EnhanceCon
     instructions.className = 'interactive-destination-map-instructions';
     instructions.innerHTML = DOMPurify.sanitize(content.config.a11yInstructions);
     instrumentFromRow(a11yRow, instructions);
-    root.append(instructions);
+    sidebar.append(instructions);
   }
 
   const liveRegion = document.createElement('div');
   liveRegion.className = 'interactive-destination-map-live-region';
   liveRegion.setAttribute('role', 'status');
   liveRegion.setAttribute('aria-live', 'polite');
-  root.append(liveRegion);
+  sidebar.append(liveRegion);
+
+  root.append(sidebar);
 
   let viewport: HTMLElement | null = null;
 

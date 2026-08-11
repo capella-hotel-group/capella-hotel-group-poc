@@ -142,17 +142,30 @@ export default async function enhance(ctx: EnhanceContext): Promise<void> {
     focalY: config.defaultFocalY ?? defaultLayer.defaultFocalY,
   };
   const state = createMapState(defaultTransformSeed);
+  let preHotspotTransform: Transform | null = null;
+
+  const stages = new Map<string, HTMLElement>();
 
   const popup: PopupController = createPopupController(
     (trigger) => {
       setDialogTrigger(state, null);
+      const savedTransform = preHotspotTransform;
+      preHotspotTransform = null;
+      if (savedTransform) {
+        const stage = stages.get(state.activeLayerId);
+        if (stage) {
+          stage.style.transitionDuration = `${reducedMotion() ? 0 : TRANSITION_MS}ms`;
+          applyTransformToStage(stage, savedTransform);
+          setTransform(state, savedTransform);
+          updateControls();
+        }
+      }
       if (trigger) trigger.focus();
     },
     (hotspot) => emitCtaClick(config.analyticsComponentId, state.activeLayerId, hotspot.hotspotId),
   );
   viewport.append(popup.dialog);
 
-  const stages = new Map<string, HTMLElement>();
   const zoomEmitter = createZoomEmitter(config.analyticsComponentId);
 
   function getViewportSize(): ViewportSize {
@@ -326,6 +339,11 @@ export default async function enhance(ctx: EnhanceContext): Promise<void> {
     const stage = stages.get(hotspot.layerId);
     if (!layer || !stage) return;
 
+    // Save current transform so the close callback can restore it
+    if (!preHotspotTransform) {
+      preHotspotTransform = { translateX: state.translateX, translateY: state.translateY, scale: state.scale };
+    }
+
     const viewportSize = getViewportSize();
     const contentSize = getStageContentSize(stage);
     const focalXPercent = hotspot.targetFocalX ?? hotspot.xPercent;
@@ -346,11 +364,14 @@ export default async function enhance(ctx: EnhanceContext): Promise<void> {
   }
 
   // ── Hotspot selection & popup ────────────────────────────────────────────────
+  let selectSeq = 0;
+
   async function selectHotspot(
     hotspot: HotspotConfig,
     trigger: HTMLButtonElement,
     interactionType: 'pointer' | 'keyboard',
   ): Promise<void> {
+    const seq = ++selectSeq;
     clearActiveHotspotMarker();
     setActiveHotspot(state, hotspot.hotspotId);
     trigger.classList.add('interactive-destination-map-marker--active');
@@ -374,6 +395,8 @@ export default async function enhance(ctx: EnhanceContext): Promise<void> {
 
     focusHotspot(hotspot);
     setDialogTrigger(state, trigger);
+    await wait(reducedMotion() ? 0 : TRANSITION_MS);
+    if (seq !== selectSeq) return;
     popup.open(hotspot, trigger);
     emitPopupOpen(config.analyticsComponentId, state.activeLayerId, hotspot.hotspotId);
   }
@@ -481,6 +504,7 @@ export default async function enhance(ctx: EnhanceContext): Promise<void> {
   });
 
   async function performReset(): Promise<void> {
+    preHotspotTransform = null;
     popup.close();
     clearActiveHotspotMarker();
     const fromLayerId = state.activeLayerId;
@@ -565,4 +589,6 @@ export default async function enhance(ctx: EnhanceContext): Promise<void> {
   setTransform(state, initialTransform);
   updateControls();
   emitMapView(config.analyticsComponentId, defaultLayer.layerId);
+
+  ctx.block.querySelector('.interactive-destination-map-list')?.setAttribute('hidden', '');
 }

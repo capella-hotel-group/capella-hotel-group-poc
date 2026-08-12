@@ -55,6 +55,14 @@ export function createPopupController(
     if (event.target === dialog) dialog.close();
   });
 
+  // Non-modal dialogs don't close on Escape natively, so wire it up for keyboard users.
+  dialog.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      dialog.close();
+    }
+  });
+
   function populate(hotspot: HotspotConfig): void {
     body.replaceChildren();
 
@@ -120,13 +128,14 @@ export function createPopupController(
   function open(hotspot: HotspotConfig, trigger: HTMLElement): void {
     currentTrigger = trigger;
     populate(hotspot);
-    if (typeof dialog.showModal === 'function') {
-      dialog.showModal();
+    // Non-modal so the popup positions within the map viewport; a modal jumps to the top layer,
+    // which is positioned against the window and can't be centered on the map.
+    if (typeof dialog.show === 'function') {
+      dialog.show();
     } else {
-      // Fallback for browsers without <dialog> support: render as a plain, focusable block.
       dialog.setAttribute('open', '');
-      dialog.focus();
     }
+    closeButton.focus();
   }
 
   function close(): void {

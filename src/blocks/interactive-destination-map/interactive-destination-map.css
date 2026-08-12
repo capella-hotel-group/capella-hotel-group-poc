@@ -3,6 +3,7 @@
 }
 
 .interactive-destination-map-root {
+    position: relative;
     display: flex;
     flex-direction: row;
     align-items: stretch;
@@ -13,8 +14,8 @@
     display: flex;
     flex-direction: column;
     gap: 32px;
-    flex: 0 0 auto;
-    width: 30%;
+    flex: 0 0 33.3333%;
+    width: 33.3333%;
     padding-block: 40px;
     padding-inline-start: 24px;
     justify-content: center;
@@ -71,8 +72,8 @@
     position: relative;
     overflow: hidden;
     aspect-ratio: 1152 / 1024;
-    max-height: 1024px;
-    flex: 1 1 auto;
+    max-height: min(80vh, 900px);
+    flex: 0 0 66.6667%;
     min-width: 0;
     background: var(--light-color);
 }
@@ -311,23 +312,25 @@
 
 /* ── Popup dialog ───────────────────────────────────────────────────────────── */
 
+/* Popup floats over the right of the map, vertically centered within the viewport, 120px from the right. */
 .interactive-destination-map-dialog {
     position: absolute;
     inset-block-start: 50%;
-    inset-inline-end: 0;
+    inset-inline-start: auto;
+    inset-inline-end: min(5%, 120px);
     transform: translateY(-50%);
-    margin: 0 0 0 auto;
     width: 100%;
-    max-width: 512px;
+    max-width: min(450px, calc(100% - min(5%, 120px) - 24px));
     min-width: 0;
-    max-height: calc(100vh - 40px);
+    max-height: calc(100% - 40px);
+    margin: 0;
     padding: 0;
     overflow-y: auto;
     border: 0;
-    right: 120px;
     border-radius: 0;
     box-shadow: none;
     background: #e0d3d1;
+    z-index: 3;
 }
 
 .interactive-destination-map-dialog::backdrop {
@@ -373,24 +376,26 @@
 
 .interactive-destination-map-dialog-thumb {
     position: relative;
-    aspect-ratio: 1 / 1;
+    display: flex;
+    justify-content: center;
     overflow: hidden;
-    background: var(--text-color);
+    background: #e0d3d1;
     margin: 0;
 }
 
 .interactive-destination-map-dialog-thumb img {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+    display: block;
+    max-width: 100%;
+    max-height: min(58vh, 520px);
+    width: auto;
+    height: auto;
 }
 
 .interactive-destination-map-dialog-thumb-overlay {
     position: absolute;
-    inset: 0;
-    background: rgb(0 0 0 / 40%);
+    inset: 0 0 auto;
+    height: 96px;
+    background: linear-gradient(rgb(0 0 0 / 55%), rgb(0 0 0 / 0%));
     pointer-events: none;
     z-index: 0;
 }
@@ -502,19 +507,102 @@
 
 @keyframes idm-dialog-open {
     from {
-        transform: translateY(-50%) scale(0.4);
+        transform: translate(-12px, -50%);
         opacity: 0;
     }
 
     to {
-        transform: translateY(-50%) scale(1);
+        transform: translate(0, -50%);
         opacity: 1;
     }
 }
 
 .interactive-destination-map-dialog[open] {
-    animation: idm-dialog-open 0.3s cubic-bezier(0.34, 1.4, 0.64, 1) both;
-    transform-origin: right center;
+    animation: idm-dialog-open 0.3s ease both;
+}
+
+@keyframes idm-dialog-sheet {
+    from {
+        transform: translateY(100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* ── Responsive: stack sidebar above the map below the 900px layout breakpoint ── */
+
+@media (width < 900px) {
+    .interactive-destination-map-root {
+        flex-direction: column;
+    }
+
+    .interactive-destination-map-sidebar {
+        flex: 0 0 auto;
+        width: 100%;
+        gap: 20px;
+        padding-block: 32px;
+        padding-inline: 16px;
+        justify-content: flex-start;
+    }
+
+    .interactive-destination-map-heading,
+    .interactive-destination-map-intro,
+    .interactive-destination-map-instructions {
+        padding-inline-start: 0;
+    }
+
+    .interactive-destination-map-viewport {
+        flex: 0 0 auto;
+        width: 100%;
+        aspect-ratio: 4 / 5;
+        min-height: 420px;
+        max-height: 80vh;
+    }
+
+    /* Stacked layout has no side column, so the popup becomes a bottom sheet over the map. */
+    .interactive-destination-map-dialog {
+        position: fixed;
+        inset: auto 0 0;
+        width: 100%;
+        height: auto;
+        max-width: none;
+        max-height: 82vh;
+        margin: 0;
+    }
+
+    .interactive-destination-map-dialog[open] {
+        animation-name: idm-dialog-sheet;
+    }
+}
+
+@media (width < 600px) {
+    .interactive-destination-map-sidebar {
+        gap: 16px;
+        padding-block: 24px;
+    }
+
+    .interactive-destination-map-dialog-body {
+        gap: 12px;
+        padding: 20px;
+    }
+
+    .interactive-destination-map-dialog-content {
+        flex-direction: column;
+    }
+
+    .interactive-destination-map-controls {
+        inset-block-end: 8px;
+        inset-inline-end: 8px;
+    }
+
+    .interactive-destination-map-back {
+        inset-block-start: 8px;
+        inset-inline-start: 8px;
+    }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -26,6 +26,7 @@ import {
 } from './lib/state';
 import {
   clampNumber,
+  computeContinuityTransform,
   computeDefaultTransform,
   coverScale,
   getFocalPercentAtViewportPoint,
@@ -51,7 +52,9 @@ interface ChangeLayerOptions {
 }
 
 const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)';
-const TRANSITION_MS = 450;
+const TRANSITION_MS = 600;
+/** Drill-in layer changes always enter below this fraction of their target scale, so the entrance always reads as zooming in/up to fit rather than (sometimes) zooming out. */
+const FORWARD_ENTRANCE_SCALE_RATIO = 0.8;
 /** Fallback zoom-in step applied to the current scale when a hotspot has no authored Target Zoom. */
 const DEFAULT_HOTSPOT_ZOOM_FACTOR = 1.6;
 
@@ -182,6 +185,36 @@ export default async function enhance(ctx: EnhanceContext): Promise<void> {
     stage.style.setProperty('--idm-scale', String(transform.scale));
   }
 
+  /**
+   * Animates a stage entering view: writes the `from` transform with no transition, waits two
+   * animation frames so the browser actually commits/paints it, then writes the `to` transform
+   * with the real transition duration - giving the incoming layer a continuous zoom instead of
+   * popping to its destination. A single forced reflow isn't reliable here since the stage may be
+   * freshly built and this runs after an async image-decode gap.
+   */
+  function nextFrame(): Promise<void> {
+    return new Promise((resolve) => {
+      requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
+    });
+  }
+
+  async function animateStageEntrance(
+    stage: HTMLElement,
+    fromTransform: Transform,
+    toTransform: Transform,
+    durationMs: number,
+  ): Promise<void> {
+    if (durationMs === 0) {
+      applyTransformToStage(stage, toTransform);
+      return;
+    }
+    stage.style.transitionDuration = '0ms';
+    applyTransformToStage(stage, fromTransform);
+    await nextFrame();
+    stage.style.transitionDuration = `${durationMs}ms`;
+    applyTransformToStage(stage, toTransform);
+  }
+
   function announce(message: string): void {
     liveRegion.textContent = '';
     liveRegion.getBoundingClientRect(); // force a reflow so repeated identical messages are re-announced
@@ -309,10 +342,27 @@ export default async function enhance(ctx: EnhanceContext): Promise<void> {
       );
     }
 
+    // Match the incoming layer's starting position to the outgoing view so the crossfade reads as
+    // one continuous zoom rather than a pop, instead of jumping straight to targetTransform. For
+    // drill-in navigation, cap the entrance scale below the target so it always zooms in to fit.
+    let entranceTransform = targetTransform;
+    const currentLayer = layerById.get(fromLayerId);
+    if (currentStage && currentLayer) {
+      const isDrillIn = trigger === 'hotspot' || trigger === 'zoom';
+      entranceTransform = computeContinuityTransform(
+        currentLayer,
+        getStageContentSize(currentStage),
+        { translateX: state.translateX, translateY: state.translateY, scale: state.scale },
+        targetLayer,
+        targetContentSize,
+        viewportSize,
+        isDrillIn ? targetTransform.scale * FORWARD_ENTRANCE_SCALE_RATIO : undefined,
+      );
+    }
+
     const durationMs = reducedMotion() ? 0 : TRANSITION_MS;
-    applyTransformToStage(targetStage, targetTransform);
-    targetStage.style.transitionDuration = `${durationMs}ms`;
     if (currentStage) currentStage.style.transitionDuration = `${durationMs}ms`;
+    await animateStageEntrance(targetStage, entranceTransform, targetTransform, durationMs);
 
     targetStage.classList.add('interactive-destination-map-stage-layer--active');
     targetStage.setAttribute('aria-hidden', 'false');
@@ -385,6 +435,7 @@ export default async function enhance(ctx: EnhanceContext): Promise<void> {
     );
 
     if (hotspot.targetLayerId) {
+      popup.close(); // an already-open popup must not linger over the newly entered layer
       await changeLayer(hotspot.targetLayerId, 'hotspot', {
         focalXPercent: hotspot.targetFocalX ?? undefined,
         focalYPercent: hotspot.targetFocalY ?? undefined,
@@ -508,13 +559,16 @@ export default async function enhance(ctx: EnhanceContext): Promise<void> {
     popup.close();
     clearActiveHotspotMarker();
     const fromLayerId = state.activeLayerId;
+    const currentStage = stages.get(fromLayerId);
+    const currentLayer = layerById.get(fromLayerId);
 
     const targetStage = buildStage(rootLayer);
     const targetImg = targetStage.querySelector('img');
     if (targetImg) await decodeImage(targetImg);
+    const targetContentSize = getStageContentSize(targetStage);
 
     const transform = computeDefaultTransform(
-      getStageContentSize(targetStage),
+      targetContentSize,
       getViewportSize(),
       defaultTransformSeed.focalX,
       defaultTransformSeed.focalY,
@@ -522,8 +576,25 @@ export default async function enhance(ctx: EnhanceContext): Promise<void> {
     );
 
     const durationMs = reducedMotion() ? 0 : TRANSITION_MS;
-    targetStage.style.transitionDuration = `${durationMs}ms`;
-    applyTransformToStage(targetStage, transform);
+    const isAlreadyRoot = currentStage === targetStage;
+    if (isAlreadyRoot) {
+      // Already the live element with a real previous transform - no continuity hack needed.
+      targetStage.style.transitionDuration = `${durationMs}ms`;
+      applyTransformToStage(targetStage, transform);
+    } else {
+      const entranceTransform =
+        currentStage && currentLayer
+          ? computeContinuityTransform(
+              currentLayer,
+              getStageContentSize(currentStage),
+              { translateX: state.translateX, translateY: state.translateY, scale: state.scale },
+              rootLayer,
+              targetContentSize,
+              getViewportSize(),
+            )
+          : transform;
+      await animateStageEntrance(targetStage, entranceTransform, transform, durationMs);
+    }
     targetStage.classList.add('interactive-destination-map-stage-layer--active');
     targetStage.setAttribute('aria-hidden', 'false');
 

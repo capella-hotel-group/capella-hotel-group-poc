@@ -129,3 +129,36 @@ export function panTransform(
     viewport,
   );
 }
+
+/**
+ * Computes a "from" transform on a layer being entered so it starts at the same apparent
+ * on-screen position as the outgoing layer's current view, giving layer transitions a
+ * continuous telescoping zoom feel instead of popping straight to the destination framing.
+ * When `maxScale` is given, the starting scale is capped below it so the entrance always reads
+ * as zooming *in* toward the destination framing rather than (sometimes) zooming out.
+ */
+export function computeContinuityTransform(
+  fromLayer: LayerConfig,
+  fromContent: ViewportSize,
+  fromTransform: Transform,
+  toLayer: LayerConfig,
+  toContent: ViewportSize,
+  viewport: ViewportSize,
+  maxScale?: number,
+): Transform {
+  const centerFocal = getFocalPercentAtViewportPoint(fromTransform, fromContent, {
+    x: viewport.width / 2,
+    y: viewport.height / 2,
+  });
+  const worldPoint = localToWorld(fromLayer, centerFocal.xPercent, centerFocal.yPercent);
+  const destinationFocal = worldToLocal(toLayer, worldPoint);
+
+  const fromWorldWidth = fromLayer.worldRight - fromLayer.worldLeft || 1;
+  const toWorldWidth = toLayer.worldRight - toLayer.worldLeft || 1;
+  const pxPerWorldUnit = (fromTransform.scale * fromContent.width) / fromWorldWidth;
+  const matchedScale = toContent.width === 0 ? toLayer.defaultZoom : (pxPerWorldUnit * toWorldWidth) / toContent.width;
+  let fromScale = clampNumber(matchedScale, toLayer.minZoom * 0.5, toLayer.maxZoom * 1.5);
+  if (maxScale != null) fromScale = Math.min(fromScale, maxScale);
+
+  return computeDefaultTransform(toContent, viewport, destinationFocal.xPercent, destinationFocal.yPercent, fromScale);
+}

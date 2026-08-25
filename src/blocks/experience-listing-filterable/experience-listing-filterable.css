@@ -1,0 +1,174 @@
+/* experience-listing-filterable block */
+.experience-listing-filterable {
+    background-color: var(--light-color);
+    padding: 40px 24px;
+}
+
+.experience-listing-filterable-container {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.experience-listing-filterable-tabs {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.experience-listing-filterable-tabs button {
+    background: none;
+    border: none;
+    color: var(--dark-color);
+    cursor: pointer;
+    font-family: var(--body-font-family);
+    font-size: var(--body-font-size-xs);
+    letter-spacing: 0.08em;
+    padding: 0;
+    text-transform: uppercase;
+}
+
+.experience-listing-filterable-tabs button.is-active {
+    color: var(--heading-color);
+}
+
+.experience-listing-filterable-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.experience-listing-filterable-sidebar button {
+    background: none;
+    border: none;
+    color: var(--heading-color);
+    cursor: pointer;
+    font-family: var(--heading-font-family);
+    font-size: var(--heading-font-size-s);
+    padding: 0;
+    text-align: left;
+}
+
+.experience-listing-filterable-sidebar button.is-active {
+    text-decoration: underline;
+}
+
+.experience-listing-filterable-grid {
+    display: grid;
+    gap: 24px 20px;
+    grid-template-columns: repeat(2, 1fr);
+}
+
+.experience-listing-filterable-card {
+    color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 244px;
+    overflow: hidden;
+    padding: 20px;
+    position: relative;
+    text-decoration: none;
+}
+
+.experience-listing-filterable-card.is-hidden {
+    display: none;
+}
+
+.experience-listing-filterable-card-image {
+    height: 100%;
+    inset: 0;
+    position: absolute;
+    width: 100%;
+    z-index: -1;
+}
+
+.experience-listing-filterable-card-image img {
+    height: 100%;
+    object-fit: cover;
+    width: 100%;
+}
+
+.experience-listing-filterable-card::after {
+    background-color: rgb(0 0 0 / 20%);
+    content: '';
+    inset: 0;
+    position: absolute;
+    z-index: -1;
+}
+
+.experience-listing-filterable-card-tag {
+    font-family: var(--body-font-family);
+    font-size: var(--body-font-size-xs);
+    margin: 0;
+    text-transform: uppercase;
+}
+
+.experience-listing-filterable-card-title {
+    font-family: var(--heading-font-family);
+    font-size: var(--heading-font-size-xs);
+    margin: 8px 0 0;
+}
+
+.experience-listing-filterable-card-icon {
+    align-self: center;
+    background: none;
+    height: 28px;
+    width: 28px;
+}
+
+.experience-listing-filterable-card-icon::before,
+.experience-listing-filterable-card-icon::after {
+    background-color: white;
+    content: '';
+    position: absolute;
+}
+
+.experience-listing-filterable-reveal {
+    background: none;
+    border: none;
+    color: var(--heading-color);
+    cursor: pointer;
+    font-family: var(--body-font-family);
+    font-size: var(--body-font-size-xs);
+    letter-spacing: 0.08em;
+    padding: 0;
+    text-decoration: underline;
+    text-transform: uppercase;
+    width: fit-content;
+}
+
+/* experience-listing-filterable — JS-driven states */
+.experience-listing-filterable-grid > a:nth-child(n + 7) {
+    display: none;
+}
+
+.experience-listing-filterable[data-state='expanded'] .experience-listing-filterable-grid > a:nth-child(n + 7) {
+    display: flex;
+}
+
+@media (width >= 900px) {
+    .experience-listing-filterable-container {
+        align-items: flex-start;
+        flex-direction: row;
+        gap: 40px;
+    }
+
+    .experience-listing-filterable-sidebar-column {
+        display: flex;
+        flex: 0 0 304px;
+        flex-direction: column;
+        gap: 56px;
+    }
+
+    .experience-listing-filterable-content {
+        flex: 1;
+    }
+
+    .experience-listing-filterable-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}

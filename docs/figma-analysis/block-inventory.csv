@@ -1,0 +1,20 @@
+STT,Component (Figma),Loai su dung,Global - Destinations (vi tri),Global - Experience (vi tri),Hotel - Destinations (vi tri),Hotel - Experience (vi tri),Pattern,Block AEM hien co / de xuat,Trang thai,Ghi chu
+1,menu-top (Header/Nav),Dung chung (4/4),Header (fixed),Header (fixed),Header (fixed),Header (fixed),Header/nav,header,Da co,Giong het ca 4 trang
+2,"Hero (Hero/navigationtoggle - Global; Hero/destination - Hotel)",Dung rieng theo loai trang (4/4 nhung khac component),1,1,1,1,Hero + switcher,"hero-video / masthead-sticky (mo rong)",Can mo rong,"Global: location-listing overlay + mode-toggle. Hotel: side-menu anchor (an o Destinations, hien o Experience)"
+3,"Content-card (award-grid ""Follow your curiosity"")",Dung rieng (chi 1/4),2,-,-,-,Card grid 3 cot,location-showcase-cards (moi),Can tao moi,Chi xuat hien o Global/Destinations
+4,content-card/spit/text (text intro khong anh),Dung rieng (Global-Exp + Hotel-Exp),-,"2, 4",-,4,Text intro,text-intro (mo rong bo anh nen),Can mo rong,Khong dung o 2 trang Destinations
+5,Content-card/split/media (dual bg-image split),Dung rieng (chi Global-Exp active),-,3,-,"(hidden, chua active)",Dual split anh nen,dual-destination-teaser (moi),Can tao moi,O Hotel-Experience co layer nhung dang hidden
+6,Content-card/split/cuturist-pick,Dung rieng (chi Global-Dest),3,-,-,-,Split profile + carousel,product-carousel (mo rong),Can mo rong,Co dropdown chon destination
+7,Hero-global/activity-listing,"Dung CHUNG (2/4 - ca 2 trang o state Experience)",-,5,-,5,Filterable sidebar-tab listing,experience-listing-filterable (moi),"Can tao moi - UU TIEN CAO","Block loi dinh nghia trang thai ""Experience""; danh sach category khac nhau nhe (5 vs 6 muc)"
+8,Content-card/choose-space (hero + Space option),"Dung rieng (Global-Exp option an; Hotel-Dest option hien)",-,6 (option an),4 (option hien),-,Hero + listing con,"promo-content (hero, da co) + space-option-list (moi)",Hero da co; listing can tao moi,Nen tach thanh 2 block rieng theo khuyen nghi AEM EDS
+9,CONCEPT/hotel-homepage/destination,"Dung rieng (2/4 - ca 2 trang thai cua Hotel)",-,-,2,2,Split + mini gallery 3 anh,capella-kyoto (mo rong),"Da co gan khop, can them field gallery",Dung chung noi bo 2 state cua Hotel; khong dung o Global
+10,CONCEPT/hotel-homepage/ARCHITECT,"Dung rieng (chi Hotel, ca 2 state)",-,-,"3, 6 (x2)",3,Split + profile kien truc su + carousel,concept-profile-split (moi),Can tao moi,O Destinations dung 2 lan (bien the khac nhau)
+11,action-card (Trip-details booking bar),Dung rieng (chi Hotel-Destinations),-,-,5,-,Booking bar,booking-bar (moi),"Can tao moi - UU TIEN CAO","Khac action-card chuan; co Discover/Dates/Adults-Kids/Check rates"
+12,CONCEPT/hotel-homepage/culturist,Dung rieng (chi Hotel-Destinations),-,-,7,-,Profile + carousel,Bien the cua concept-profile-split,Can tao moi (tai dung #10),Noi dung van hoa dia phuong
+13,CONCEPT/hotel-homepage/interactive-map,"Dung rieng, dang hidden",-,-,(hidden),-,Map tuong tac,interactive-destination-map,"Da co, khop san",Chua active trong wireframe hien tai
+14,Content-card/offer (offer fan-stack),Dung chung (3/4),4,7,9,-,Split text + fanned card stack,offer-carousel / offer-suggestions (mo rong CSS),"Da co, can chinh layout",Khong dung o Hotel-Experience
+15,action-card (chuan, CTA banner),Dung chung (3/4),"5, 7 (x2)","8, 10 (x2)",10 (x1),-,CTA banner,action-card (moi),Can tao moi,Co bien the an "" form"" chua ro nghiep vu
+16,Content-card/split/feature,DUNG CHUNG CA 4 TRANG,6,9,11,6,Split text + image,text-with-image,"Da co, khop tot",Khong doi qua state/loai trang
+17,Award-section,Dung chung (3/4),8,11,12,-,Highlight listing,highlights-carousel,"Da co, khop tot",Khong dung o Hotel-Experience
+18,Footer-content,DUNG CHUNG CA 4 TRANG,9,12,13,7,Footer,footer,"Da co, khop",-
+19,Mini gallery strip (3x image-ratio),Dung chung noi bo Hotel (lap trong 3 block),-,-,"trong #9, #10, #12","trong #9, #10",List anh nho 3 item,De xuat tach thanh sub-component dung chung,Can thao luan,Lap lai giong het trong destination/architect/culturist

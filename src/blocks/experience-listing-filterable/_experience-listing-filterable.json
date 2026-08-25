@@ -1,0 +1,85 @@
+{
+  "definitions": [
+    {
+      "title": "Experience Listing Filterable",
+      "id": "experience-listing-filterable",
+      "plugins": {
+        "xwalk": {
+          "page": {
+            "resourceType": "core/franklin/components/block/v1/block",
+            "template": {
+              "name": "Experience Listing Filterable",
+              "filter": "experience-listing-filterable"
+            }
+          }
+        }
+      }
+    },
+    {
+      "title": "Experience Listing Item",
+      "id": "experience-listing-filterable-item",
+      "plugins": {
+        "xwalk": {
+          "page": {
+            "resourceType": "core/franklin/components/block/v1/block/item",
+            "template": {
+              "name": "Experience Listing Item",
+              "model": "experience-listing-filterable-item"
+            }
+          }
+        }
+      }
+    }
+  ],
+  "models": [
+    {
+      "id": "experience-listing-filterable",
+      "fields": []
+    },
+    {
+      "id": "experience-listing-filterable-item",
+      "fields": [
+        {
+          "component": "reference",
+          "valueType": "string",
+          "name": "image",
+          "label": "Image",
+          "multi": false
+        },
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "locationTag",
+          "label": "Location Tag",
+          "value": ""
+        },
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "title",
+          "label": "Title",
+          "value": ""
+        },
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "category",
+          "label": "Category",
+          "value": ""
+        },
+        {
+          "component": "aem-content",
+          "valueType": "string",
+          "name": "link",
+          "label": "Link"
+        }
+      ]
+    }
+  ],
+  "filters": [
+    {
+      "id": "experience-listing-filterable",
+      "components": ["experience-listing-filterable-item"]
+    }
+  ]
+}

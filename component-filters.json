@@ -48,7 +48,8 @@
       "offer-suggestions",
       "tabs-with-blocks",
       "mode-toggle",
-      "interactive-destination-map"
+      "interactive-destination-map",
+      "experience-listing-filterable"
     ]
   },
   {
@@ -102,6 +103,12 @@
       "image",
       "button",
       "title"
+    ]
+  },
+  {
+    "id": "experience-listing-filterable",
+    "components": [
+      "experience-listing-filterable-item"
     ]
   },
   {

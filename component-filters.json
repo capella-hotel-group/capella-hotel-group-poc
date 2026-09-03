@@ -112,6 +112,12 @@
     ]
   },
   {
+    "id": "hero-banner-with-toggle",
+    "components": [
+      "hero-banner-with-toggle-item"
+    ]
+  },
+  {
     "id": "hero-video",
     "components": [
       "hero-video-item"

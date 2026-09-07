@@ -1,5 +1,6 @@
 import { decorateMain } from '@/app/scripts';
 import { loadSections } from '@/app/aem';
+import type { HeroVideoElement } from './types';
 
 const FADE_ATTR = 'data-soft-nav';
 const FADE_OUT_CLASS = 'mode-toggle-fade-out';
@@ -8,13 +9,22 @@ const FADE_IN_START_CLASS = 'mode-toggle-fade-in-start';
 // each block's own `--soft-nav-duration` override. Kept generous so per-block customization
 // (e.g. a 500ms transition) never gets cut short if transitionend somehow doesn't fire.
 const FADE_DURATION_MS = 800;
-// Only this exact wrapper node (added by decorateBlock's `${blockName}-wrapper` convention)
-// stays mounted across a swap. Its section may hold other page-specific content (e.g. a hero
-// banner or video) that should still update, so we preserve the node itself, not its section.
-const PRESERVE_SELECTOR = '.mode-toggle-wrapper';
+// Upper bound on how long the hero-video reveal waits for its incoming video's first frame
+// before showing anyway — prevents a blocked-autoplay video from stalling the whole transition.
+const FIRST_FRAME_GATE_MS = 800;
+// Only this node (the toggle sub-DOM hero-video renders) stays mounted across a swap so its
+// indicator slides continuously instead of re-mounting. It lives inside hero-video, whose media
+// still swaps to the incoming page's video.
+const PRESERVE_SELECTOR = '.hero-video-toggle';
 
 let activeController: AbortController | null = null;
 let popstateBound = false;
+
+function delay(ms: number): Promise<void> {
+  return new Promise((resolve) => {
+    window.setTimeout(resolve, ms);
+  });
+}
 
 function isModifiedClick(event: MouseEvent): boolean {
   return event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0;
@@ -147,7 +157,7 @@ async function navigate(url: string, { push }: { push: boolean }): Promise<void>
     await waitForFadeOut(fadeTargets);
 
     // Prefer grafting into the incoming page's own hero-video (matches the initial-load
-    // placement in mode-toggle.ts's attachToHeroVideo), falling back to the flat section slot.
+    // placement in hero-video.ts), falling back to the flat section slot.
     const heroVideoInNew = newMain.querySelector<HTMLElement>('.hero-video');
     if (preservedNode && heroVideoInNew) {
       heroVideoInNew.append(preservedNode);
@@ -158,6 +168,8 @@ async function navigate(url: string, { push }: { push: boolean }): Promise<void>
     // Pre-fade the incoming content so it's invisible (and slightly scaled up) right up until
     // insertion, then reveal it with a zoom-in + fade — the preserved node never gets this class.
     const newContentTargets = collectFadeTargets(newMain, preservedNode);
+    const heroTargets = newContentTargets.filter((el) => el.closest('.hero-video') !== null);
+    const otherTargets = newContentTargets.filter((el) => el.closest('.hero-video') === null);
     newContentTargets.forEach((el) => {
       el.setAttribute(FADE_ATTR, '');
       el.classList.add(FADE_IN_START_CLASS);
@@ -166,11 +178,20 @@ async function navigate(url: string, { push }: { push: boolean }): Promise<void>
     currentMain.replaceChildren(...newMain.children);
 
     newContentTargets.forEach((el) => el.getBoundingClientRect()); // force reflow
-    newContentTargets.forEach((el) => el.classList.remove(FADE_IN_START_CLASS));
+    otherTargets.forEach((el) => el.classList.remove(FADE_IN_START_CLASS));
 
     document.title = doc.title;
     if (push) window.history.pushState({}, '', url);
     syncActiveState(new URL(url, window.location.href).pathname);
+
+    // Hold the hero-video reveal until its incoming video has a decoded frame, so the fade-in
+    // coincides with the video crossfade (matching the initial page load) rather than flashing
+    // in a poster first. Capped by FIRST_FRAME_GATE_MS so blocked autoplay can't stall forever.
+    if (heroTargets.length > 0) {
+      const hero = currentMain.querySelector<HeroVideoElement>('.hero-video');
+      await Promise.race([hero?.__heroFirstFrameReady ?? Promise.resolve(), delay(FIRST_FRAME_GATE_MS)]);
+      heroTargets.forEach((el) => el.classList.remove(FADE_IN_START_CLASS));
+    }
   } catch (error) {
     if ((error as { name?: string }).name === 'AbortError') return;
     console.error('mode-toggle soft-nav failed, falling back to full navigation', error);

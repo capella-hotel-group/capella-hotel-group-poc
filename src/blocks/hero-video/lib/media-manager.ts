@@ -81,6 +81,8 @@ export class MediaManager {
   private muted = true;
   private transition: TransitionStyle = 'crossfade';
   private onError: (item: HeroVideoItem, errorType: string) => void = () => {};
+  private onFirstFrame: () => void = () => {};
+  private firstFrameEmitted = false;
   private pendingFadeIn: Animation | null = null;
   private pendingFadeOut: Animation | null = null;
   // When autoplay is blocked, we register a one-shot listener that retries playback on the first
@@ -116,6 +118,11 @@ export class MediaManager {
 
   setErrorHandler(cb: (item: HeroVideoItem, errorType: string) => void): void {
     this.onError = cb;
+  }
+
+  /** Fires once, right after the first successfully-loaded video decodes its first frame. */
+  setFirstFrameHandler(cb: () => void): void {
+    this.onFirstFrame = cb;
   }
 
   setTransition(style: TransitionStyle): void {
@@ -258,6 +265,11 @@ export class MediaManager {
 
     // Ensure at least one decoded frame is available before we begin the fade.
     await waitForFirstFrame(incoming);
+
+    if (!this.firstFrameEmitted) {
+      this.firstFrameEmitted = true;
+      this.onFirstFrame();
+    }
 
     if (this.transition === 'cut') {
       incoming.style.opacity = '1';

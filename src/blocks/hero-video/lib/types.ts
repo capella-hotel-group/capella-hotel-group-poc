@@ -6,6 +6,15 @@ export interface HeroVideoConfig {
   prefix: string;
   suffix: string;
   transition: TransitionStyle;
+  destinationLabel: string;
+  destinationHref: string;
+  experienceLabel: string;
+  experienceHref: string;
+}
+
+/** hero-video block element carrying the soft-nav readiness gate promise. */
+export interface HeroVideoElement extends HTMLElement {
+  __heroFirstFrameReady?: Promise<void>;
 }
 
 export interface HeroVideoItem {

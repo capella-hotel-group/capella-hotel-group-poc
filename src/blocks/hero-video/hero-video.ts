@@ -4,7 +4,8 @@ import { emitHeroImpression, emitItemSelect, emitMediaError } from './lib/analyt
 import { runIntro, skipIntro } from './lib/intro';
 import { MediaManager } from './lib/media-manager';
 import { SelectorUI } from './lib/selector-ui';
-import type { HeroVideoConfig, HeroVideoItem, HeroVideoState, IntroElements } from './lib/types';
+import { initSoftNav } from './lib/soft-nav';
+import type { HeroVideoConfig, HeroVideoElement, HeroVideoItem, HeroVideoState, IntroElements } from './lib/types';
 
 // ── Cursor controller ─────────────────────────────────────────────────────────
 
@@ -85,10 +86,17 @@ function parseConfig(configRow: HTMLElement): HeroVideoConfig {
   const rawTransition = cells[2]?.textContent?.trim().toLowerCase();
   const transition: HeroVideoConfig['transition'] =
     rawTransition === 'slide' || rawTransition === 'cut' ? rawTransition : 'crossfade';
+  // cells[3]=destinationLabel, cells[4]=destinationUrl, cells[5]=experienceLabel, cells[6]=experienceUrl
+  const destAnchor = cells[4]?.querySelector<HTMLAnchorElement>('a');
+  const expAnchor = cells[6]?.querySelector<HTMLAnchorElement>('a');
   return {
     prefix: cells[0]?.textContent?.trim() || 'See',
     suffix: cells[1]?.textContent?.trim() || 'with new eyes',
     transition,
+    destinationLabel: cells[3]?.textContent?.trim() || 'Destinations',
+    destinationHref: destAnchor?.getAttribute('href') || '/en/',
+    experienceLabel: cells[5]?.textContent?.trim() || 'Experiences',
+    experienceHref: expAnchor?.getAttribute('href') || '/en/experience/',
   };
 }
 
@@ -125,6 +133,67 @@ function parseItems(itemRows: HTMLElement[]): HeroVideoItem[] {
 
 // ── DOM builder ───────────────────────────────────────────────────────────────
 
+function buildToggle(config: HeroVideoConfig): {
+  toggleWrapper: HTMLElement;
+  destLink: HTMLAnchorElement;
+  expLink: HTMLAnchorElement;
+} {
+  const normalizePath = (p: string): string => p.replace(/\/?$/, '/');
+  const isExperience = normalizePath(window.location.pathname) === normalizePath(config.experienceHref);
+
+  const toggleWrapper = document.createElement('div');
+  toggleWrapper.className = 'hero-video-toggle';
+
+  const inner = document.createElement('div');
+  inner.className = 'mode-toggle-inner';
+  inner.setAttribute('role', 'group');
+  inner.setAttribute('aria-label', 'Site mode');
+  // Persisted so soft-nav can recompute active state without re-reading the (detached) source row.
+  inner.dataset.destinationHref = config.destinationHref;
+  inner.dataset.experienceHref = config.experienceHref;
+
+  const destLink = document.createElement('a');
+  destLink.href = config.destinationHref;
+  destLink.className = `mode-toggle-btn mode-toggle-btn--dest${!isExperience ? ' mode-toggle-btn--active' : ''}`;
+  destLink.textContent = config.destinationLabel;
+  if (!isExperience) destLink.setAttribute('aria-current', 'page');
+
+  const track = document.createElement('div');
+  track.className = 'mode-toggle-track';
+  track.setAttribute('role', 'button');
+  track.setAttribute('tabindex', '0');
+  track.setAttribute('aria-label', 'Toggle site mode');
+  const indicator = document.createElement('div');
+  indicator.className = 'mode-toggle-indicator';
+  indicator.style.transform = isExperience ? 'translateX(100%)' : 'translateX(0%)';
+  track.append(indicator);
+
+  const expLink = document.createElement('a');
+  expLink.href = config.experienceHref;
+  expLink.className = `mode-toggle-btn mode-toggle-btn--exp${isExperience ? ' mode-toggle-btn--active' : ''}`;
+  expLink.textContent = config.experienceLabel;
+  if (isExperience) expLink.setAttribute('aria-current', 'page');
+
+  // Clicking/pressing the track switches to whichever side isn't active, reusing the same link
+  // (and its soft-nav click handler) so behavior stays in sync with the labels.
+  const toggleViaTrack = (): void => {
+    const target = expLink.classList.contains('mode-toggle-btn--active') ? destLink : expLink;
+    target.click();
+  };
+  track.addEventListener('click', toggleViaTrack);
+  track.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      toggleViaTrack();
+    }
+  });
+
+  inner.append(destLink, track, expLink);
+  toggleWrapper.append(inner);
+
+  return { toggleWrapper, destLink, expLink };
+}
+
 function buildDOM(config: HeroVideoConfig): {
   root: DocumentFragment;
   mediaEl: HTMLElement;
@@ -139,6 +208,8 @@ function buildDOM(config: HeroVideoConfig): {
   controlsEl: HTMLElement;
   soundBtn: HTMLButtonElement;
   cursorEl: HTMLElement;
+  destLink: HTMLAnchorElement;
+  expLink: HTMLAnchorElement;
 } {
   const fragment = document.createDocumentFragment();
 
@@ -222,7 +293,12 @@ function buildDOM(config: HeroVideoConfig): {
   const cursorEl = document.createElement('div');
   cursorEl.className = 'hero-video-cursor';
   cursorEl.setAttribute('aria-hidden', 'true');
-  fragment.append(mediaEl, overlayEl, introPhraseEl, selectorEl, controlsEl, cursorEl);
+
+  // Mode toggle lives inside hero-video so soft-nav can preserve it across swaps while the media
+  // reloads. It is appended last but positioned as an overlay by CSS.
+  const { toggleWrapper, destLink, expLink } = buildToggle(config);
+
+  fragment.append(mediaEl, overlayEl, introPhraseEl, selectorEl, controlsEl, cursorEl, toggleWrapper);
 
   return {
     root: fragment,
@@ -238,6 +314,8 @@ function buildDOM(config: HeroVideoConfig): {
     controlsEl,
     soundBtn,
     cursorEl,
+    destLink,
+    expLink,
   };
 }
 
@@ -270,12 +348,25 @@ export default async function decorate(block: HTMLElement): Promise<void> {
   // Videos are always muted — the sound/unmute control is intentionally removed.
   dom.soundBtn.hidden = true;
 
+  // Soft-nav toggle: wire mode switching on the toggle links now that they're in the DOM.
+  initSoftNav([dom.destLink, dom.expLink]);
+
   const cursor = new CursorController(block, dom.cursorEl);
   cursor.mount();
 
   const media = new MediaManager(dom.videoA, dom.videoB, dom.posterEl);
   media.setTransition(config.transition);
   media.setErrorHandler((item, errorType) => emitMediaError(item.label, item.videoUrl, errorType));
+
+  // Readiness gate: soft-nav awaits this before revealing hero-video on a mode swap so the fade-in
+  // coincides with the video crossfade. Resolves on the first decoded frame, or a fallback timeout
+  // so blocked autoplay never stalls the transition.
+  let resolveFirstFrame: () => void = () => {};
+  (block as HeroVideoElement).__heroFirstFrameReady = new Promise<void>((resolve) => {
+    resolveFirstFrame = resolve;
+  });
+  media.setFirstFrameHandler(() => resolveFirstFrame());
+  window.setTimeout(() => resolveFirstFrame(), 1500);
 
   // Load first item — deferred until the block is attached to a *live, rendered* document.
   // `Node.isConnected` only means "rooted in some Document", which is true even for a block

@@ -322,13 +322,10 @@ function buildDOM(config: HeroVideoConfig): {
   };
 }
 
-function shouldSkipIntro(block: HTMLElement): boolean {
+function shouldSkipIntro(): boolean {
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return true;
   if (document.documentElement.classList.contains('adobe-ue-edit')) return true;
   if (window.self !== window.top) return true; // inside iframe (UE)
-  // Mode-toggle soft-nav flagged this instance as a mid-navigation swap — skip the 3.7s
-  // landing intro so the transition feels like a video crossfade, not a page relaunch.
-  if (block.hasAttribute('data-soft-nav-swap')) return true;
   return false;
 }
 
@@ -451,20 +448,20 @@ export default async function decorate(block: HTMLElement): Promise<void> {
     controls: dom.controlsEl,
   };
 
-  // WAAPI feature detection — if unavailable, skip all animation
-  if (typeof Element.prototype.animate !== 'function') {
+  const finishWithoutIntro = (): void => {
     skipIntro(introElements);
     selectorUI.measureRows();
     selectorUI.activateItem(state.activeIndex, false);
     selectorUI.setIntroComplete(true);
     state.introComplete = true;
-  } else if (shouldSkipIntro(block)) {
-    skipIntro(introElements);
-    selectorUI.measureRows();
-    selectorUI.activateItem(state.activeIndex, false);
-    selectorUI.setIntroComplete(true);
-    state.introComplete = true;
-  } else {
+  };
+
+  const startIntro = (): void => {
+    // No WAAPI / reduced-motion / UE editor — jump straight to the final state.
+    if (typeof Element.prototype.animate !== 'function' || shouldSkipIntro()) {
+      finishWithoutIntro();
+      return;
+    }
     runIntro(
       introElements,
       () => {
@@ -489,6 +486,21 @@ export default async function decorate(block: HTMLElement): Promise<void> {
         preloadVid.src = nextItem.videoUrl;
       }
     });
+  };
+
+  // Defer the intro until the block is live-connected. On a mode-toggle soft-nav this block is
+  // decorated while still detached in a DOMParser scratch document, so waiting until it's grafted
+  // into the real page replays the full landing intro at reveal time — in sync with the video
+  // crossfade, matching the initial page load. On initial load the block is already connected, so
+  // this runs synchronously with no flash.
+  if (isLiveConnected(block)) {
+    startIntro();
+  } else {
+    const waitForAttachIntro = (): void => {
+      if (isLiveConnected(block)) startIntro();
+      else requestAnimationFrame(waitForAttachIntro);
+    };
+    requestAnimationFrame(waitForAttachIntro);
   }
 
   // Sound toggle removed — videos stay permanently muted.

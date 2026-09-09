@@ -37,7 +37,7 @@ export class SelectorUI {
     this.items = items;
     this.activeIndex = activeIndex;
 
-    this.itemListEl.innerHTML = '';
+    this.itemListEl.replaceChildren();
     items.forEach((item, idx) => {
       const li = document.createElement('li');
       li.className = 'hero-video-item';

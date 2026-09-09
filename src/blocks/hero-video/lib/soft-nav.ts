@@ -137,13 +137,6 @@ async function navigate(url: string, { push }: { push: boolean }): Promise<void>
 
     decorateMain(newMain);
 
-    // Strip the incoming page's own toggle instance, remembering its exact slot so the
-    // preserved node can be grafted back into the same position (same section, same index).
-    const incomingDup = newMain.querySelector<HTMLElement>(PRESERVE_SELECTOR);
-    const graftParent = incomingDup?.parentElement ?? null;
-    const graftIndex = graftParent ? [...graftParent.children].indexOf(incomingDup as Element) : -1;
-    incomingDup?.remove();
-
     // Signal to blocks that they're being mounted mid-navigation, so they can skip landing-page
     // intro sequences that would otherwise replay on every mode swap (e.g. hero-video's 3.7s
     // "See with new eyes" phrase + split-layout entrance). Blocks read this before running
@@ -156,13 +149,16 @@ async function navigate(url: string, { push }: { push: boolean }): Promise<void>
 
     await waitForFadeOut(fadeTargets);
 
-    // Prefer grafting into the incoming page's own hero-video (matches the initial-load
-    // placement in hero-video.ts), falling back to the flat section slot.
+    // The incoming hero-video builds its own toggle during loadSections(). Remove that fresh
+    // instance and graft the preserved node into its exact slot so the indicator animates
+    // continuously (one toggle, no overlap) instead of a second toggle mounting on top of it.
     const heroVideoInNew = newMain.querySelector<HTMLElement>('.hero-video');
-    if (preservedNode && heroVideoInNew) {
-      heroVideoInNew.append(preservedNode);
-    } else if (preservedNode && graftParent) {
-      graftParent.insertBefore(preservedNode, graftParent.children[graftIndex] ?? null);
+    const incomingToggle = heroVideoInNew?.querySelector<HTMLElement>(PRESERVE_SELECTOR) ?? null;
+    const graftParent = incomingToggle?.parentElement ?? heroVideoInNew ?? null;
+    const graftBefore = incomingToggle?.nextElementSibling ?? null;
+    incomingToggle?.remove();
+    if (preservedNode && graftParent) {
+      graftParent.insertBefore(preservedNode, graftBefore);
     }
 
     // Pre-fade the incoming content so it's invisible (and slightly scaled up) right up until

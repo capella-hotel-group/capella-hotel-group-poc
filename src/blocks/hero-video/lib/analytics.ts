@@ -16,10 +16,6 @@ export function emitItemSelect(
   emit('hero-video:item-select', { previousItem, newItem, inputSource });
 }
 
-export function emitSoundToggle(muted: boolean): void {
-  emit('hero-video:sound-toggle', { muted });
-}
-
 export function emitMediaError(item: string, mediaUrl: string, errorType: string): void {
   emit('hero-video:media-error', { item, mediaUrl, errorType });
 }

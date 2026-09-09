@@ -24,7 +24,6 @@ export interface HeroVideoItem {
   link: string | null;
   focalDesktop: string;
   focalMobile: string;
-  hasAudio: boolean;
   /** Original row element for moveInstrumentation */
   sourceRow: HTMLElement;
 }

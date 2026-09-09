@@ -624,12 +624,6 @@
         "name": "focalMobile",
         "label": "Focal Point (Mobile)",
         "value": "center"
-      },
-      {
-        "component": "boolean",
-        "valueType": "boolean",
-        "name": "hasAudio",
-        "label": "Has Audio"
       }
     ]
   },

@@ -81,22 +81,26 @@ class CursorController {
 
 // ── DOM parsing ───────────────────────────────────────────────────────────────
 
-function parseConfig(configRow: HTMLElement): HeroVideoConfig {
-  const cells = [...configRow.children] as HTMLElement[];
-  const rawTransition = cells[2]?.textContent?.trim().toLowerCase();
+function parseConfig(configRows: HTMLElement[]): HeroVideoConfig {
+  // Each block-level field renders as its own single-cell row, in model declaration order:
+  //   0=prefix, 1=suffix, 2=transition, 3=destinationLabel, 4=destinationUrl,
+  //   5=experienceLabel, 6=experienceUrl. The authored value lives in row.children[0].
+  const cellText = (i: number): string => configRows[i]?.children[0]?.textContent?.trim() ?? '';
+  const cellAnchor = (i: number): HTMLAnchorElement | null =>
+    configRows[i]?.children[0]?.querySelector<HTMLAnchorElement>('a') ?? null;
+
+  const rawTransition = cellText(2).toLowerCase();
   const transition: HeroVideoConfig['transition'] =
     rawTransition === 'slide' || rawTransition === 'cut' ? rawTransition : 'crossfade';
-  // cells[3]=destinationLabel, cells[4]=destinationUrl, cells[5]=experienceLabel, cells[6]=experienceUrl
-  const destAnchor = cells[4]?.querySelector<HTMLAnchorElement>('a');
-  const expAnchor = cells[6]?.querySelector<HTMLAnchorElement>('a');
+
   return {
-    prefix: cells[0]?.textContent?.trim() || 'See',
-    suffix: cells[1]?.textContent?.trim() || 'with new eyes',
+    prefix: cellText(0) || 'See',
+    suffix: cellText(1) || 'with new eyes',
     transition,
-    destinationLabel: cells[3]?.textContent?.trim() || 'Destinations',
-    destinationHref: destAnchor?.getAttribute('href') || '/en/',
-    experienceLabel: cells[5]?.textContent?.trim() || 'Experiences',
-    experienceHref: expAnchor?.getAttribute('href') || '/en/experience/',
+    destinationLabel: cellText(3) || 'Destinations',
+    destinationHref: cellAnchor(4)?.getAttribute('href') || '/en/',
+    experienceLabel: cellText(5) || 'Experiences',
+    experienceHref: cellAnchor(6)?.getAttribute('href') || '/en/experience/',
   };
 }
 
@@ -106,8 +110,8 @@ function parseItems(itemRows: HTMLElement[]): HeroVideoItem[] {
       const cells = [...row.children] as HTMLElement[];
       // Model fields → cell indices:
       //   cells[0] = label, cells[1] = video, cells[2] = poster,
-      //   cells[3] = link, cells[4] = focalDesktop, cells[5] = focalMobile, cells[6] = hasAudio
-      if (cells.length < 7) return null;
+      //   cells[3] = link, cells[4] = focalDesktop, cells[5] = focalMobile
+      if (cells.length < 2) return null;
 
       const label = cells[0]?.textContent?.trim() ?? '';
 
@@ -122,11 +126,10 @@ function parseItems(itemRows: HTMLElement[]): HeroVideoItem[] {
       const link = linkAnchor?.href ?? null;
       const focalDesktop = cells[4]?.textContent?.trim() || 'center';
       const focalMobile = cells[5]?.textContent?.trim() || 'center';
-      const hasAudio = cells[6]?.textContent?.trim().toLowerCase() === 'true';
 
       if (!label || !videoUrl) return null;
 
-      return { label, videoUrl, posterUrl, link, focalDesktop, focalMobile, hasAudio, sourceRow: row };
+      return { label, videoUrl, posterUrl, link, focalDesktop, focalMobile, sourceRow: row };
     })
     .filter((item): item is HeroVideoItem => item !== null);
 }
@@ -333,8 +336,14 @@ export default async function decorate(block: HTMLElement): Promise<void> {
   const rows = [...block.children] as HTMLElement[];
   if (rows.length < 2) return;
 
-  const config = parseConfig(rows[0]);
-  const items = parseItems(rows.slice(1));
+  // Config fields render as single-cell rows; items render as multi-cell rows (one cell per item
+  // field). Splitting by cell count keeps config parsing correct even when legacy content omits
+  // the later-added destination/experience rows and shifts positions.
+  const configRows = rows.filter((row) => row.children.length <= 1);
+  const itemRows = rows.filter((row) => row.children.length > 1);
+
+  const config = parseConfig(configRows);
+  const items = parseItems(itemRows);
   if (items.length === 0) return;
 
   const state: HeroVideoState = {
@@ -381,7 +390,7 @@ export default async function decorate(block: HTMLElement): Promise<void> {
   const firstItem = items[state.activeIndex];
   if (firstItem) {
     const startFirstLoad = (): void => {
-      media.switchTo(firstItem).catch((err: unknown) => console.warn('[hero-video] first switchTo failed', err));
+      media.switchTo(firstItem).catch(() => {});
       // Self-healing "auto-click": on soft-nav mounts play() sometimes succeeds silently (no
       // rejection logged) but the crossfade leaves the video paused/invisible. Re-check shortly
       // after mount settles and force it visible+playing, same effect as a manual click.
@@ -429,8 +438,7 @@ export default async function decorate(block: HTMLElement): Promise<void> {
     state.activeIndex = index;
     const item = items[index];
     if (item) {
-      // TEMP diagnostic: log instead of swallowing so autoplay/load failures are visible.
-      media.switchTo(item).catch((err: unknown) => console.warn('[hero-video] switchTo failed', err));
+      media.switchTo(item).catch(() => {});
       emitItemSelect(prevItem?.label ?? '', item.label, 'pointer');
     }
   });

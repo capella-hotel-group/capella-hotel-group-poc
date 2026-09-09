@@ -174,11 +174,7 @@ export class MediaManager {
     video.muted = this.muted;
     const p = video.play();
     if (p && typeof p.catch === 'function') {
-      // TEMP diagnostic: log the real rejection reason instead of swallowing it.
-      p.catch((err: unknown) => {
-        console.warn('[hero-video] play() rejected', err);
-        this.armGestureRetry();
-      });
+      p.catch(() => this.armGestureRetry());
     }
   }
 

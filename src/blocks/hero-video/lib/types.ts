@@ -36,6 +36,8 @@ export interface HeroVideoState {
 
 export interface IntroElements {
   introPhrase: HTMLElement;
+  phrasePrefix: HTMLElement;
+  phraseSuffix: HTMLElement;
   prefix: HTMLElement;
   suffix: HTMLElement;
   itemList: HTMLElement;

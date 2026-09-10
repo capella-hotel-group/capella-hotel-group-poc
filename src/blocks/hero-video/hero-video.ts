@@ -205,6 +205,8 @@ function buildDOM(config: HeroVideoConfig): {
   videoB: HTMLVideoElement;
   overlayEl: HTMLElement;
   introPhraseEl: HTMLElement;
+  phrasePrefixEl: HTMLElement;
+  phraseSuffixEl: HTMLElement;
   prefixEl: HTMLElement;
   suffixEl: HTMLElement;
   itemListEl: HTMLUListElement;
@@ -252,10 +254,16 @@ function buildDOM(config: HeroVideoConfig): {
   overlayEl.setAttribute('aria-hidden', 'true');
 
   // ── Intro phrase (single centered sentence, visible during intro only) ────
+  // Prefix/suffix are wrapped in spans so the split can hand each word off to the real prefix/
+  // suffix by position (FLIP) instead of cross-fading — so "with new eyes" never fades in twice.
   const introPhraseEl = document.createElement('div');
   introPhraseEl.className = 'hero-video-intro-phrase';
   introPhraseEl.setAttribute('aria-hidden', 'true');
-  introPhraseEl.textContent = `${config.prefix} ${config.suffix}`;
+  const phrasePrefixEl = document.createElement('span');
+  phrasePrefixEl.textContent = config.prefix;
+  const phraseSuffixEl = document.createElement('span');
+  phraseSuffixEl.textContent = config.suffix;
+  introPhraseEl.append(phrasePrefixEl, document.createTextNode(' '), phraseSuffixEl);
 
   // ── Selector UI ───────────────────────────────────────────────────────────
   const selectorEl = document.createElement('div');
@@ -317,6 +325,8 @@ function buildDOM(config: HeroVideoConfig): {
     videoB,
     overlayEl,
     introPhraseEl,
+    phrasePrefixEl,
+    phraseSuffixEl,
     prefixEl,
     suffixEl,
     itemListEl,
@@ -448,6 +458,8 @@ export default async function decorate(block: HTMLElement): Promise<void> {
 
   const introElements: IntroElements = {
     introPhrase: dom.introPhraseEl,
+    phrasePrefix: dom.phrasePrefixEl,
+    phraseSuffix: dom.phraseSuffixEl,
     prefix: dom.prefixEl,
     suffix: dom.suffixEl,
     itemList: dom.itemListEl,

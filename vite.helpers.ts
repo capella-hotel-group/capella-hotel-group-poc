@@ -87,6 +87,17 @@ async function removeStaleEntries(subdir: string): Promise<void> {
  * entries from output dirs (e.g. deleted or renamed blocks/chunks) without
  * doing a full clean that would cause downtime.
  */
+// Serializes root syncs so overlapping rebuilds never run cp/rm concurrently — which otherwise
+// races with the next build's emptyOutDir clearing dist/ mid-copy and throws GenericFailure.
+let syncChain: Promise<void> = Promise.resolve();
+
+async function syncDistToRoot(): Promise<void> {
+  // Remove stale entries first (deleted/renamed blocks or chunks) before copying so root never
+  // has leftover files from prior builds.
+  await Promise.all(['blocks', 'chunks'].map(removeStaleEntries));
+  await cp(DIST_DIR, ROOT, { recursive: true, force: true });
+}
+
 export function cleanOutputPlugin(isWatch: boolean): Plugin {
   return {
     name: 'clean-output',
@@ -102,10 +113,14 @@ export function cleanOutputPlugin(isWatch: boolean): Plugin {
     },
     async closeBundle() {
       if (!isWatch) return;
-      // Remove stale entries first (deleted/renamed blocks or chunks)
-      // before copying so root never has leftover files from prior builds.
-      await Promise.all(['blocks', 'chunks'].map(removeStaleEntries));
-      await cp(DIST_DIR, ROOT, { recursive: true, force: true });
+      // Chain onto the previous sync and swallow transient FS races (a rebuild can empty dist/
+      // under an in-flight copy). A crash here would kill the whole watcher; the next successful
+      // build re-syncs root, so logging and continuing is safe.
+      syncChain = syncChain.then(syncDistToRoot).catch((err: unknown) => {
+        const message = err instanceof Error ? err.message : String(err);
+        console.warn(`[clean-output] root sync skipped (will retry next build): ${message}`);
+      });
+      await syncChain;
     },
   };
 }

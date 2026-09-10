@@ -279,7 +279,13 @@ function buildDOM(config: HeroVideoConfig): {
   suffixEl.textContent = config.suffix;
   suffixEl.setAttribute('aria-hidden', 'true');
 
-  selectorEl.append(prefixEl, itemListEl, suffixEl);
+  // "See" and the item list share one box so the prefix sits centered above the list; the prefix
+  // is absolutely positioned inside it, so it never shifts the (screen-centered) list.
+  const leadEl = document.createElement('div');
+  leadEl.className = 'hero-video-lead';
+  leadEl.append(prefixEl, itemListEl);
+
+  selectorEl.append(leadEl, suffixEl);
 
   // ── Bottom controls (sound toggle only — mode toggling lives in a sibling block) ──
   const controlsEl = document.createElement('div');

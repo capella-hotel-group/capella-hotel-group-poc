@@ -9,6 +9,13 @@
 const APP_BUILDER_URL =
   'https://3599957-turneoapp-stage.adobeioruntime.net/api/v1/web/turneo-app/get-experience-data.json';
 
+/**
+ * Real Turneo storeId behind the `capella-poc` site (the one the `<turneo-widget>`
+ * embed resolves internally). Without this, the endpoint falls back to an
+ * unrelated demo store (Croatia tours) instead of Capella's own experiences.
+ */
+export const CAPELLA_STORE_ID = '69fc031756d9011fcc90e6b1';
+
 // --- Response types ---
 
 export interface AppBuilderPrice {

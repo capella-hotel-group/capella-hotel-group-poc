@@ -164,6 +164,24 @@
     transform: scale(0.97);
 }
 
+.turneo-experiences-card-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: auto;
+}
+
+.turneo-experiences-card-cta--secondary {
+    background-color: transparent;
+    color: var(--header-cta-bg);
+    border: 1px solid var(--header-cta-bg);
+}
+
+.turneo-experiences-card-cta--secondary:hover {
+    background-color: var(--header-cta-bg);
+    color: var(--background-color);
+}
+
 /* === Skeleton Loading === */
 
 .turneo-experiences-card--skeleton {
@@ -216,4 +234,233 @@
     font-family: var(--body-font-family);
     font-size: var(--body-font-size-s);
     color: var(--dark-color);
+}
+
+/* === Detail Popup (custom layout, native <dialog>) === */
+
+.turneo-experiences-dialog {
+    width: 100%;
+    max-width: 900px;
+    max-height: calc(100% - 64px);
+    margin: auto;
+    padding: 0;
+    border: 0;
+    border-radius: 8px;
+    overflow-y: auto;
+    background-color: var(--background-color);
+    box-shadow: 0 8px 32px rgb(0 0 0 / 20%);
+}
+
+.turneo-experiences-dialog::backdrop {
+    background: rgb(0 0 0 / 55%);
+}
+
+.turneo-experiences-dialog-close {
+    position: sticky;
+    top: 12px;
+    inset-inline-end: 12px;
+    float: right;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    margin-inline-end: 12px;
+    font-size: 24px;
+    line-height: 1;
+    color: var(--text-color);
+    background-color: var(--background-color);
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 1;
+}
+
+.turneo-experiences-dialog-close:hover {
+    background-color: #f0f0f0;
+}
+
+.turneo-experiences-dialog-body {
+    display: flex;
+    flex-direction: column;
+}
+
+@media (width >= 700px) {
+    .turneo-experiences-dialog-body {
+        flex-direction: row;
+    }
+}
+
+.turneo-experiences-dialog-image {
+    flex: 0 0 auto;
+    aspect-ratio: 16 / 10;
+}
+
+@media (width >= 700px) {
+    .turneo-experiences-dialog-image {
+        flex: 0 0 40%;
+        aspect-ratio: auto;
+        align-self: stretch;
+    }
+}
+
+.turneo-experiences-dialog-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.turneo-experiences-dialog-content {
+    flex: 1;
+    min-width: 0;
+    padding: 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.turneo-experiences-dialog-title {
+    font-family: var(--heading-font-family);
+    font-size: var(--heading-font-size-m);
+    color: var(--text-color);
+    margin: 0;
+    line-height: 1.2;
+}
+
+.turneo-experiences-dialog-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 16px;
+}
+
+.turneo-experiences-dialog-meta-item {
+    font-family: var(--body-font-family);
+    font-size: var(--body-font-size-xs);
+    color: var(--dark-color);
+}
+
+.turneo-experiences-dialog-meta-item:not(:last-child)::after {
+    content: '\2022';
+    margin-inline-start: 16px;
+}
+
+.turneo-experiences-dialog-description {
+    font-family: var(--body-font-family);
+    font-size: var(--body-font-size-s);
+    color: var(--text-color);
+    line-height: 1.6;
+    margin: 0;
+}
+
+.turneo-experiences-dialog-subheading {
+    font-family: var(--heading-font-family);
+    font-size: var(--heading-font-size-xs);
+    color: var(--text-color);
+    margin: 0;
+}
+
+.turneo-experiences-dialog-included {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 8px 16px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.turneo-experiences-dialog-included li {
+    font-family: var(--body-font-family);
+    font-size: var(--body-font-size-xs);
+    color: var(--dark-color);
+    padding-inline-start: 20px;
+    position: relative;
+}
+
+.turneo-experiences-dialog-included li::before {
+    content: '\2713';
+    position: absolute;
+    inset-inline-start: 0;
+    color: var(--header-cta-bg);
+    font-weight: 700;
+}
+
+.turneo-experiences-dialog-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-top: auto;
+    padding-top: 16px;
+    border-top: 1px solid #eee;
+}
+
+.turneo-experiences-dialog-price {
+    font-family: var(--heading-font-family);
+    font-size: var(--heading-font-size-s);
+    color: var(--text-color);
+}
+
+.turneo-experiences-dialog-cta {
+    font-family: var(--body-font-family);
+    font-size: var(--body-font-size-xs);
+    font-weight: 500;
+    letter-spacing: var(--header-letter-spacing);
+    text-transform: uppercase;
+    text-decoration: none;
+    background-color: var(--header-cta-bg);
+    color: var(--background-color);
+    border: none;
+    border-radius: 4px;
+    padding: 12px 24px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    display: inline-block;
+}
+
+.turneo-experiences-dialog-cta:hover {
+    background-color: var(--header-cta-hover-bg);
+}
+
+/* === Real turneo-widget Popup (widget loaded in an iframe, boxed like the custom popup) === */
+
+.turneo-experiences-widget-dialog {
+    width: calc(100% - 32px);
+    max-width: 1100px;
+    height: min(85vh, 900px);
+    max-height: calc(100% - 32px);
+    margin: auto;
+    padding: 48px 0 0;
+    box-sizing: border-box;
+    border: 0;
+    border-radius: 8px;
+    overflow: hidden;
+    background-color: var(--background-color);
+    box-shadow: 0 8px 32px rgb(0 0 0 / 20%);
+}
+
+.turneo-experiences-widget-dialog::backdrop {
+    background: rgb(0 0 0 / 55%);
+}
+
+.turneo-experiences-widget-dialog-body {
+    width: 100%;
+    height: 100%;
+    border-top: 1px solid #eee;
+}
+
+.turneo-experiences-widget-frame {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: 0;
+}
+
+.turneo-experiences-widget-dialog .turneo-experiences-dialog-close {
+    position: absolute;
+    top: 6px;
+    inset-inline-end: 8px;
+    margin: 0;
+    z-index: 1;
 }

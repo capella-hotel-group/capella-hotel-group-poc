@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>Turneo experience</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        min-height: 100%;
+        background: #fff;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Iframe host for <turneo-widget>; the widget reads ?turneoExperience=<id>_<slug> from this frame's URL. -->
+    <turneo-widget store="capella-poc"></turneo-widget>
+    <script src="https://widget-turneo.vercel.app/turneo-widget.iife.js"></script>
+  </body>
+</html>

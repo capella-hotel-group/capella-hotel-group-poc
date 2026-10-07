@@ -15,6 +15,13 @@ export function buildWidgetExperienceParam(id: string, name: string): string {
   return `${id}_${name.replace(/ /g, '-')}`;
 }
 
+/** URL of the standalone page hosting `<turneo-widget>`, deep-linked to one experience (for iframes). */
+export function buildWidgetFrameUrl(id: string, name: string): string {
+  const url = new URL(`${window.hlx?.codeBasePath ?? ''}/tools/turneo/widget-frame.html`, window.location.origin);
+  url.searchParams.set('turneoExperience', buildWidgetExperienceParam(id, name));
+  return url.toString();
+}
+
 /** Mounts the `<turneo-widget>` custom element (and its script, once) inside `container`. */
 export function mountWidgetDetail(container: HTMLElement): void {
   if (!document.querySelector(`script[src="${WIDGET_SCRIPT_URL}"]`)) {
